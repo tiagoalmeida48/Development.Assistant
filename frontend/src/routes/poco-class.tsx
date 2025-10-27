@@ -129,7 +129,7 @@ function PocoClassPage() {
         </p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <div className="grid gap-6 lg:grid-cols-[1fr_2fr_1fr]">
         <div className="space-y-6">
           <Card>
             <CardHeader>
@@ -311,7 +311,7 @@ function PocoClassPage() {
         {/* Coluna 2: Lista de Tabelas */}
         <div>
           {availableTables.length > 0 && (
-            <Card className="sticky top-8">
+            <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Database className="h-5 w-5" />
@@ -351,16 +351,18 @@ function PocoClassPage() {
                   </Button>
                 </div>
 
-                <div className="bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-gray-200 rounded-lg p-4 max-h-[600px] overflow-y-auto">
-                  <div className="grid grid-cols-1 gap-2">
+                <div className="bg-gradient-to-br from-gray-50 to-gray-100 border-2 border-gray-200 rounded-lg p-4">
+                  <div className="grid grid-cols-2 gap-2">
                     {availableTables.map((table, idx) => (
-                      <div
+                      <button
+                        type="button"
                         key={idx}
                         className={`
-                          flex items-center gap-2.5 px-3 py-2.5 rounded-md border-2 transition-all duration-200 cursor-pointer
+                          flex items-center gap-2 px-3 py-2.5 rounded-lg border-2 transition-all duration-150 cursor-pointer
+                          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
                           ${checkedTables.has(table)
-                            ? 'bg-blue-50 border-blue-500 shadow-md scale-[1.02]'
-                            : 'bg-white border-gray-300 hover:border-blue-400 hover:shadow-sm hover:scale-[1.01]'
+                            ? 'bg-gradient-to-br from-blue-500 to-blue-600 border-blue-600 text-white shadow-lg transform scale-[1.02]'
+                            : 'bg-white border-gray-300 hover:border-blue-400 hover:bg-blue-50 hover:shadow-md active:scale-[0.98]'
                           }
                         `}
                         onClick={() => handleTableToggle(table)}
@@ -368,20 +370,20 @@ function PocoClassPage() {
                         <Checkbox
                           id={`table-${idx}`}
                           checked={checkedTables.has(table)}
-                          onCheckedChange={() => handleTableToggle(table)}
-                          className="flex-shrink-0"
+                          className={`flex-shrink-0 pointer-events-none ${checkedTables.has(table) ? 'border-white' : ''}`}
                         />
-                        <label
-                          htmlFor={`table-${idx}`}
-                          className="flex-1 font-mono text-sm font-medium cursor-pointer select-none truncate"
+                        <span
+                          className={`flex-1 font-mono text-sm font-medium select-none text-left truncate ${
+                            checkedTables.has(table) ? 'text-white' : 'text-gray-700'
+                          }`}
                           title={table}
                         >
                           {table}
-                        </label>
+                        </span>
                         {checkedTables.has(table) && (
-                          <CheckCircle2 className="h-4 w-4 text-blue-600 flex-shrink-0 animate-in zoom-in duration-200" />
+                          <CheckCircle2 className="h-4 w-4 flex-shrink-0 animate-in zoom-in duration-200" />
                         )}
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </div>

@@ -10,7 +10,8 @@
       "WebFetch(domain:tanstack.com)",
       "Bash(dotnet build:*)",
       "Bash(yarn add:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "ask": []
