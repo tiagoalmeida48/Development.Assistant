@@ -1,0 +1,70 @@
+{{~ # Template para gerar Services App ~}}
+using {{ project_name }}.App.Dto{{ namespace }};
+using {{ project_name }}.App.Interfaces{{ namespace }};
+using {{ project_name }}.Domain.Interfaces.Services{{ namespace }};
+using {{ project_name }}.Domain.Models{{ namespace }};
+using System.Collections.Generic;
+using System.Linq;
+
+namespace {{ project_name }}.App.Services{{ namespace }}
+{
+    public class {{ table_name }}AppService : I{{ table_name }}AppService
+    {
+        readonly I{{ table_name }}Service _{{ table_name }}Service;
+
+        public {{ table_name }}AppService(I{{ table_name }}Service {{ table_prop }}Service)
+        {
+            _{{ table_name }}Service = {{ table_prop }}Service;
+        }
+
+        public IEnumerable<{{ table_name }}DisplayDto> All(int language, int ordination, bool desc, long quantityRegister)
+        {
+            var result = _{{ table_name }}Service.All(language, ordination, desc, quantityRegister);
+            return result.Select(x => new {{ table_name }}DisplayDto
+            {
+                // TODO: Map properties
+            });
+        }
+
+        public IEnumerable<{{ table_name }}TextDto> AllLanguage({{ columns_key }})
+        {
+            var result = _{{ table_name }}Service.AllLanguage({{ columns_key_names }});
+            return result.Select(x => new {{ table_name }}TextDto
+            {
+                // TODO: Map properties
+            });
+        }
+
+        public {{ table_name }}DisplayDto Get({{ columns_key }}, int language)
+        {
+            var result = _{{ table_name }}Service.Get({{ columns_key_names }}, language);
+            return new {{ table_name }}DisplayDto
+            {
+                // TODO: Map properties
+            };
+        }
+
+        public bool Create({{ table_name }}CreateDto {{ table_prop }}Dto)
+        {
+            var model = new {{ table_name }}Mod
+            {
+                // TODO: Map properties
+            };
+            return _{{ table_name }}Service.Create(model);
+        }
+
+        public bool Update({{ table_name }}UpdateDto {{ table_prop }}Dto)
+        {
+            var model = new {{ table_name }}Mod
+            {
+                // TODO: Map properties
+            };
+            return _{{ table_name }}Service.Update(model);
+        }
+
+        public bool Delete({{ columns_key }})
+        {
+            return _{{ table_name }}Service.Delete({{ columns_key_names }});
+        }
+    }
+}

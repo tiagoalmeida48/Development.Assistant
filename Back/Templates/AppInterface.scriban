@@ -1,0 +1,16 @@
+{{~ # Template para gerar Interfaces App ~}}
+using {{ project_name }}.App.Dto{{ namespace }};
+using System.Collections.Generic;
+
+namespace {{ project_name }}.App.Interfaces{{ namespace }}
+{
+    public interface I{{ table_name }}AppService
+    {
+        IEnumerable<{{ table_name }}DisplayDto> All(int language, int ordination, bool desc, long quantityRegister);
+        IEnumerable<{{ table_name }}TextDto> AllLanguage({{ columns_key }});
+        {{ table_name }}DisplayDto Get({{ columns_key }}, int language);
+        bool Create({{ table_name }}CreateDto {{ table_prop }}Dto);
+        bool Update({{ table_name }}UpdateDto {{ table_prop }}Dto);
+        bool Delete({{ columns_key }});
+    }
+}

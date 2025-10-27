@@ -1,0 +1,51 @@
+{{~ # Template para gerar Domain Service ~}}
+using {{ project_name }}.Domain.Interfaces.Repository{{ namespace }};
+using {{ project_name }}.Domain.Interfaces.Services{{ namespace }};
+using {{ project_name }}.Domain.Models{{ namespace }};
+using System.Collections.Generic;
+
+namespace {{ project_name }}.Domain.Services{{ namespace }}
+{
+    public class {{ table_name }}Service : I{{ table_name }}Service
+    {
+        readonly I{{ table_name }}Repository _{{ table_name }}Repository;
+
+        public {{ table_name }}Service(I{{ table_name }}Repository {{ table_prop }}Repository)
+        {
+            _{{ table_name }}Repository = {{ table_prop }}Repository;
+        }
+
+        public IEnumerable<{{ table_name }}Mod> All(int language, int ordination, bool desc, long quantityRegister)
+        {
+            return _{{ table_name }}Repository.All(language, ordination, desc, quantityRegister);
+        }
+
+        public IEnumerable<{{ table_name }}Mod> AllLanguage({{ columns_key }})
+        {
+            return _{{ table_name }}Repository.AllLanguage({{ columns_key_names }});
+        }
+
+        public {{ table_name }}Mod Get({{ columns_key }}, int language)
+        {
+            return _{{ table_name }}Repository.Get({{ columns_key_names }}, language);
+        }
+
+        public bool Create({{ table_name }}Mod model)
+        {
+            // TODO: Add business logic/validations here
+            return _{{ table_name }}Repository.Create(model);
+        }
+
+        public bool Update({{ table_name }}Mod model)
+        {
+            // TODO: Add business logic/validations here
+            return _{{ table_name }}Repository.Update(model);
+        }
+
+        public bool Delete({{ columns_key }})
+        {
+            // TODO: Add business logic/validations here
+            return _{{ table_name }}Repository.Delete({{ columns_key_names }});
+        }
+    }
+}

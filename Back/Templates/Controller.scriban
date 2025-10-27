@@ -1,0 +1,92 @@
+{{~ # Template para gerar Controllers ~}}
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Collections.Generic;
+using {{ project_name }}.Api.Segurity;
+using {{ project_name }}.App.Dto{{ namespace }};
+using {{ project_name }}.App.Interfaces{{ namespace }};
+using {{ project_name }}.CrossCutting.Utils;
+
+namespace {{ project_name }}.Api.Controllers{{ namespace }}
+{
+    public class {{ table_name }}Controller : ControllerBase
+    {
+        readonly I{{ table_name }}AppService _{{ table_name }}AppService;
+
+        public {{ table_name }}Controller(I{{ table_name }}AppService {{ table_prop }}AppService)
+        {
+            _{{ table_name }}AppService = {{ table_prop }}AppService;
+        }
+
+        [HttpGet]
+        [Autorization(TypeAccess.)]
+        public ResultApi<IEnumerable<{{ table_name }}DisplayDto>> All(int ordination, bool desc, long quantityRegister)
+        {
+            var res = new ResultApi<IEnumerable<{{ table_name }}DisplayDto>>
+            {
+                Result = _{{ table_name }}AppService.All(UserLogged.language, ordination, desc, quantityRegister)
+            };
+            return res;
+        }
+
+        [HttpGet]
+        [Autorization(TypeAccess.)]
+        public ResultApi<IEnumerable<{{ table_name }}TextDto>> AllLanguage({{ columns_key }})
+        {
+            var res = new ResultApi<IEnumerable<{{ table_name }}TextDto>>
+            {
+                Result = _{{ table_name }}AppService.AllLanguage({{ columns_key_names }})
+            };
+            return res;
+        }
+
+        [HttpGet]
+        [Autorization(TypeAccess.)]
+        public ResultApi<{{ table_name }}DisplayDto> Get({{ columns_key }})
+        {
+            var res = new ResultApi<{{ table_name }}DisplayDto>
+            {
+                Result = _{{ table_name }}AppService.Get({{ columns_key_names }}, UserLogged.language)
+            };
+            return res;
+        }
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="{{ table_prop }}Dto">Required fields: {{ columns_key_names }}</param>
+        /// <returns></returns>
+        [HttpPost]
+        [Autorization(TypeAccess.)]
+        public ResultApi<bool> Create([FromBody] {{ table_name }}CreateDto {{ table_prop }}Dto)
+        {
+            var res = new ResultApi<bool>
+            {
+                Result = _{{ table_name }}AppService.Create({{ table_prop }}Dto)
+            };
+            return res;
+        }
+
+        [HttpPut]
+        [Autorization(TypeAccess.)]
+        public ResultApi<bool> Update([FromBody] {{ table_name }}UpdateDto {{ table_prop }}Dto)
+        {
+            var res = new ResultApi<bool>
+            {
+                Result = _{{ table_name }}AppService.Update({{ table_prop }}Dto)
+            };
+            return res;
+        }
+
+        [HttpDelete]
+        [Autorization(TypeAccess.)]
+        public ResultApi<bool> Delete({{ columns_key }})
+        {
+            var res = new ResultApi<bool>
+            {
+                Result = _{{ table_name }}AppService.Delete({{ columns_key_names }})
+            };
+            return res;
+        }
+    }
+}

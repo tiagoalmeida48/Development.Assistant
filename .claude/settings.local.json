@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet add package:*)",
+      "WebSearch",
+      "Bash(yarn build)",
+      "Bash(yarn install:*)",
+      "Bash(yarn dev)",
+      "Bash(yarn list:*)",
+      "WebFetch(domain:tanstack.com)",
+      "Bash(dotnet build:*)",
+      "Bash(yarn add:*)",
+      "Bash(cat:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
