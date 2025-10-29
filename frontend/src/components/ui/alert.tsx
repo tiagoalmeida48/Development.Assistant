@@ -1,37 +1,30 @@
 import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "@/utils"
 
-import { cn } from "@/lib/utils"
+export interface AlertProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: 'default' | 'destructive' | 'success'
+}
 
-const alertVariants = cva(
-  "relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
-  {
-    variants: {
-      variant: {
-        default: "bg-background text-foreground",
-        destructive:
-          "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
-        success:
-          "border-green-500/50 text-green-700 dark:border-green-500 [&>svg]:text-green-700 bg-green-50",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-    },
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(
+  ({ className, variant = 'default', ...props }, ref) => {
+    const baseClasses = "relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground"
+
+    const variantClasses = {
+      default: "bg-background text-foreground",
+      destructive: "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
+      success: "border-green-500/50 text-green-700 dark:border-green-500 [&>svg]:text-green-700 bg-green-50",
+    }
+
+    return (
+      <div
+        ref={ref}
+        role="alert"
+        className={cn(baseClasses, variantClasses[variant], className)}
+        {...props}
+      />
+    )
   }
 )
-
-const Alert = React.forwardRef<
-  HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
->(({ className, variant, ...props }, ref) => (
-  <div
-    ref={ref}
-    role="alert"
-    className={cn(alertVariants({ variant }), className)}
-    {...props}
-  />
-))
 Alert.displayName = "Alert"
 
 const AlertTitle = React.forwardRef<

@@ -1,11 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
-import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 import path from 'path'
 
 export default defineConfig({
   plugins: [
-    TanStackRouterVite(),
     react()
   ],
   resolve: {
@@ -14,10 +12,17 @@ export default defineConfig({
     },
   },
   server: {
+    watch: {
+      usePolling: true,
+    },
     port: 3000,
     proxy: {
-      '/graphql': {
-        target: 'http://localhost:5000',
+      '/api': {
+        target: 'https://localhost:44304',
+        changeOrigin: true,
+      },
+      '/swagger': {
+        target: 'https://localhost:44304',
         changeOrigin: true,
       },
     },

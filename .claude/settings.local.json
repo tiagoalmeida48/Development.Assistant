@@ -11,7 +11,10 @@
       "Bash(dotnet build:*)",
       "Bash(yarn add:*)",
       "Bash(cat:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(wc:*)",
+      "Bash(rm:*)",
+      "Read(//usr/**)"
     ],
     "deny": [],
     "ask": []
