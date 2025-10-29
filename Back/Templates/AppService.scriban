@@ -1,70 +1,49 @@
 {{~ # Template para gerar Services App ~}}
 using {{ project_name }}.App.Dto{{ namespace }};
 using {{ project_name }}.App.Interfaces{{ namespace }};
+using BaseProject.CrossCutting.Extensions;
+using BaseProject.CrossCutting.Utils;
 using {{ project_name }}.Domain.Interfaces.Services{{ namespace }};
 using {{ project_name }}.Domain.Models{{ namespace }};
 using System.Collections.Generic;
 using System.Linq;
 
-namespace {{ project_name }}.App.Services{{ namespace }}
+namespace {{ project_name }}.App.Services{{ namespace }};
+
+public class {{ table_name }}AppService(I{{ table_name }}Service {{ table_prop }}Service) : ServiceAppBase, I{{ table_name }}AppService
 {
-    public class {{ table_name }}AppService : I{{ table_name }}AppService
+    public {{ table_name }}DisplayDto Get({{ columns_key }}, string language)
     {
-        readonly I{{ table_name }}Service _{{ table_name }}Service;
+        return {{ table_prop }}Service.Get({{ columns_key_names }}, language).MapTo<{{ table_name }}DisplayDto>();
+    }
 
-        public {{ table_name }}AppService(I{{ table_name }}Service {{ table_prop }}Service)
-        {
-            _{{ table_name }}Service = {{ table_prop }}Service;
-        }
+    public IEnumerable<{{ table_name }}DisplayDto> All(string ordinations, long quantityRegister, string language)
+    {
+        var newOrdinations = ordinations.Deserialize<OrdinationParam>();
+        return {{ table_prop }}Service.All(newOrdinations, quantityRegister, language);
+    }
+    {{~ if exist_text ~}}
+    
+    public IEnumerable<{{ table_name }}TextDto> AllLanguage({{ columns_key }})
+    {
+        return {{ table_prop }}Service.AllLanguage({{ columns_key_names }}).MapTo<IEnumerable<{{ table_name }}TextDto>>();   
+    }
+    {{~ end ~}}
 
-        public IEnumerable<{{ table_name }}DisplayDto> All(int language, int ordination, bool desc, long quantityRegister)
-        {
-            var result = _{{ table_name }}Service.All(language, ordination, desc, quantityRegister);
-            return result.Select(x => new {{ table_name }}DisplayDto
-            {
-                // TODO: Map properties
-            });
-        }
+    public bool Create({{ table_name }}CreateDto {{ table_prop }}Dto)
+    {
+        var model = {{ table_prop }}Dto.MapTo<{{ table_name }}Mod>();
+        return {{ table_prop }}Service.Create(model);
+    }
 
-        public IEnumerable<{{ table_name }}TextDto> AllLanguage({{ columns_key }})
-        {
-            var result = _{{ table_name }}Service.AllLanguage({{ columns_key_names }});
-            return result.Select(x => new {{ table_name }}TextDto
-            {
-                // TODO: Map properties
-            });
-        }
+    public bool Update({{ table_name }}UpdateDto {{ table_prop }}Dto)
+    {
+        var model = {{ table_prop }}Dto.MapTo<{{ table_name }}Mod>();
+        return {{ table_prop }}Service.Update(model);
+    }
 
-        public {{ table_name }}DisplayDto Get({{ columns_key }}, int language)
-        {
-            var result = _{{ table_name }}Service.Get({{ columns_key_names }}, language);
-            return new {{ table_name }}DisplayDto
-            {
-                // TODO: Map properties
-            };
-        }
-
-        public bool Create({{ table_name }}CreateDto {{ table_prop }}Dto)
-        {
-            var model = new {{ table_name }}Mod
-            {
-                // TODO: Map properties
-            };
-            return _{{ table_name }}Service.Create(model);
-        }
-
-        public bool Update({{ table_name }}UpdateDto {{ table_prop }}Dto)
-        {
-            var model = new {{ table_name }}Mod
-            {
-                // TODO: Map properties
-            };
-            return _{{ table_name }}Service.Update(model);
-        }
-
-        public bool Delete({{ columns_key }})
-        {
-            return _{{ table_name }}Service.Delete({{ columns_key_names }});
-        }
+    public bool Delete({{ columns_key }}, string language)
+    {
+        return {{ table_prop }}Service.Delete({{ columns_key_names }}, language);
     }
 }

@@ -2,91 +2,86 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Collections.Generic;
-using {{ project_name }}.Api.Segurity;
+using {{ project_name }}.Api.Security;
 using {{ project_name }}.App.Dto{{ namespace }};
 using {{ project_name }}.App.Interfaces{{ namespace }};
 using {{ project_name }}.CrossCutting.Utils;
 
-namespace {{ project_name }}.Api.Controllers{{ namespace }}
+namespace {{ project_name }}.Api.Controllers{{ namespace }};
+
+[AttributeBundler(Bundler.System)]
+public class {{ table_name }}Controller(I{{ table_name }}AppService {{ table_prop }}AppService) : ControllerBase
 {
-    public class {{ table_name }}Controller : ControllerBase
+    [HttpGet]
+    [Authorization(TypeAccess., Constants.ReadOnly)]
+    public ResultApi<{{ table_name }}DisplayDto> Get({{ columns_key }})
     {
-        readonly I{{ table_name }}AppService _{{ table_name }}AppService;
-
-        public {{ table_name }}Controller(I{{ table_name }}AppService {{ table_prop }}AppService)
+        var res = new ResultApi<{{ table_name }}DisplayDto>
         {
-            _{{ table_name }}AppService = {{ table_prop }}AppService;
-        }
+            Result = _{{ table_name }}AppService.Get({{ columns_key_names }}, UserLogged.language)
+        };
+        return res;
+    }
 
-        [HttpGet]
-        [Autorization(TypeAccess.)]
-        public ResultApi<IEnumerable<{{ table_name }}DisplayDto>> All(int ordination, bool desc, long quantityRegister)
+    [HttpGet]
+    [Authorization(TypeAccess., Constants.ReadOnly)]
+    public ResultApi<IEnumerable<{{ table_name }}DisplayDto>> All([FromHeader] string ordinations, long quantityRegister)
+    {
+        var res = new ResultApi<IEnumerable<{{ table_name }}DisplayDto>>
         {
-            var res = new ResultApi<IEnumerable<{{ table_name }}DisplayDto>>
-            {
-                Result = _{{ table_name }}AppService.All(UserLogged.language, ordination, desc, quantityRegister)
-            };
-            return res;
-        }
+            Result = _{{ table_name }}AppService.All(ordinations, quantityRegister, UserLogged.language)
+        };
+        return res;
+    }
+    {{~ if exist_text ~}}
 
-        [HttpGet]
-        [Autorization(TypeAccess.)]
-        public ResultApi<IEnumerable<{{ table_name }}TextDto>> AllLanguage({{ columns_key }})
+    [HttpGet]
+    [Authorization(TypeAccess., Constants.ReadOnly)]
+    public ResultApi<IEnumerable<{{ table_name }}TextDto>> AllLanguage({{ columns_key }})
+    {
+        var res = new ResultApi<IEnumerable<{{ table_name }}TextDto>>
         {
-            var res = new ResultApi<IEnumerable<{{ table_name }}TextDto>>
-            {
-                Result = _{{ table_name }}AppService.AllLanguage({{ columns_key_names }})
-            };
-            return res;
-        }
+            Result = _{{ table_name }}AppService.AllLanguage({{ columns_key_names }})
+        };
+        return res;
+    }
+    {{~ end ~}}
 
-        [HttpGet]
-        [Autorization(TypeAccess.)]
-        public ResultApi<{{ table_name }}DisplayDto> Get({{ columns_key }})
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="{{ table_prop }}Dto">Required fields: {{ columns_key_names }}</param>
+    /// <returns></returns>
+    [HttpPost]
+    [Authorization(TypeAccess.)]
+    public ResultApi<bool> Create([FromBody] {{ table_name }}CreateDto {{ table_prop }}Dto)
+    {
+        var res = new ResultApi<bool>
         {
-            var res = new ResultApi<{{ table_name }}DisplayDto>
-            {
-                Result = _{{ table_name }}AppService.Get({{ columns_key_names }}, UserLogged.language)
-            };
-            return res;
-        }
+            Result = _{{ table_name }}AppService.Create({{ table_prop }}Dto)
+        };
+        return res;
+    }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="{{ table_prop }}Dto">Required fields: {{ columns_key_names }}</param>
-        /// <returns></returns>
-        [HttpPost]
-        [Autorization(TypeAccess.)]
-        public ResultApi<bool> Create([FromBody] {{ table_name }}CreateDto {{ table_prop }}Dto)
+    [HttpPut]
+    [Authorization(TypeAccess.)]
+    public ResultApi<bool> Update([FromBody] {{ table_name }}UpdateDto {{ table_prop }}Dto)
+    {
+        var res = new ResultApi<bool>
         {
-            var res = new ResultApi<bool>
-            {
-                Result = _{{ table_name }}AppService.Create({{ table_prop }}Dto)
-            };
-            return res;
-        }
+            Result = _{{ table_name }}AppService.Update({{ table_prop }}Dto)
+        };
+        return res;
+    }
 
-        [HttpPut]
-        [Autorization(TypeAccess.)]
-        public ResultApi<bool> Update([FromBody] {{ table_name }}UpdateDto {{ table_prop }}Dto)
+    [HttpDelete]
+    [Authorization(TypeAccess.)]
+    public ResultApi<bool> Delete({{ columns_key }})
+    {
+        var res = new ResultApi<bool>
         {
-            var res = new ResultApi<bool>
-            {
-                Result = _{{ table_name }}AppService.Update({{ table_prop }}Dto)
-            };
-            return res;
-        }
-
-        [HttpDelete]
-        [Autorization(TypeAccess.)]
-        public ResultApi<bool> Delete({{ columns_key }})
-        {
-            var res = new ResultApi<bool>
-            {
-                Result = _{{ table_name }}AppService.Delete({{ columns_key_names }})
-            };
-            return res;
-        }
+            Result = _{{ table_name }}AppService.Delete({{ columns_key_names }})
+        };
+        return res;
     }
 }

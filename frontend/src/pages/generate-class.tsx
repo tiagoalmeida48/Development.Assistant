@@ -8,7 +8,7 @@ import { CheckCircle2, Settings, Loader2, Database, FolderOpen, CheckSquare, Squ
 
 export default function GenerateClassPage() {
   const [connectionString, setConnectionString] = useState('')
-  const [dbType, setDbType] = useState('MySQL')
+  const [dbType, setDbType] = useState('0')
   const [pathGeral, setPathGeral] = useState('')
   const [projectName, setProjectName] = useState('')
   const [nameSpace, setNameSpace] = useState('')
@@ -47,7 +47,7 @@ export default function GenerateClassPage() {
       return
     }
 
-    await executeFetchTables(() => api.codeGenerator.getAllTables(connectionString, dbType))
+    await executeFetchTables(() => api.codeGenerator.getAllTables(connectionString, parseInt(dbType)))
     setCheckedTables(new Set())
   }
 
@@ -69,7 +69,7 @@ export default function GenerateClassPage() {
     await executeGenerate(async () => {
       await api.codeGenerator.createClass({
         connectionString,
-        dbType,
+        dbType: parseInt(dbType),
         tables,
         pathGeral,
         projectName,

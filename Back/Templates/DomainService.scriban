@@ -4,48 +4,60 @@ using {{ project_name }}.Domain.Interfaces.Services{{ namespace }};
 using {{ project_name }}.Domain.Models{{ namespace }};
 using System.Collections.Generic;
 
-namespace {{ project_name }}.Domain.Services{{ namespace }}
+namespace {{ project_name }}.Domain.Services{{ namespace }};
+
+public class {{ table_name }}Service(I{{ table_name }}Repository {{ table_prop }}Rep
+                                     I{{ table_name }}TextRepository {{ table_prop }}TextRep) : BaseService<{{ table_name }}Mod>({{ table_prop }}Rep), I{{ table_name }}Service
 {
-    public class {{ table_name }}Service : I{{ table_name }}Service
+    public bool Exist({{ columns_key }})
     {
-        readonly I{{ table_name }}Repository _{{ table_name }}Repository;
+        return {{ table_prop }}Rep.Exist(new {{ table_name }}Mod { {{ columns_key_names }} });
+    }
 
-        public {{ table_name }}Service(I{{ table_name }}Repository {{ table_prop }}Repository)
-        {
-            _{{ table_name }}Repository = {{ table_prop }}Repository;
-        }
+    public {{ table_name }}Mod Get({{ columns_key }}, string language)
+    {
+        if ({{ columns_key_names }})
+            throw new BusinessError(GeneralErrorNumber.REQUIRED_FIELD, FieldName.);
 
-        public IEnumerable<{{ table_name }}Mod> All(int language, int ordination, bool desc, long quantityRegister)
-        {
-            return _{{ table_name }}Repository.All(language, ordination, desc, quantityRegister);
-        }
+        var result = {{ table_prop }}Rep.Search({{ columns_key_names }}).FirstOrDefault();
+        if (result == null)
+            throw new BusinessError(GeneralErrorNumber.REGISTER_NOT_FOUND, FieldName.);
 
-        public IEnumerable<{{ table_name }}Mod> AllLanguage({{ columns_key }})
-        {
-            return _{{ table_name }}Repository.AllLanguage({{ columns_key_names }});
-        }
+        result.{{ table_name }}Idiom = {{ table_prop }}TextRep.Search({{ columns_key_names }}, language: language);
+        return result;
+    }
 
-        public {{ table_name }}Mod Get({{ columns_key }}, int language)
-        {
-            return _{{ table_name }}Repository.Get({{ columns_key_names }}, language);
-        }
+    public IEnumerable<{{ table_name }}Mod> All(OrdinationParam ordinations, long quantityRegister, string language)
+    {
+        var records = {{ table_prop }}Rep.Search(language: language, ordinations: ordinations, quantityRegister: quantityRegister);
+        if (records.IsEmpty()) return [];
 
-        public bool Create({{ table_name }}Mod model)
-        {
-            // TODO: Add business logic/validations here
-            return _{{ table_name }}Repository.Create(model);
-        }
+        foreach (var record in records)
+            record.{{ table_name }}Idiom = {{ table_prop }}TextRep.Search(record.{{ table_name }}, language: language);
 
-        public bool Update({{ table_name }}Mod model)
-        {
-            // TODO: Add business logic/validations here
-            return _{{ table_name }}Repository.Update(model);
-        }
+        return records;
+    }
 
-        public bool Delete({{ columns_key }})
-        {
-            // TODO: Add business logic/validations here
-            return _{{ table_name }}Repository.Delete({{ columns_key_names }});
-        }
+    public IEnumerable<{{ table_name }}Mod> AllLanguage({{ columns_key }})
+    {
+        return {{ table_prop }}TextRep.AllLanguage({{ columns_key_names }});
+    }
+
+    public bool Create({{ table_name }}Mod model)
+    {
+        // TODO: Add business logic/validations here
+        return {{ table_prop }}Rep.Create(model);
+    }
+
+    public bool Update({{ table_name }}Mod model)
+    {
+        // TODO: Add business logic/validations here
+        return {{ table_prop }}Rep.Update(model);
+    }
+
+    public bool Delete({{ columns_key }})
+    {
+        // TODO: Add business logic/validations here
+        return {{ table_prop }}Rep.Delete({{ columns_key_names }});
     }
 }

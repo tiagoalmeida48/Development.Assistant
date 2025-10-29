@@ -1,3 +1,4 @@
+using Development.Assistant;
 using Development.Assistant.Back.Domain.Services;
 using Development.Assistant.Back.Services;
 using Microsoft.Extensions.FileProviders;
@@ -8,6 +9,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Configurar WebRoot explicitamente
 builder.Environment.WebRootPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
+
+var dirPath = AppDomain.CurrentDomain.BaseDirectory;
+var finalPath = Path.Combine(dirPath, "Development.Assistant.dll");
+
+TypeMapper.Initialize(finalPath, ["Development.Assistant.Back.Models"], []);
 
 builder.Services.AddScoped<CopyProjectService>();
 builder.Services.AddScoped<CompareDatabaseService>();

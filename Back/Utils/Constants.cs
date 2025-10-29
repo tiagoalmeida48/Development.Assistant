@@ -94,7 +94,7 @@ public class Constants
         return paths[typeClass];
     }
     
-    public static ScriptObject CreateBaseModel(string tableNameOriginal, string tableName, string tableProp, string projectName, string nameSpace, string columnsKey, IEnumerable<ColumnInfo> columns)
+    public static ScriptObject CreateBaseModel(string tableNameOriginal, string tableName, string tableProp, string projectName, string nameSpace, string columnsKey, IEnumerable<ColumnInfo> columns, bool existText = false)
     {
         return new ScriptObject
         {
@@ -105,7 +105,8 @@ public class Constants
             { "namespace", nameSpace },
             { "columns_key", columnsKey },
             { "columns_key_names", columnsKey.RemoveColumnTypes() },
-            { "columns", columns }
+            { "columns", columns },
+            { "exist_text", existText }
         };
     }
 }

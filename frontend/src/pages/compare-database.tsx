@@ -9,7 +9,7 @@ import { CheckCircle2, Database, Loader2, ArrowRight, ArrowLeft } from 'lucide-r
 export default function CompareDatabasePage() {
   const [connectionString1, setConnectionString1] = useState('')
   const [connectionString2, setConnectionString2] = useState('')
-  const [dbType, setDbType] = useState('MySQL')
+  const [dbType, setDbType] = useState('0')
 
   const { loading, data: result, execute } = useAsyncAction<DatabaseClass>()
 
@@ -18,7 +18,7 @@ export default function CompareDatabasePage() {
       return
     }
 
-    await execute(() => api.database.compareDatabases(connectionString1, connectionString2, dbType))
+    await execute(() => api.database.compareDatabases(connectionString1, connectionString2, parseInt(dbType)))
   }
 
   return (

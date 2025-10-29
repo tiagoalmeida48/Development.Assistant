@@ -2,15 +2,15 @@
 using {{ project_name }}.Domain.Models{{ namespace }};
 using System.Collections.Generic;
 
-namespace {{ project_name }}.Domain.Interfaces.Services{{ namespace }}
+namespace {{ project_name }}.Domain.Interfaces.Services{{ namespace }};
+
+public interface I{{ table_name }}Service : IBaseService<{{ table_name }}Mod>
 {
-    public interface I{{ table_name }}Service
-    {
-        IEnumerable<{{ table_name }}Mod> All(int language, int ordination, bool desc, long quantityRegister);
-        IEnumerable<{{ table_name }}Mod> AllLanguage({{ columns_key }});
-        {{ table_name }}Mod Get({{ columns_key }}, int language);
-        bool Create({{ table_name }}Mod model);
-        bool Update({{ table_name }}Mod model);
-        bool Delete({{ columns_key }});
-    }
+    bool Exist({{ columns_key }});
+    {{ table_name }}Mod Get({{ columns_key }}, string language);
+    IEnumerable<{{ table_name }}Mod> All(OrdinationParam ordinations, long quantityRegister, string language);
+    {{~ if exist_text ~}}
+    IEnumerable<{{ table_name }}Mod> AllLanguage({{ columns_key }});
+    {{~ end ~}}
+    bool Delete({{ columns_key }}, string language);
 }

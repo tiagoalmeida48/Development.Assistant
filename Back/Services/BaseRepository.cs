@@ -19,11 +19,11 @@ public class BaseRepository
                                        SELECT 
                                            COLUMN_NAME AS name,
                                            DATA_TYPE AS type,
-                                           IS_NULLABLE AS is_nullable,
-                                           COLUMN_KEY AS is_primary_key,
-                                           EXTRA AS is_identity 
+                                           CASE WHEN IS_NULLABLE = 'YES' THEN 1 ELSE 0 END AS IS_NULLABLE,
+                                           CASE WHEN COLUMN_KEY = 'PRI' THEN 1 ELSE 0 END AS is_primary_key,
+                                           CASE WHEN EXTRA IS NOT NULL THEN 1 ELSE 0 END AS is_identity 
                                        FROM INFORMATION_SCHEMA.COLUMNS 
-                                       WHERE TABLE_NAME = '{tableName}' AND TABLE_SCHEMA = DATABASE()
+                                       WHERE TABLE_NAME = '{tableName}' AND TABLE_SCHEMA = DATABASE() AND COLUMN_NAME NOT IN ('CREATED', 'UPDATED')
                                        GROUP BY COLUMN_NAME, DATA_TYPE, DATA_TYPE, COLUMN_KEY, EXTRA
                                        ORDER BY ORDINAL_POSITION
                                        """,
@@ -32,12 +32,12 @@ public class BaseRepository
             Constants.DbType.PostgreSql => $"""
                                             SELECT cols.column_name AS Name, 
                                                    cols.data_type AS Type, 
-                                                   cols.is_nullable AS Null, 
-                                                   CASE WHEN kcu.column_name IS NOT NULL THEN 'YES' ELSE 'NO' END AS KEY
+                                                   cols.is_nullable, 
+                                                   CASE WHEN kcu.column_name IS NOT NULL THEN 'YES' ELSE 'NO' END AS is_primary_key
                                                FROM information_schema.columns AS cols
                                                LEFT JOIN information_schema.key_column_usage AS kcu ON cols.table_name = kcu.table_name AND cols.column_name = kcu.column_name AND cols.table_schema = kcu.table_schema
                                                LEFT JOIN information_schema.table_constraints AS tc ON kcu.constraint_name = tc.constraint_name AND kcu.table_schema = tc.table_schema AND tc.constraint_type = 'PRIMARY KEY'
-                                               WHERE cols.table_name = '{tableName}' AND cols.table_schema = '{schema}'
+                                               WHERE cols.table_name = '{tableName}' AND cols.table_schema = '{schema}' AND COLUMN_NAME NOT IN ('CREATED', 'UPDATED')
                                             """,
             _ => throw new ArgumentException($"DbType não suportado: {dbType}")
         };

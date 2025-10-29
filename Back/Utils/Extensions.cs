@@ -14,8 +14,7 @@ public static class Extensions
 
     public static string ConvertToCamelCase(this string value)
     {
-        var newValue = value.ConvertToPascalCase();
-        return char.ToLowerInvariant(newValue[0]) + newValue[1..];
+        return char.ToLowerInvariant(value[0]) + value[1..];
     }
 
     public static string RemoveColumnTypes(this string value)

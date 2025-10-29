@@ -19,12 +19,7 @@ public class CodeGeneratorController(ScribanCodeGeneratorService scribanCodeGene
     [HttpPost("all-tables")]
     public async Task<ActionResult<List<string>>> AllTables([FromBody] GetTablesRequest request)
     {
-        if (!Enum.TryParse<Constants.DbType>(request.DbType, out var dbType))
-        {
-            return BadRequest($"Tipo de banco inválido: {request.DbType}");
-        }
-
-        var tables = await Task.Run(() => scribanCodeGeneratorService.AllTables(request.ConnectionString, dbType));
+        var tables = await Task.Run(() => scribanCodeGeneratorService.AllTables(request.ConnectionString, request.DbType));
         return Ok(tables.ToList());
     }
 

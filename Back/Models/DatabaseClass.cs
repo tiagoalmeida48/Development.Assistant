@@ -1,4 +1,7 @@
-﻿namespace Development.Assistant.Back.Models;
+﻿using Development.Assistant.Back.Utils;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Development.Assistant.Back.Models;
 
 public class DatabaseClass
 {
@@ -20,8 +23,14 @@ public class ColumnInfo
 {
     public string Name { get; set; }
     public string Type { get; set; }
+    
+    [Column("is_primary_key")]
     public bool IsPrimaryKey { get; set; }
+    
+    [Column("is_identity")]
     public bool IsIdentity { get; set; }
+    
+    [Column("is_nullable")]
     public bool IsNullable { get; set; }
 }
 
@@ -43,5 +52,5 @@ public class CompareDatabasesRequest
 public class GetTablesRequest
 {
     public string ConnectionString { get; set; }
-    public string DbType { get; set; }
+    public Constants.DbType DbType { get; set; }
 }

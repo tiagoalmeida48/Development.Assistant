@@ -22,7 +22,7 @@ export interface DatabaseClass {
 
 export interface InfoClass {
   connectionString: string
-  dbType: string
+  dbType: number
   tables: string[]
   pathGeral: string
   projectName: string
@@ -62,7 +62,7 @@ async function apiCall<T>(
 
 export const api = {
   database: {
-    compareDatabases: (connectionString1: string, connectionString2: string, dbType: string) =>
+    compareDatabases: (connectionString1: string, connectionString2: string, dbType: number) =>
       apiCall<DatabaseClass>('/database/compare-databases', 'POST', undefined, {
         connectionString1,
         connectionString2,
@@ -74,7 +74,7 @@ export const api = {
   },
 
   codeGenerator: {
-    getAllTables: (connectionString: string, dbType: string) =>
+    getAllTables: (connectionString: string, dbType: number) =>
       apiCall<string[]>('/code-generator/all-tables', 'POST', undefined, {
         connectionString,
         dbType,

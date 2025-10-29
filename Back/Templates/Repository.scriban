@@ -1,96 +1,95 @@
 {{~ # Template para gerar Repository com Dapper ~}}
 using Dapper;
-using {{ project_name }}.Domain.Interfaces.Repository{{ namespace }};
-using {{ project_name }}.Domain.Models{{ namespace }};
+using {{ project_name }}.Domain.Interfaces.Repository;
+using {{ project_name }}.Domain.Models;
 using {{ project_name }}.Infra.Data.Context;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 
-namespace {{ project_name }}.Infra.Data.Repository{{ namespace }}
+namespace {{ project_name }}.Infra.Repository;
+
+public class {{ table_name }}Repository : I{{ table_name }}Repository
 {
-    public class {{ table_name }}Repository : I{{ table_name }}Repository
+    private readonly IDbConnection _connection;
+
+    public {{ table_name }}Repository(IDbConnection connection)
     {
-        private readonly IDbConnection _connection;
+        _connection = connection;
+    }
 
-        public {{ table_name }}Repository(IDbConnection connection)
+    public IEnumerable<{{ table_name }}Mod> All(int language, int ordination, bool desc, long quantityRegister)
+    {
+        var sql = @"
+            SELECT TOP (@QuantityRegister) *
+            FROM {{ table_name_original }}
+            ORDER BY
+                CASE WHEN @Ordination = 1 AND @Desc = 0 THEN [Column1] END ASC,
+                CASE WHEN @Ordination = 1 AND @Desc = 1 THEN [Column1] END DESC
+        ";
+
+        return _connection.Query<{{ table_name }}Mod>(sql, new
         {
-            _connection = connection;
-        }
+            Language = language,
+            Ordination = ordination,
+            Desc = desc,
+            QuantityRegister = quantityRegister
+        });
+    }
 
-        public IEnumerable<{{ table_name }}Mod> All(int language, int ordination, bool desc, long quantityRegister)
+    public {{ table_name }}Mod Get({{ columns_key }}, int language)
+    {
+        var sql = @"
+            SELECT *
+            FROM {{ table_name_original }}
+            WHERE {{ primary_key_condition }}
+        ";
+
+        return _connection.QueryFirstOrDefault<{{ table_name }}Mod>(sql, new
         {
-            var sql = @"
-                SELECT TOP (@QuantityRegister) *
-                FROM {{ table_name_original }}
-                ORDER BY
-                    CASE WHEN @Ordination = 1 AND @Desc = 0 THEN [Column1] END ASC,
-                    CASE WHEN @Ordination = 1 AND @Desc = 1 THEN [Column1] END DESC
-            ";
+            {{ primary_key_params }}
+            Language = language
+        });
+    }
 
-            return _connection.Query<{{ table_name }}Mod>(sql, new
-            {
-                Language = language,
-                Ordination = ordination,
-                Desc = desc,
-                QuantityRegister = quantityRegister
-            });
-        }
+    public bool Create({{ table_name }}Mod model)
+    {
+        var sql = @"
+            INSERT INTO {{ table_name_original }} (
+                {{ insert_columns }}
+            )
+            VALUES (
+                {{ insert_values }}
+            )
+        ";
 
-        public {{ table_name }}Mod Get({{ columns_key }}, int language)
+        var rowsAffected = _connection.Execute(sql, model);
+        return rowsAffected > 0;
+    }
+
+    public bool Update({{ table_name }}Mod model)
+    {
+        var sql = @"
+            UPDATE {{ table_name_original }}
+            SET {{ update_columns }}
+            WHERE {{ primary_key_condition }}
+        ";
+
+        var rowsAffected = _connection.Execute(sql, model);
+        return rowsAffected > 0;
+    }
+
+    public bool Delete({{ columns_key }})
+    {
+        var sql = @"
+            DELETE FROM {{ table_name_original }}
+            WHERE {{ primary_key_condition }}
+        ";
+
+        var rowsAffected = _connection.Execute(sql, new
         {
-            var sql = @"
-                SELECT *
-                FROM {{ table_name_original }}
-                WHERE {{ primary_key_condition }}
-            ";
-
-            return _connection.QueryFirstOrDefault<{{ table_name }}Mod>(sql, new
-            {
-                {{ primary_key_params }}
-                Language = language
-            });
-        }
-
-        public bool Create({{ table_name }}Mod model)
-        {
-            var sql = @"
-                INSERT INTO {{ table_name_original }} (
-                    {{ insert_columns }}
-                )
-                VALUES (
-                    {{ insert_values }}
-                )
-            ";
-
-            var rowsAffected = _connection.Execute(sql, model);
-            return rowsAffected > 0;
-        }
-
-        public bool Update({{ table_name }}Mod model)
-        {
-            var sql = @"
-                UPDATE {{ table_name_original }}
-                SET {{ update_columns }}
-                WHERE {{ primary_key_condition }}
-            ";
-
-            var rowsAffected = _connection.Execute(sql, model);
-            return rowsAffected > 0;
-        }
-
-        public bool Delete({{ columns_key }})
-        {
-            var sql = @"
-                DELETE FROM {{ table_name_original }}
-                WHERE {{ primary_key_condition }}
-            ";
-
-            var rowsAffected = _connection.Execute(sql, new
-            {
-                {{ primary_key_params }}
-            });
-            return rowsAffected > 0;
-        }
+            {{ primary_key_params }}
+        });
+        return rowsAffected > 0;
     }
 }
