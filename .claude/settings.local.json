@@ -14,7 +14,11 @@
       "Bash(tree:*)",
       "Bash(wc:*)",
       "Bash(rm:*)",
-      "Read(//usr/**)"
+      "Read(//usr/**)",
+      "Bash(test:*)",
+      "Bash(du:*)",
+      "Bash(dotnet msbuild:*)",
+      "Bash(dotnet clean:*)"
     ],
     "deny": [],
     "ask": []

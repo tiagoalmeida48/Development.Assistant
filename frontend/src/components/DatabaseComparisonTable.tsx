@@ -90,28 +90,28 @@ export function DatabaseComparisonTable({ tables, database1, database2 }: Databa
             )}
             <td className="px-2 py-1.5">{col.name}</td>
             <td className="px-2 py-1.5 font-mono text-[10px]">{type}</td>
-            <td className={`px-2 py-1.5 text-center ${existsInBank1 ? 'bg-green-50 dark:bg-green-950' : 'bg-red-50 dark:bg-red-950'}`}>
+            <td className={`px-2 py-1.5 text-center`}>
               {existsInBank1 ? (
-                <span className="inline-flex items-center gap-0.5 text-green-700 dark:text-green-400 text-[10px]">
-                  <CheckCircle2 className="h-2.5 w-2.5" />
+                <span className="inline-flex items-center gap-0.5 text-xs font-bold">
+                  <CheckCircle2 className="h-3 w-3" />
                   Sim
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-0.5 text-red-700 dark:text-red-400 text-[10px]">
-                  <MinusCircle className="h-2.5 w-2.5" />
+                <span className="inline-flex items-center gap-0.5 text-xs font-bold">
+                  <MinusCircle className="h-3 w-3" />
                   Não
                 </span>
               )}
             </td>
-            <td className={`px-2 py-1.5 text-center ${existsInBank2 ? 'bg-blue-50 dark:bg-blue-950' : 'bg-red-50 dark:bg-red-950'}`}>
+            <td className={`px-2 py-1.5 text-center`}>
               {existsInBank2 ? (
-                <span className="inline-flex items-center gap-0.5 text-blue-700 dark:text-blue-400 text-[10px]">
-                  <CheckCircle2 className="h-2.5 w-2.5" />
+                <span className="inline-flex items-center gap-0.5 text-xs font-bold">
+                  <CheckCircle2 className="h-3 w-3" />
                   Sim
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-0.5 text-red-700 dark:text-red-400 text-[10px]">
-                  <MinusCircle className="h-2.5 w-2.5" />
+                <span className="inline-flex items-center gap-0.5 text-xs font-bold">
+                  <MinusCircle className="h-3 w-3" />
                   Não
                 </span>
               )}
@@ -135,28 +135,28 @@ export function DatabaseComparisonTable({ tables, database1, database2 }: Databa
           <td className="px-2 py-1.5 text-muted-foreground italic" colSpan={2}>
             Tabela completa
           </td>
-          <td className={`px-2 py-1.5 text-center ${existsInBank1 ? 'bg-green-50 dark:bg-green-950' : 'bg-red-50 dark:bg-red-950'}`}>
+          <td className={`px-2 py-1.5 text-center`}>
             {existsInBank1 ? (
-              <span className="inline-flex items-center gap-0.5 text-green-700 dark:text-green-400 text-[10px]">
-                <CheckCircle2 className="h-2.5 w-2.5" />
+              <span className="inline-flex items-center gap-0.5 text-xs font-bold">
+                <CheckCircle2 className="h-3 w-3" />
                 Sim
               </span>
             ) : (
-              <span className="inline-flex items-center gap-0.5 text-red-700 dark:text-red-400 text-[10px]">
-                <MinusCircle className="h-2.5 w-2.5" />
+              <span className="inline-flex items-center gap-0.5 text-xs font-bold">
+                <MinusCircle className="h-3 w-3" />
                 Não
               </span>
             )}
           </td>
-          <td className={`px-2 py-1.5 text-center ${existsInBank2 ? 'bg-blue-50 dark:bg-blue-950' : 'bg-red-50 dark:bg-red-950'}`}>
+          <td className={`px-2 py-1.5 text-center`}>
             {existsInBank2 ? (
-              <span className="inline-flex items-center gap-0.5 text-blue-700 dark:text-blue-400 text-[10px]">
-                <CheckCircle2 className="h-2.5 w-2.5" />
+              <span className="inline-flex items-center gap-0.5 text-xs font-bold">
+                <CheckCircle2 className="h-3 w-3" />
                 Sim
               </span>
             ) : (
-              <span className="inline-flex items-center gap-0.5 text-red-700 dark:text-red-400 text-[10px]">
-                <MinusCircle className="h-2.5 w-2.5" />
+              <span className="inline-flex items-center gap-0.5 text-xs font-bold">
+                <MinusCircle className="h-3 w-3" />
                 Não
               </span>
             )}
@@ -174,15 +174,15 @@ export function DatabaseComparisonTable({ tables, database1, database2 }: Databa
             <th className="px-2 py-1.5 text-left font-semibold">Tabela</th>
             <th className="px-2 py-1.5 text-left font-semibold">Campo</th>
             <th className="px-2 py-1.5 text-left font-semibold">Tipo</th>
-            <th className="px-2 py-1.5 text-center font-semibold bg-green-50 dark:bg-green-950">
+            <th className="px-2 py-1.5 text-center font-semibold">
               <div className="flex items-center justify-center gap-1">
-                <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                <span className="inline-block w-1.5 h-1.5 rounded-full"></span>
                 {database1}
               </div>
             </th>
-            <th className="px-2 py-1.5 text-center font-semibold bg-blue-50 dark:bg-blue-950">
+            <th className="px-2 py-1.5 text-center font-semibold">
               <div className="flex items-center justify-center gap-1">
-                <span className="inline-block w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                <span className="inline-block w-1.5 h-1.5 rounded-full"></span>
                 {database2}
               </div>
             </th>

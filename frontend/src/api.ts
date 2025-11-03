@@ -23,6 +23,7 @@ export interface DatabaseClass {
 export interface InfoClass {
   connectionString: string
   dbType: number
+  template: number
   tables: string[]
   pathGeral: string
   projectName: string
@@ -37,7 +38,7 @@ async function apiCall<T>(
   params?: Record<string, string>,
   body?: unknown
 ): Promise<T> {
-  const url = new URL(`http://localhost:5000/api${endpoint}`, window.location.origin)
+  const url = new URL(`${import.meta.env.VITE_API_URL}${endpoint}`, window.location.origin)
 
   if (method === 'GET' && params) {
     Object.entries(params).forEach(([key, value]) => {

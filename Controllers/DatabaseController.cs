@@ -12,12 +12,7 @@ public class DatabaseController(CompareDatabaseService compareDatabaseService) :
     [HttpPost("compare-databases")]
     public async Task<ActionResult<DatabaseClass>> CompareDatabases([FromBody] CompareDatabasesRequest request)
     {
-        if (!Enum.TryParse<Constants.DbType>(request.DbType, out var dbType))
-        {
-            return BadRequest($"Tipo de banco inválido: {request.DbType}");
-        }
-
-        var result = await compareDatabaseService.CompareAsync(request.ConnectionString1, request.ConnectionString2, dbType);
+        var result = await compareDatabaseService.CompareAsync(request.ConnectionString1, request.ConnectionString2, request.DbType);
         return Ok(result);
     }
 

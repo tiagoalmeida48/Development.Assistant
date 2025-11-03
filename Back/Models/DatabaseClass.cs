@@ -46,7 +46,7 @@ public class CompareDatabasesRequest
 {
     public string ConnectionString1 { get; set; }
     public string ConnectionString2 { get; set; }
-    public string DbType { get; set; }
+    public Constants.DbType DbType { get; set; }
 }
 
 public class GetTablesRequest

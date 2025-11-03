@@ -5,6 +5,8 @@
     <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>14</LangVersion>
+
+    <SatelliteResourceLanguages>none</SatelliteResourceLanguages>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,11 +20,6 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.6" />
   </ItemGroup>
 
-  <!-- Copiar templates Scriban para o output -->
-  <ItemGroup>
-    <None Include="Back\Templates\*.scriban" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
   <ItemGroup>
     <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
@@ -30,11 +27,5 @@
   <ItemGroup>
     <EditorConfigFiles Remove=".editorconfig" />
   </ItemGroup>
-
-  <!-- Build frontend React -->
-  <Target Name="BuildFrontend" BeforeTargets="Build" Condition="'$(Configuration)' == 'Release'">
-    <Exec WorkingDirectory="frontend" Command="yarn install" />
-    <Exec WorkingDirectory="frontend" Command="yarn build" />
-  </Target>
 
 </Project>

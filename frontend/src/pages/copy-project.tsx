@@ -100,14 +100,6 @@ export default function CopyProjectPage() {
             </div>
           </div>
 
-          <div className="bg-orange-300 border  rounded-lg p-3">
-            <ul className="text-sm text-black space-y-1 list-disc list-inside">
-              <li>Namespaces antigos serão substituídos</li>
-              <li>Pastas bin, obj, .vs, .git ignoradas</li>
-              <li>Arquivos .editorconfig, .gitattributes e .gitignore ignorados</li>
-            </ul>
-          </div>
-
           <div className="flex gap-3">
             <Button
               onClick={handleCopy}

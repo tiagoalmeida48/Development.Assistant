@@ -131,15 +131,15 @@ export default function CompareDatabasePage() {
                     <thead className="bg-muted border-b">
                       <tr>
                         <th className="px-4 py-2 text-left font-semibold">Tabela</th>
-                        <th className="px-4 py-2 text-right font-semibold bg-green-50 dark:bg-green-950">
+                        <th className="px-4 py-2 text-right font-semibold">
                           <div className="flex items-center justify-end gap-1">
-                            <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                            <span className="inline-block w-1.5 h-1.5 rounded-full"></span>
                             {result.database1}
                           </div>
                         </th>
-                        <th className="px-2 py-1.5 text-right font-semibold bg-blue-50 dark:bg-blue-950">
+                        <th className="px-2 py-1.5 text-right font-semibold">
                           <div className="flex items-center justify-end gap-1">
-                            <span className="inline-block w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                            <span className="inline-block w-1.5 h-1.5 rounded-full"></span>
                             {result.database2}
                           </div>
                         </th>
@@ -154,17 +154,17 @@ export default function CompareDatabasePage() {
                         return (
                           <tr key={idx} className="border-b hover:bg-muted/50 transition-colors">
                             <td className="px-4 py-3 font-medium">{reg.table}</td>
-                            <td className="px-4 py-3 text-right bg-green-50/60 dark:bg-green-950/30 font-semibold">
+                            <td className="px-4 py-3 text-right font-semibold">
                               {reg.totalRegisters1.toLocaleString()}
                             </td>
-                            <td className="px-4 py-3 text-right bg-blue-50/60 dark:bg-blue-950/30 font-semibold">
+                            <td className="px-4 py-3 text-right font-semibold">
                               {reg.totalRegisters2.toLocaleString()}
                             </td>
                             <td className="px-4 py-3 text-center">
                               <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${
                                 diff > 0
-                                  ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-200'
-                                  : 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200'
+                                  ? 'bg-green-100 text-green-700 dark:bg-green-900/70 dark:text-green-300'
+                                  : 'bg-blue-100 text-blue-700 dark:bg-blue-900/70 dark:text-blue-300'
                               }`}>
                                 {diff > 0 ? (
                                   <>
