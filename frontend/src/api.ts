@@ -27,6 +27,7 @@ export interface InfoClass {
   tables: string[]
   pathGeral: string
   projectName: string
+  excludePrefixTable: string
   nameSpace: string
 }
 
@@ -53,7 +54,14 @@ async function apiCall<T>(
   })
 
   if (!response.ok) {
-    throw new Error(`Erro: ${response.statusText}`)
+    let errorMessage = `Erro: ${response.statusText}`
+
+    const errorData = await response.json()
+    if (errorData.error) {
+      errorMessage = `${errorData.error} - ${errorData.details}`
+    }
+
+    throw new Error(errorMessage)
   }
 
   return response.json()

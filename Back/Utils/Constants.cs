@@ -140,19 +140,19 @@ public class Constants
         return paths[typeClass];
     }
     
-    public static ScriptObject MapInfo(string tableNameOriginal, string tableName, string tableProp, string projectName, string nameSpace, string columnsKey, IEnumerable<ColumnInfo> columns, bool existText = false)
+    public static ScriptObject MapInfo(string tableNameOriginal, string tableName, string tableProp, InfoFullClass data)
     {
         return new ScriptObject
         {
             { "table_name_original", tableNameOriginal },
             { "table_name", tableName },
             { "table_prop", tableProp },
-            { "project_name", projectName },
-            { "namespace", nameSpace },
-            { "columns_key", columnsKey },
-            { "columns_key_names", columnsKey.RemoveColumnTypes() },
-            { "columns", columns },
-            { "exist_text", existText }
+            { "project_name", data.InfoClass.ProjectName },
+            { "namespace", data.InfoClass.NameSpace },
+            { "columns_key", data.ColumnsKey },
+            { "columns_key_names", data.ColumnsKey.RemoveColumnTypes() },
+            { "columns", data.Columns },
+            { "exist_text", data.ExistText }
         };
     }
 }

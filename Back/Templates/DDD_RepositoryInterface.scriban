@@ -1,0 +1,22 @@
+{{~ # Template para gerar Interface Repository ~}}
+using {{ project_name }}.Domain.Models{{ namespace }};
+using System.Collections.Generic;
+
+namespace {{ project_name }}.Domain.Interfaces.Repository{{ namespace }};
+
+public interface I{{ table_name }}Repository : IBaseRepository<{{ table_name }}Mod>
+{
+    {{~ if string.ends_with table_name "Text" ~}}
+    IEnumerable<{{ table_name }}Mod> AllLanguage({{ columns_key }});
+    IEnumerable<{{ table_name }}Mod> Search({{ columns_key }},
+                                            string description = null,
+                                            string language = null);
+    {{~ else ~}}
+    IEnumerable<{{ table_name }}Mod> Search({{ columns_key }},
+                                            {{~ if exist_text ~}}
+                                            string language = null, 
+                                            {{~ end ~}}
+                                            OrdinationParam ordinations = null, 
+                                            long quantityRegister = 0);
+    {{~ end ~}}
+}

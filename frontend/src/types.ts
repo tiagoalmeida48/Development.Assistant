@@ -40,3 +40,8 @@ export interface InfoClass {
   projectName: string
   nameSpace: string
 }
+
+export interface ErrorResponse {
+  error: string
+  details?: string
+}

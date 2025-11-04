@@ -1,0 +1,82 @@
+{{~ # Template para gerar Repository com Dapper ~}}
+using {{ project_name }}.CrossCutting.Extensions;
+using {{ project_name }}.CrossCutting.Utils;
+using {{ project_name }}.Domain.Interfaces.Repository{{ namespace }};
+using {{ project_name }}.Domain.Models{{ namespace }};
+using Dapper;
+using System.Collections.Generic;
+using System.Text;
+
+namespace {{ project_name }}.Repository{{ namespace }};
+
+public class {{ table_name }}Repository(string connDb) : BaseRepository<{{ table_name }}Mod>(connDb), I{{ table_name }}Repository
+{
+    {{~ if string.ends_with table_name "Text" ~}}
+    public IEnumerable<{{ table_name }}Mod> Search({{ columns_key }},
+                                                   string description = null,
+                                                   string language = null)
+    {
+        var sb = new StringBuilder();
+        var param = new DynamicParameters();
+
+        sb.Append($"{EntityHelper.GetSelectFrom<{{ table_name }}Mod>()} WHERE 1 = 1 ");
+
+        if (description.IsNotEmpty())
+        {
+            param.Add("@description", $"%{description}%");
+            sb.Append("AND DESCRIPTION LIKE @description ");
+        }
+
+        if (language.IsNotEmpty())
+        {
+            param.Add("@language", language);
+            sb.Append("AND IDIOM = @language ");
+        }
+
+        using var con = Conn;
+        return con.Query<{{ table_name }}Mod>(sb.ToString(), param);
+    }
+
+    public IEnumerable<{{ table_name }}Mod> AllLanguage({{ columns_key }})
+    {
+        var query = $"""
+                     SELECT I.IDIOM,
+                            RT.{{ columns_key_names }}
+                            RT.DESCRIPTION,
+                            RT.CREATED,
+                            RT.UPDATED 
+                        FROM base_idiom I 
+                        LEFT JOIN {{ table_name_original }} RT ON RT.IDIOM = I.IDIOM 
+                        AND RT.{{ columns_key_names }} WHERE I.ACTIVE = TRUE
+                     """;
+
+        using var con = Conn;
+        return con.Query<{{ table_name }}Mod>(query, new { {{ columns_key_names }} });
+    }
+    {{~ else ~}}
+    public IEnumerable<{{ table_name }}Mod> Search({{ columns_key }},
+                                                   string language = null,
+                                                   OrdinationParam ordination = null,
+                                                   long quantityRegister = 0)
+    {
+        var sb = new StringBuilder();
+        var param = new DynamicParameters();
+
+        param.Add("@language", language);
+        sb.Append($"""
+                   SELECT * 
+                       FROM {{ table_name_original }} 
+                       WHERE 1 = 1 
+                   """);
+
+        if (ordination != null)
+            sb.Append(ordination.GetColumnsOrderBy<{{ table_name }}Mod>(sb.ToString()));
+
+        param.Add("@quantityRegister", quantityRegister > 0 ? quantityRegister : Constants.MaxPageSizeLimit);
+        sb.Append("LIMIT @quantityRegister");
+
+        using var con = Conn;
+        return con.Query<{{ table_name }}Mod>(sb.ToString(), param);
+    }
+    {{~ end ~}}
+}

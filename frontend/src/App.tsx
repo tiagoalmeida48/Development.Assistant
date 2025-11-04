@@ -93,7 +93,7 @@ export default function App() {
         visibleToasts={5}
         toastOptions={{
           style: {
-            border: '1px solid hsl(var(--border))',
+            border: '1px solid var(--border)',
           },
           className: 'toast-with-progress',
         }}

@@ -7,7 +7,6 @@ import {
   Button,
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
   Input,
@@ -33,6 +32,7 @@ export default function GenerateClassPage() {
   const [pathGeral, setPathGeral] = useState("");
   const [projectName, setProjectName] = useState("");
   const [nameSpace, setNameSpace] = useState("");
+  const [excludePrefixTable, setExcludePrefixTable] = useState("");
   const [selectedTables, setSelectedTables] = useState("");
   const [checkedTables, setCheckedTables] = useState<Set<string>>(new Set());
 
@@ -115,10 +115,11 @@ export default function GenerateClassPage() {
         pathGeral,
         projectName,
         nameSpace,
+        excludePrefixTable
       });
       toast.success("Classes geradas com sucesso!", {
         description:
-          "As classes POCO e camadas foram geradas no diretório especificado.",
+          "As classes e camadas foram geradas no diretório especificado.",
       });
     });
   };
@@ -128,6 +129,7 @@ export default function GenerateClassPage() {
     setPathGeral("");
     setProjectName("");
     setNameSpace("");
+    setExcludePrefixTable("");
     setSelectedTables("");
     setCheckedTables(new Set());
     resetGenerate();
@@ -214,7 +216,7 @@ export default function GenerateClassPage() {
                   </select>
                 </div>
                 
-                <div className="space-y-2 col-span-2">
+                <div className="space-y-2">
                   <Label htmlFor="projectName" className="text-sm font-medium">
                     Projeto
                   </Label>
@@ -229,12 +231,25 @@ export default function GenerateClassPage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="nameSpace" className="text-sm font-medium">
-                    Namespace
+                    Ultimo nome do namespace
                   </Label>
                   <Input
                     id="nameSpace"
                     placeholder=".Core"
                     value={nameSpace}
+                    onChange={(e) => setNameSpace(e.target.value)}
+                    className="h-10"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="excludePrefixTable" className="text-sm font-medium">
+                    Excluir prefixo das tabelas
+                  </Label>
+                  <Input
+                    id="excludePrefixTable"
+                    placeholder="Base"
+                    value={excludePrefixTable}
                     onChange={(e) => setNameSpace(e.target.value)}
                     className="h-10"
                   />
@@ -266,20 +281,6 @@ export default function GenerateClassPage() {
 
           {/* Card de Tabelas */}
           <Card className="shadow-sm">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Database className="h-5 w-5" />
-                Tabelas {availableTables && `(${availableTables.length})`}
-              </CardTitle>
-              <CardDescription className="text-sm">
-                {checkedTables.size > 0 && (
-                  <span className="text-primary font-semibold">
-                    ✓ {checkedTables.size} selecionada
-                    {checkedTables.size > 1 ? "s" : ""}
-                  </span>
-                )}
-              </CardDescription>
-            </CardHeader>
             <CardContent className="space-y-3">
               {availableTables && availableTables.length > 0 ? (
                 <>

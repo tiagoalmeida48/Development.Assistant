@@ -1,0 +1,101 @@
+{{~ # Template para gerar Domain Service ~}}
+using {{ project_name }}.Domain.Interfaces.Repository{{ namespace }};
+using {{ project_name }}.Domain.Interfaces.Services{{ namespace }};
+using {{ project_name }}.Domain.Entities{{ namespace }};
+using System.Collections.Generic;
+
+namespace {{ project_name }}.Application.Services{{ namespace }}.{{ table_name }};
+
+{{~ if exist_text ~}}
+public partial class {{ table_name }}Service(I{{ table_name }}Repository {{ table_prop }}Rep,
+                                     I{{ table_name }}TextRepository {{ table_prop }}TextRep,
+                                     IIdiomService idiomSrv) : BaseService<{{ table_name }}Entity>({{ table_prop }}Rep), I{{ table_name }}Service
+{
+    public bool Create({{ table_name }}Entity entity)
+    {
+        ValidatePersistence(entity, true);
+    
+        using var tran = GetTransaction();
+        {{ table_prop }}.{{ table_name }} = {{ table_prop }}Rep.Create(entity);
+
+        foreach (var {{ table_prop }}Text in entity.{{ table_name }}Idiom)
+        {
+            if ({{ table_prop }}Text.Description.IsEmpty()) continue;
+
+            ValidatePersistenceIdiom({{ table_prop }}Text);
+
+            {{ table_prop }}Text.{{ table_name }} = {{ table_prop }}.{{ table_name }};
+            {{ table_prop }}TextRep.Create({{ table_prop }}Text);
+        }
+
+        tran.Complete();
+        return true;
+    }
+
+    public bool Update({{ table_name }}Entity entity)
+    {
+        ValidatePersistence(entity, false);
+    
+        using var tran = GetTransaction();
+        {{ table_prop }}Rep.Update(entity);
+
+        foreach (var {{ table_prop }}Text in entity.{{ table_name }}Idiom)
+        {
+            if ({{ table_prop }}Text.Description.IsEmpty()) continue;
+
+            ValidatePersistenceText({{ table_prop }}Idiom);
+            
+            {{ table_prop }}Text.{{ table_name }} = {{ table_prop }}.{{ table_name }};
+
+            if ({{ table_prop }}TextRep.Exist({{ table_prop }}Text))
+                {{ table_prop }}TextRep.Update({{ table_prop }}Text);
+            else
+                {{ table_prop }}TextRep.Create({{ table_prop }}Text);
+        }
+
+        tran.Complete();
+        return true;
+    }
+
+    public bool Delete({{ columns_key }})
+    {
+        var record = Get({{ columns_key }});
+     
+        using var tran = GetTransaction();
+        foreach (var {{ table_prop }}Text in record.{{ table_name }}Idiom)
+            {{ table_prop }}TextRep.Delete({{ table_prop }}Text);
+ 
+        {{ table_prop }}Rep.Delete(record);
+        
+        tran.Complete();
+        return true;
+    }
+}
+{{~ else ~}}
+public class {{ table_name }}Service(I{{ table_name }}Repository {{ table_prop }}Rep) : BaseService<{{ table_name }}Entity>({{ table_prop }}Rep), I{{ table_name }}Service
+{
+    public bool Create({{ table_name }}Entity entity)
+    {
+        ValidatePersistence(entity, true);
+    
+        {{ table_prop }}Rep.Create(entity);
+        return true;
+    }
+
+    public bool Update({{ table_name }}Entity entity)
+    {
+        ValidatePersistence(entity, false);
+    
+        {{ table_prop }}Rep.Update(entity);
+        return true;
+    }
+
+    public bool Delete({{ columns_key }})
+    {
+        var record = Get({{ columns_key }});
+     
+        {{ table_prop }}Rep.Delete(record);
+        return true;
+    }
+}
+{{~ end ~}}

@@ -1,0 +1,29 @@
+{{~ # Template para gerar Domain Models ~}}
+using System.Collections.Generic;
+using Dapper.Contrib.Extensions;
+using System;
+
+namespace {{ project_name }}.Domain.Models{{ namespace }};
+
+[Table("{{ table_name_original }}")]
+public class {{ table_name }}Mod : BaseModel
+{
+{{~ for column in columns ~}}
+{{~ if column.IsPrimaryKey && column.IsIdentity ~}}
+    [Key]
+{{~ else if column.IsPrimaryKey ~}}
+    [ExplicitKey]
+{{~ end ~}}
+    public {{ column.Type }}{{ if column.IsNullable }}?{{ end }} {{ column.Name }} { get; set; }
+    
+{{~ end ~}}
+{{~ if exist_text ~}}
+    [Computed]
+    public IEnumerable<{{ table_name }}TextMod> {{ table_name }}Idiom { get; set; }
+    
+{{~ end ~}} 
+    public override void TreatForeignKey()
+    {
+        throw new NotImplementedException();
+    }
+}

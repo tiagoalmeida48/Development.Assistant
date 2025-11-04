@@ -1,0 +1,73 @@
+{{~ # Template para gerar Domain Service ~}}
+using {{ project_name }}.Domain.Interfaces.Repository{{ namespace }};
+using {{ project_name }}.Domain.Interfaces.Services{{ namespace }};
+using {{ project_name }}.Domain.Entities{{ namespace }};
+using System.Collections.Generic;
+
+namespace {{ project_name }}.Application.Services{{ namespace }}.{{ table_name }};
+
+{{~ if exist_text ~}}
+public partial class {{ table_name }}Service
+{
+    public bool Exist({{ columns_key }})
+    {
+        return {{ table_prop }}Rep.Exist(new {{ table_name }}Entity { {{ columns_key_names }} });
+    }
+
+    public {{ table_name }}Entity Get({{ columns_key }})
+    {
+        if ({{ columns_key_names }})
+            throw new BusinessError(GeneralErrorNumber.REQUIRED_FIELD, FieldName.);
+
+        var result = {{ table_prop }}Rep.Search({{ columns_key_names }}).FirstOrDefault();
+        if (result == null)
+            throw new BusinessError(GeneralErrorNumber.REGISTER_NOT_FOUND, FieldName.);
+
+        result.{{ table_name }}Idiom = {{ table_prop }}TextRep.Search({{ columns_key_names }});
+        return result;
+    }
+
+    public IEnumerable<{{ table_name }}Entity> All(OrdinationParam ordinations, long quantityRegister)
+    {
+        var newOrdinations = ordinations.Deserialize<OrdinationParam>();
+        var records = {{ table_prop }}Rep.Search(ordinations: newOrdinations, quantityRegister: quantityRegister);
+
+        foreach (var record in records)
+            record.{{ table_name }}Idiom = {{ table_prop }}TextRep.Search(record.{{ table_name }});
+
+        return records;
+    }
+
+    public IEnumerable<{{ table_name }}Entity> AllLanguage({{ columns_key }})
+    {
+        return {{ table_prop }}TextRep.AllLanguage({{ columns_key_names }});
+    }
+}
+{{~ else ~}}
+public partial class {{ table_name }}Service
+{
+    public bool Exist({{ columns_key }})
+    {
+        return {{ table_prop }}Rep.Exist(new {{ table_name }}Entity { {{ columns_key_names }} });
+    }
+
+    public {{ table_name }}Entity Get({{ columns_key }})
+    {
+        if ({{ columns_key_names }})
+            throw new BusinessError(GeneralErrorNumber.REQUIRED_FIELD, FieldName.);
+
+        var result = {{ table_prop }}Rep.Search({{ columns_key_names }}).FirstOrDefault();
+        if (result == null)
+            throw new BusinessError(GeneralErrorNumber.REGISTER_NOT_FOUND, FieldName.);
+
+        return result;
+    }
+
+    public IEnumerable<{{ table_name }}Entity> All(OrdinationParam ordinations, long quantityRegister)
+    {
+        var newOrdinations = ordinations.Deserialize<OrdinationParam>();
+        var records = {{ table_prop }}Rep.Search(ordinations: newOrdinations, quantityRegister: quantityRegister);
+        return records;
+    }
+}
+{{~ end ~}}
