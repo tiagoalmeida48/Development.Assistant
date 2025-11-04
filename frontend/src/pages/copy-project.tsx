@@ -38,7 +38,7 @@ export default function CopyProjectPage() {
   return (
     <div className="container mx-auto py-6 px-4 max-w-5xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">Copiar Projeto</h1>
+        <h1 className="text-2xl text-secondary-foreground font-bold mb-2">Copiar Projeto</h1>
       </div>
 
       <Card className="shadow-sm hover:shadow-md transition-shadow">

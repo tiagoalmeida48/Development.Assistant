@@ -19,7 +19,7 @@ function Layout({ children }: { children: React.ReactNode }) {
       <nav className="border-b bg-card">
         <div className="container mx-auto px-3 py-2">
           <div className="flex items-center justify-between">
-            <Link to="/" className="text-lg font-bold">
+            <Link to="/" className="text-lg text-secondary-foreground font-bold">
               Assistente de Desenvolvimento
             </Link>
             <div className="flex items-center gap-4">

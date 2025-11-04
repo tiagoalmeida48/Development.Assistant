@@ -1,57 +1,48 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #020617;
-  --card: #ffffff;
-  --card-foreground: #020617;
-  --popover: #ffffff;
-  --popover-foreground: #020617;
-  --primary: #3b82f6;
-  --primary-foreground: #f8fafc;
-  --secondary: #f1f5f9;
-  --secondary-foreground: #0f172a;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --accent: #f1f5f9;
-  --accent-foreground: #0f172a;
-  --destructive: #ef4444;
-  --destructive-foreground: #f8fafc;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #3b82f6;
+@theme {
+  --color-background: #ffffff;
+  --color-foreground: #020617;
+  --color-card: #f3f3f3;
+  --color-card-foreground: #020617;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #020617;
+  --color-primary: #3b82f6;
+  --color-primary-foreground: #f8fafc;
+  --color-secondary: #f1f5f9;
+  --color-secondary-foreground: #0f172a;
+  --color-muted: #f1f5f9;
+  --color-muted-foreground: #64748b;
+  --color-accent: #f1f5f9;
+  --color-accent-foreground: #0f172a;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #f8fafc;
+  --color-border: #e2e8f0;
+  --color-input: #FFFFFF;
+  --color-ring: #3b82f6;
   --radius: 0.5rem;
 }
 
 .dark {
-  --background: #212a48;
-  --foreground: #f8fafc;
-  --card: #020817;
-  --card-foreground: #f8fafc;
-  --popover: #020817;
-  --popover-foreground: #f8fafc;
-  --primary: #2563eb;
-  --primary-foreground: #0f172a;
-  --secondary: #1e293b;
-  --secondary-foreground: #f8fafc;
-  --muted: #1e293b;
-  --muted-foreground: #94a3b8;
-  --accent: #1e293b;
-  --accent-foreground: #f8fafc;
-  --destructive: #991b1b;
-  --destructive-foreground: #f8fafc;
-  --border: #adadad;
-  --input: #1e293b;
-  --ring: #2563eb;
-}
-
-* {
-  border-color: var(--border);
-}
-
-body {
-  background-color: var(--background);
-  color: var(--foreground);
+  --color-background: #0f1419;
+  --color-foreground: #e2e8f0;
+  --color-card: #1a1f2e;
+  --color-card-foreground: #e2e8f0;
+  --color-popover: #1a1f2e;
+  --color-popover-foreground: #e2e8f0;
+  --color-primary: #8b5cf6;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #2d3748;
+  --color-secondary-foreground: #e2e8f0;
+  --color-muted: #2d3748;
+  --color-muted-foreground: #94a3b8;
+  --color-accent: #065566;
+  --color-accent-foreground: #ffffff;
+  --color-destructive: #f43f5e;
+  --color-destructive-foreground: #ffffff;
+  --color-border: #2d3748;
+  --color-input: #292929;
+  --color-ring: #8b5cf6;
 }
 
 /* Toast Progress Bar */
@@ -76,22 +67,26 @@ body {
   right: 0;
   height: 2px;
   width: 100%;
-  background: var(--primary);
+  background: var(--color-primary);
   animation: toastProgress 4s linear forwards;
   transform-origin: left;
-  border-radius: 0 0 var(--border-radius) var(--border-radius);
+  border-radius: 0 0 var(--radius) var(--radius);
 }
 
 [data-sonner-toast][data-type="error"] [data-content]::after {
-  background: var(--destructive);
+  background: var(--color-destructive);
 }
 
 [data-sonner-toast][data-type="success"] [data-content]::after {
   background: #10b981;
 }
 
+[data-sonner-toast][data-type="warning"] [data-content]::after {
+  background: #f59e0b;
+}
+
 [data-sonner-toast][data-type="info"] [data-content]::after {
-  background: var(--primary);
+  background: var(--color-primary);
 }
 
 @keyframes toastProgress {
@@ -99,7 +94,7 @@ body {
     width: 100%;
   }
   to {
-    width: 0%;
+    width: 0;
   }
 }
 
@@ -108,6 +103,6 @@ body {
 }
 
 .dark select option {
-  background-color: var(--background);
-  color: var(--foreground);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
 }

@@ -27,8 +27,8 @@ export interface InfoClass {
   tables: string[]
   pathGeral: string
   projectName: string
-  excludePrefixTable: string
   nameSpace: string
+  excludePrefixTable: string
 }
 
 // ==================== HELPER ====================

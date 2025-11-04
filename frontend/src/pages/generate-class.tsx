@@ -138,7 +138,7 @@ export default function GenerateClassPage() {
   return (
     <div className="container mx-auto py-6 px-4 max-w-7xl">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-2">Gerar Classes</h1>
+        <h1 className="text-2xl text-secondary-foreground font-bold mb-2">Gerar Classes</h1>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -161,7 +161,7 @@ export default function GenerateClassPage() {
                     id="dbType"
                     value={dbType}
                     onChange={(e) => setDbType(e.target.value)}
-                    className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex h-10 w-full items-center justify-between rounded-md border border-foreground bg-input text-foreground px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <option value="0">MySQL</option>
                     <option value="1">Oracle</option>
@@ -209,7 +209,7 @@ export default function GenerateClassPage() {
                       id="template"
                       value={template}
                       onChange={(e) => setTemplate(e.target.value)}
-                      className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background text-foreground px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex h-10 w-full items-center justify-between rounded-md border border-foreground bg-input text-foreground px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <option value="0">DDD</option>
                     <option value="1">Arquitetura Limpa</option>
@@ -250,7 +250,7 @@ export default function GenerateClassPage() {
                     id="excludePrefixTable"
                     placeholder="Base"
                     value={excludePrefixTable}
-                    onChange={(e) => setNameSpace(e.target.value)}
+                    onChange={(e) => setExcludePrefixTable(e.target.value)}
                     className="h-10"
                   />
                 </div>
@@ -260,7 +260,6 @@ export default function GenerateClassPage() {
                     onClick={handleLoadTables}
                     disabled={loadingTables}
                     className="w-full h-10"
-                    variant="outline"
                   >
                     {loadingTables ? (
                       <>
@@ -414,35 +413,35 @@ export default function GenerateClassPage() {
               <div className="space-y-4 text-sm">
                 {/* Presentation Layer */}
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-primary">
+                  <div className="flex items-center gap-2 text-secondary-foreground">
                     <FileCode className="h-4 w-4" />
                     <span>1 - Api/Controllers</span>
                   </div>
-                  <div className="flex items-center gap-2 text-primary">
+                  <div className="flex items-center gap-2 text-secondary-foreground">
                     <FileCode className="h-4 w-4" />
                     <span>2 - App/Dto</span>
                   </div>
-                  <div className="flex items-center gap-2 text-primary">
+                  <div className="flex items-center gap-2 text-secondary-foreground">
                     <FileCode className="h-4 w-4" />
                     <span>2 - App/Interfaces</span>
                   </div>
-                  <div className="flex items-center gap-2 text-primary">
+                  <div className="flex items-center gap-2 text-secondary-foreground">
                     <FileCode className="h-4 w-4" />
                     <span>2 - App/Services</span>
                   </div>
-                  <div className="flex items-center gap-2 text-primary">
+                  <div className="flex items-center gap-2 text-secondary-foreground">
                     <FileCode className="h-4 w-4" />
                     <span>3 - Domain/Interfaces</span>
                   </div>
-                  <div className="flex items-center gap-2 text-primary">
+                  <div className="flex items-center gap-2 text-secondary-foreground">
                     <FileCode className="h-4 w-4" />
                     <span>3 - Domain/Models</span>
                   </div>
-                  <div className="flex items-center gap-2 text-primary">
+                  <div className="flex items-center gap-2 text-secondary-foreground">
                     <FileCode className="h-4 w-4" />
                     <span>3 - Domain/Services</span>
                   </div>
-                  <div className="flex items-center gap-2 text-primary">
+                  <div className="flex items-center gap-2 text-secondary-foreground">
                     <FileCode className="h-4 w-4" />
                     <span>4 - Repository</span>
                   </div>
@@ -459,39 +458,39 @@ export default function GenerateClassPage() {
               <div className="space-y-4 text-sm">
                 {/* Presentation Layer */}
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-primary">
+                  <div className="flex items-center gap-2 text-secondary-foreground">
                     <FileCode className="h-4 w-4" />
                     <span>1 - Domain/Entities</span>
                   </div>
-                  <div className="flex items-center gap-2 text-primary">
+                  <div className="flex items-center gap-2 text-secondary-foreground">
                     <FileCode className="h-4 w-4" />
                     <span>1 - Domain/Interfaces Repositories</span>
                   </div>
-                  <div className="flex items-center gap-2 text-primary">
+                  <div className="flex items-center gap-2 text-secondary-foreground">
                     <FileCode className="h-4 w-4" />
                     <span>2 - Application/Interfaces Services</span>
                   </div>
-                  <div className="flex items-center gap-2 text-primary">
+                  <div className="flex items-center gap-2 text-secondary-foreground">
                     <FileCode className="h-4 w-4" />
                     <span>2 - Application/Services</span>
                   </div>
-                  <div className="flex items-center gap-2 text-primary">
+                  <div className="flex items-center gap-2 text-secondary-foreground">
                     <FileCode className="h-4 w-4" />
                     <span>2 - Application/Records</span>
                   </div>
-                  <div className="flex items-center gap-2 text-primary">
+                  <div className="flex items-center gap-2 text-secondary-foreground">
                     <FileCode className="h-4 w-4" />
                     <span>3 - Infra/Repositories</span>
                   </div>
-                  <div className="flex items-center gap-2 text-primary">
+                  <div className="flex items-center gap-2 text-secondary-foreground">
                     <FileCode className="h-4 w-4" />
                     <span>3 - Infra/Models</span>
                   </div>
-                  <div className="flex items-center gap-2 text-primary">
+                  <div className="flex items-center gap-2 text-secondary-foreground">
                     <FileCode className="h-4 w-4" />
                     <span>4 - Api/Controllers</span>
                   </div>
-                  <div className="flex items-center gap-2 text-primary">
+                  <div className="flex items-center gap-2 text-secondary-foreground">
                     <FileCode className="h-4 w-4" />
                     <span>4 - Api/GraphQl</span>
                   </div>
