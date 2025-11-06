@@ -1,12 +1,14 @@
 using Development.Assistant.Back.Models;
+using Development.Assistant.Back.Repository;
 using Development.Assistant.Back.Utils;
+using Microsoft.OpenApi.Extensions;
 using Scriban;
 using Scriban.Runtime;
 using Path = System.IO.Path;
 
 namespace Development.Assistant.Back.Services;
 
-public class ScribanCodeGeneratorService(BaseRepository repository)
+public class ScribanCodeGeneratorService(BaseRepository repository, InputHistoryService inputHistorySrv)
 {
     public IEnumerable<string> AllTables(string connectionString, Constants.DbType dbType)
     {
@@ -22,6 +24,16 @@ public class ScribanCodeGeneratorService(BaseRepository repository)
             
             var tasks = infoClass.Tables.Select(table => GenerateForTableAsync(table, infoClass));
             await Task.WhenAll(tasks);
+            
+            
+            var inputsValue = new List<InputHistoryRequest>();
+            inputsValue.Add(new InputHistoryRequest(Constants.InputName.ConnString, infoClass.ConnectionString));
+            inputsValue.Add(new InputHistoryRequest(Constants.InputName.PathGeral, infoClass.PathGeral));
+            inputsValue.Add(new InputHistoryRequest(Constants.InputName.ProjectName, infoClass.ProjectName));
+            inputsValue.Add(new InputHistoryRequest(Constants.InputName.NameSpace, infoClass.NameSpace));
+            inputsValue.Add(new InputHistoryRequest(Constants.InputName.ExcludePrefixTable, infoClass.ExcludePrefixTable));
+
+            inputHistorySrv.Create(inputsValue);
 
             return true;
         }
@@ -49,8 +61,8 @@ public class ScribanCodeGeneratorService(BaseRepository repository)
 
         var columnsKey = string.Join(", ", columns.Where(c => c.IsPrimaryKey).Select(c => $"{c.Type} {c.Name.ConvertToCamelCase()}"));
         var existText = infoClass.Tables.Any(t => t.Equals($"{table}_text", StringComparison.OrdinalIgnoreCase));
-        
-        var infoFullClass = new InfoFullClass(infoClass.DbType, infoClass, table, tbName, tbProp, columnsKey, columns, existText);
+    
+        var infoFullClass = new InfoFullClass(infoClass.DbType.GetDisplayName(), infoClass, table, tbName, tbProp, columnsKey, columns, existText);
 
         Task[] generateTasks;
 
@@ -91,7 +103,7 @@ public class ScribanCodeGeneratorService(BaseRepository repository)
         await Task.WhenAll(generateTasks);
     }
 
-    private async Task GenerateAndSaveAsync(Constants.TypeClass typeClass, InfoFullClass data, string prefix, string suffix)
+    private static async Task GenerateAndSaveAsync(Constants.TypeClass typeClass, InfoFullClass data, string prefix, string suffix)
     {
         Constants.TypeClass[] allowedTextTypes = [
             Constants.TypeClass.DDD_Dto, Constants.TypeClass.DDD_Model, Constants.TypeClass.DDD_InterfaceRepo, Constants.TypeClass.DDD_Repository,

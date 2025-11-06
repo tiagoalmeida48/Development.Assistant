@@ -1,14 +1,23 @@
-﻿using System.Text.RegularExpressions;
+﻿using Development.Assistant.Back.Models;
+using Development.Assistant.Back.Utils;
+using System.Text.RegularExpressions;
 
 namespace Development.Assistant.Back.Services;
 
-public class CopyProjectService
+public class CopyProjectService(InputHistoryService inputHistorySrv)
 {
     public bool CopyProject(string sourceProjectPath, string destinationProjectPath, string oldNamespace, string newNamespace)
     { 
         var destinationDir = CopyDirectory(sourceProjectPath, destinationProjectPath, oldNamespace, newNamespace);
         UpdateNamespaceInProject(destinationDir, oldNamespace, newNamespace);
         
+        var inputsValue = new List<InputHistoryRequest>();
+        inputsValue.Add(new InputHistoryRequest(Constants.InputName.SourcePath, sourceProjectPath));
+        inputsValue.Add(new InputHistoryRequest(Constants.InputName.DestPath, destinationProjectPath));
+        inputsValue.Add(new InputHistoryRequest(Constants.InputName.OldNamespace, oldNamespace));
+        inputsValue.Add(new InputHistoryRequest(Constants.InputName.NewNamespace, newNamespace));
+
+        inputHistorySrv.Create(inputsValue);
         return true;
     }
 

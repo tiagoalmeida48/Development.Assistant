@@ -1,15 +1,21 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { api, type DatabaseClass } from '@/api'
 import { useAsyncAction } from '@/hooks/useAsyncAction'
+import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { validateFields } from '@/utils'
-import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Label } from '@/components/ui'
+import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Label } from '@/components/ui'
+import { InputWithHistory, type InputWithHistoryRef } from '@/components/ui/input-with-history'
 import { DatabaseComparisonTable } from '@/components/DatabaseComparisonTable'
+import { ScrollToTop } from '@/components/ScrollToTop'
 import { CheckCircle2, Database, Loader2, ArrowRight, ArrowLeft } from 'lucide-react'
 
 export default function CompareDatabasePage() {
   const [connectionString1, setConnectionString1] = useState('')
   const [connectionString2, setConnectionString2] = useState('')
-  const [dbType, setDbType] = useState('0')
+  const [dbType, setDbType] = useLocalStorage('compare-db-type', '0')
+
+  const conn1Ref = useRef<InputWithHistoryRef>(null)
+  const conn2Ref = useRef<InputWithHistoryRef>(null)
 
   const { loading, data: result, execute } = useAsyncAction<DatabaseClass>()
 
@@ -27,44 +33,46 @@ export default function CompareDatabasePage() {
         <h1 className="text-2xl text-secondary-foreground font-bold mb-2">Comparar Bancos de Dados</h1>
       </div>
 
-      <Card className="mb-6 shadow-sm hover:shadow-md transition-shadow">
+      <Card className="mb-6 shadow-sm border-border hover:shadow-md transition-shadow">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Configuração</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 grid grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="dbType" className="text-sm font-medium">Tipo de Banco de Dados</Label>
             <select
               id="dbType"
               value={dbType}
               onChange={(e) => setDbType(e.target.value)}
-              className="flex h-10 w-full rounded-md border border-foreground bg-input text-foreground px-3 py-2 text-sm shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary"
+              className="flex h-10 w-full rounded-md border border-border bg-input text-foreground px-3 py-2 text-sm shadow-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary"
             >
-              <option value="0">MySQL</option>
+              <option value="0">MariaDb</option>
               <option value="1">Oracle</option>
               <option value="2">PostgreSQL</option>
               <option value="3">SQL Server</option>
             </select>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 col-span-2">
             <Label htmlFor="conn1" className="text-sm font-medium">Connection String - Banco 1</Label>
-            <Input
+            <InputWithHistory
+              ref={conn1Ref}
               id="conn1"
               placeholder="Server=localhost;Database=db1;User=user;Password=pass;"
               value={connectionString1}
-              onChange={(e) => setConnectionString1(e.target.value)}
+              onValueChange={setConnectionString1}
               className="h-10"
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 col-span-full">
             <Label htmlFor="conn2" className="text-sm font-medium">Connection String - Banco 2</Label>
-            <Input
+            <InputWithHistory
+              ref={conn2Ref}
               id="conn2"
               placeholder="Server=localhost;Database=db2;User=user;Password=pass;"
               value={connectionString2}
-              onChange={(e) => setConnectionString2(e.target.value)}
+              onValueChange={setConnectionString2}
               className="h-10"
             />
           </div>
@@ -72,7 +80,7 @@ export default function CompareDatabasePage() {
           <Button
             onClick={handleCompare}
             disabled={loading}
-            className="w-full h-10"
+            className="w-full h-10 col-span-full"
           >
             {loading ? (
               <>
@@ -202,6 +210,9 @@ export default function CompareDatabasePage() {
           )}
         </>
       )}
+
+      {/* Botão Voltar ao Topo */}
+      <ScrollToTop />
     </div>
   )
 }

@@ -4,7 +4,7 @@ namespace Development.Assistant.Back.Models;
 
 public class InfoFullClass
 {
-    public InfoFullClass(Constants.DbType database, InfoClass infoClass, string tableNameOriginal, string tableName, string tableProp, string columnsKey, IEnumerable<ColumnInfo> columns, bool existText)
+    public InfoFullClass(string database, InfoClass infoClass, string tableNameOriginal, string tableName, string tableProp, string columnsKey, IEnumerable<ColumnInfo> columns, bool existText)
     {
         Database = database;
         InfoClass = infoClass;
@@ -16,7 +16,7 @@ public class InfoFullClass
         ExistText = existText;
     }
     
-    public Constants.DbType Database { get; set; }
+    public string Database { get; set; }
     public InfoClass InfoClass { get; set; }
     public string TableNameOriginal { get; set; }
     public string TableName { get; set; }

@@ -1,8 +1,8 @@
 export enum DbType {
-  MySQL = 'MY_SQL',
-  SQLServer = 'SQL_SERVER',
-  Oracle = 'ORACLE',
-  PostgreSQL = 'POSTGRE_SQL',
+  MariaDb = '0',
+  SqlServer = '1',
+  Oracle = '2',
+  PostgreSql = '3',
 }
 
 export interface ColumnInfo {
@@ -44,4 +44,22 @@ export interface InfoClass {
 export interface ErrorResponse {
   error: string
   details?: string
+}
+
+// ==================== AUTH & USER ====================
+
+export interface User {
+  id: number
+  username: string
+  login: string
+  password?: string
+}
+
+export interface LoginRequest {
+  login: string
+  password: string
+}
+
+export interface LoginResponse {
+  token: string
 }

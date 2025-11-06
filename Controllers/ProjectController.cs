@@ -1,4 +1,5 @@
 using Development.Assistant.Back.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Development.Assistant.Controllers;
@@ -8,6 +9,7 @@ namespace Development.Assistant.Controllers;
 public class ProjectController(CopyProjectService copyProjectService) : ControllerBase
 {
     [HttpGet("copy-project")]
+    [Authorize] 
     public async Task<ActionResult<bool>> CopyProject(string sourceProjectPath, string destinationProjectPath, string oldNamespace, string newNamespace)
     {
         await Task.Run(() => copyProjectService.CopyProject(sourceProjectPath, destinationProjectPath, oldNamespace, newNamespace));

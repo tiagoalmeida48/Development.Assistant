@@ -1,10 +1,11 @@
 ﻿using Development.Assistant.Back.Models;
+using Development.Assistant.Back.Repository;
 using Development.Assistant.Back.Services;
 using Development.Assistant.Back.Utils;
 
 namespace Development.Assistant.Back.Domain.Services;
 
-public class CompareDatabaseService(BaseRepository repository) 
+public class CompareDatabaseService(BaseRepository repository, InputHistoryService inputHistorySrv) 
 {
     public async Task<DatabaseClass> CompareAsync(string connectionString1, string connectionString2, Constants.DbType dbType)
     {
@@ -26,6 +27,12 @@ public class CompareDatabaseService(BaseRepository repository)
                 RegisterTables = CompareRegisterLists(database1, database2)
             };
 
+            var inputsValue = new List<InputHistoryRequest>();
+            inputsValue.Add(new InputHistoryRequest(Constants.InputName.Conn1, connectionString1));
+            inputsValue.Add(new InputHistoryRequest(Constants.InputName.Conn2, connectionString2));
+          
+            inputHistorySrv.Create(inputsValue);
+            
             return model;
         }
         catch (Exception e)

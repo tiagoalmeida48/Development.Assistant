@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { toast } from 'sonner'
 import { api } from '@/api'
 import { useAsyncAction } from '@/hooks/useAsyncAction'
 import { validateFields } from '@/utils'
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label } from '@/components/ui'
+import { Button, Card, CardContent, CardHeader, CardTitle, Label } from '@/components/ui'
+import { InputWithHistory, type InputWithHistoryRef } from '@/components/ui/input-with-history'
 import { Copy, Loader2, FolderInput, FolderOutput } from 'lucide-react'
 
 export default function CopyProjectPage() {
@@ -11,6 +12,11 @@ export default function CopyProjectPage() {
   const [destinationProjectPath, setDestinationProjectPath] = useState('')
   const [oldNamespace, setOldNamespace] = useState('')
   const [newNamespace, setNewNamespace] = useState('')
+
+  const sourcePathRef = useRef<InputWithHistoryRef>(null)
+  const destPathRef = useRef<InputWithHistoryRef>(null)
+  const oldNsRef = useRef<InputWithHistoryRef>(null)
+  const newNsRef = useRef<InputWithHistoryRef>(null)
 
   const { loading, success, execute, reset: resetAction } = useAsyncAction()
 
@@ -41,7 +47,7 @@ export default function CopyProjectPage() {
         <h1 className="text-2xl text-secondary-foreground font-bold mb-2">Copiar Projeto</h1>
       </div>
 
-      <Card className="shadow-sm hover:shadow-md transition-shadow">
+      <Card className="shadow-sm hover:shadow-md border-border transition-shadow">
         <CardHeader className="pb-3">
           <CardTitle className="text-lg">Configuração da Cópia</CardTitle>
         </CardHeader>
@@ -52,11 +58,12 @@ export default function CopyProjectPage() {
                 <FolderInput className="h-4 w-4" />
                 Projeto Origem
               </Label>
-              <Input
+              <InputWithHistory
+                ref={sourcePathRef}
                 id="sourcePath"
                 placeholder="C:\Projects\Source"
                 value={sourceProjectPath}
-                onChange={(e) => setSourceProjectPath(e.target.value)}
+                onValueChange={setSourceProjectPath}
                 className="h-10"
               />
             </div>
@@ -66,11 +73,12 @@ export default function CopyProjectPage() {
                 <FolderOutput className="h-4 w-4" />
                 Projeto Destino
               </Label>
-              <Input
+              <InputWithHistory
+                ref={destPathRef}
                 id="destPath"
                 placeholder="C:\Projects\Destination"
                 value={destinationProjectPath}
-                onChange={(e) => setDestinationProjectPath(e.target.value)}
+                onValueChange={setDestinationProjectPath}
                 className="h-10"
               />
             </div>
@@ -79,22 +87,24 @@ export default function CopyProjectPage() {
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="oldNs" className="text-sm font-medium">Namespace Antigo</Label>
-              <Input
+              <InputWithHistory
+                ref={oldNsRef}
                 id="oldNs"
                 placeholder="OldProject.Core"
                 value={oldNamespace}
-                onChange={(e) => setOldNamespace(e.target.value)}
+                onValueChange={setOldNamespace}
                 className="h-10"
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="newNs" className="text-sm font-medium">Namespace Novo</Label>
-              <Input
+              <InputWithHistory
+                ref={newNsRef}
                 id="newNs"
                 placeholder="NewProject.Core"
                 value={newNamespace}
-                onChange={(e) => setNewNamespace(e.target.value)}
+                onValueChange={setNewNamespace}
                 className="h-10"
               />
             </div>

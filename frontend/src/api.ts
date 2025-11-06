@@ -35,7 +35,7 @@ export interface InfoClass {
 
 async function apiCall<T>(
   endpoint: string,
-  method: 'GET' | 'POST' = 'GET',
+  method: 'GET' | 'POST' | 'PUT' = 'GET',
   params?: Record<string, string>,
   body?: unknown
 ): Promise<T> {
@@ -47,29 +47,75 @@ async function apiCall<T>(
     })
   }
 
+  // Pegar token do localStorage
+  const token = localStorage.getItem('token')
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  }
+
+  // Adicionar Authorization header se token existir
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`
+  }
+
   const response = await fetch(url.toString(), {
     method,
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: body ? JSON.stringify(body) : undefined,
   })
 
   if (!response.ok) {
     let errorMessage = `Erro: ${response.statusText}`
 
-    const errorData = await response.json()
-    if (errorData.error) {
-      errorMessage = `${errorData.error} - ${errorData.details}`
+    try {
+      const errorData = await response.json()
+      if (errorData.message) {
+        errorMessage = errorData.message
+      } else if (errorData.error) {
+        errorMessage = `${errorData.error} - ${errorData.details}`
+      }
+    } catch {
+      // Se não conseguir parsear JSON, manter mensagem padrão
     }
 
     throw new Error(errorMessage)
   }
 
-  return response.json()
+  // Pegar o content-type para saber como parsear
+  const contentType = response.headers.get('content-type')
+
+  // Se for JSON, parsear como JSON
+  if (contentType && contentType.includes('application/json')) {
+    return response.json()
+  }
+
+  // Se for texto, retornar como texto (para strings como token JWT)
+  return response.text()
 }
 
 // ==================== API ====================
 
 export const api = {
+  auth: {
+    login: (login: string, password: string) =>
+      apiCall<string>('/auth/login', 'POST', undefined, { login, password }),
+  },
+
+  user: {
+    getAll: () =>
+      apiCall<any[]>('/user/all', 'GET'),
+
+    get: (id: number) =>
+      apiCall<any>('/user/get', 'GET', { id: id.toString() }),
+
+    create: (username: string, login: string, password: string) =>
+      apiCall<boolean>('/user/create', 'POST', undefined, { username, login, password }),
+
+    update: (id: number, username: string, login: string, password: string) =>
+      apiCall<boolean>('/user/update', 'PUT', undefined, { id, username, login, password }),
+  },
+
   database: {
     compareDatabases: (connectionString1: string, connectionString2: string, dbType: number) =>
       apiCall<DatabaseClass>('/database/compare-databases', 'POST', undefined, {
@@ -101,6 +147,18 @@ export const api = {
         oldNamespace,
         newNamespace,
       }),
+  },
+
+  inputHistory: {
+    getAll: (input: string, valueInput?: string) =>
+      apiCall<Array<{ id: number; user: number; input: string; valueInput: string }>>(
+        '/inputhistory/all',
+        'GET',
+        valueInput ? { input, valueInput } : { input }
+      ),
+
+    delete: (ids: number[]) =>
+      apiCall<boolean>('/inputhistory/delete', 'DELETE', undefined, ids),
   },
 }
 

@@ -7,10 +7,10 @@ public class Constants
 {
     public enum DbType
     {
-        MySQL,
+        MariaDb,
         Oracle,
         PostgreSql,
-        SQLServer
+        SqlServer
     }
 
     public enum Template
@@ -59,6 +59,8 @@ public class Constants
         { "date", "DateTime" },
         { "varchar", "string" },
         { "char", "string" },
+        { "nvarchar", "string" },
+        { "nchar", "string" },
 
         { "boolean", "bool" },
         { "\"char\"", "string" },
@@ -152,7 +154,30 @@ public class Constants
             { "columns_key", data.ColumnsKey },
             { "columns_key_names", data.ColumnsKey.RemoveColumnTypes() },
             { "columns", data.Columns },
-            { "exist_text", data.ExistText }
+            { "exist_text", data.ExistText },
+            { "database", data.Database }       
         };
+    }
+
+    public class JwtConfig
+    {
+        public static string SecretKey => "MinhaSuperChaveSecretaComMaisDe32CaracteresParaSeguranca!@#2024";
+        public static string Issuer => "DevelopmentAssistant";
+        public static string Audience => "DevelopmentAssistantApp";
+    }
+
+    public class InputName
+    {
+        public const string Conn1 = "conn1";
+        public const string Conn2 = "conn2";
+        public const string SourcePath = "sourcePath";
+        public const string DestPath = "destPath";
+        public const string OldNamespace = "oldNs";
+        public const string NewNamespace = "newNs";
+        public const string ConnString = "connString";
+        public const string PathGeral = "pathGeral";
+        public const string ProjectName = "projectName";
+        public const string NameSpace = "nameSpace";
+        public const string ExcludePrefixTable = "excludePrefixTable";
     }
 }

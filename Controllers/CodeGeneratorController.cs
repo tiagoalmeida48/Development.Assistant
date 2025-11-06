@@ -1,6 +1,6 @@
 using Development.Assistant.Back.Models;
 using Development.Assistant.Back.Services;
-using Development.Assistant.Back.Utils;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Development.Assistant.Controllers;
@@ -10,6 +10,7 @@ namespace Development.Assistant.Controllers;
 public class CodeGeneratorController(ScribanCodeGeneratorService scribanCodeGeneratorService) : ControllerBase
 {
     [HttpPost("create-class")]
+    [Authorize] 
     public async Task<ActionResult<bool>> CreateClass([FromBody] InfoClass input)
     {
         var success = await scribanCodeGeneratorService.CreateClassAsync(input);
@@ -17,10 +18,10 @@ public class CodeGeneratorController(ScribanCodeGeneratorService scribanCodeGene
     }
 
     [HttpPost("all-tables")]
+    [Authorize] 
     public async Task<ActionResult<List<string>>> AllTables([FromBody] GetTablesRequest request)
     {
         var tables = await Task.Run(() => scribanCodeGeneratorService.AllTables(request.ConnectionString, request.DbType));
         return Ok(tables.ToList());
     }
-
 }

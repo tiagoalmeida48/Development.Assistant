@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { api } from "@/api";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import { validateFields } from "@/utils";
 import {
   Button,
@@ -9,10 +10,15 @@ import {
   CardContent,
   CardHeader,
   CardTitle,
-  Input,
   Label,
   Checkbox,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui";
+import { InputWithHistory, type InputWithHistoryRef } from "@/components/ui/input-with-history";
+import { ScrollToTop } from "@/components/ScrollToTop";
 import {
   CheckCircle2,
   Settings,
@@ -23,18 +29,27 @@ import {
   Square,
   FileCode,
   Layers,
+  Copy,
 } from "lucide-react";
 
 export default function GenerateClassPage() {
   const [connectionString, setConnectionString] = useState("");
-  const [dbType, setDbType] = useState("0");
-  const [template, setTemplate] = useState("0");
+  const [dbType, setDbType] = useLocalStorage("gen-db-type", "0");
+  const [template, setTemplate] = useLocalStorage("gen-template", "0");
   const [pathGeral, setPathGeral] = useState("");
   const [projectName, setProjectName] = useState("");
   const [nameSpace, setNameSpace] = useState("");
   const [excludePrefixTable, setExcludePrefixTable] = useState("");
   const [selectedTables, setSelectedTables] = useState("");
   const [checkedTables, setCheckedTables] = useState<Set<string>>(new Set());
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [generatedPath, setGeneratedPath] = useState("");
+
+  const connStringRef = useRef<InputWithHistoryRef>(null);
+  const pathGeralRef = useRef<InputWithHistoryRef>(null);
+  const projectNameRef = useRef<InputWithHistoryRef>(null);
+  const nameSpaceRef = useRef<InputWithHistoryRef>(null);
+  const excludePrefixRef = useRef<InputWithHistoryRef>(null);
 
   const {
     loading: loadingTables,
@@ -117,11 +132,31 @@ export default function GenerateClassPage() {
         nameSpace,
         excludePrefixTable
       });
+
+      // Salva o caminho e mostra o modal
+      setGeneratedPath(pathGeral);
+      setShowSuccessModal(true);
+
       toast.success("Classes geradas com sucesso!", {
         description:
           "As classes e camadas foram geradas no diretório especificado.",
       });
     });
+  };
+
+  const handleCopyPath = async () => {
+    try {
+      await navigator.clipboard.writeText(generatedPath);
+      toast.success("Caminho copiado!", {
+        description: "Cole no explorador de arquivos"
+      });
+      // Fecha o modal após copiar
+      setShowSuccessModal(false);
+    } catch (err) {
+      toast.error("Erro ao copiar", {
+        description: "Não foi possível copiar o caminho para a área de transferência"
+      });
+    }
   };
 
   const handleReset = () => {
@@ -144,7 +179,7 @@ export default function GenerateClassPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 space-y-4">
           {/* Card de Configuração */}
-          <Card className="shadow-sm hover:shadow-md transition-shadow">
+          <Card className="shadow-sm hover:shadow-md border-border transition-shadow">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Settings className="h-5 w-5" />
@@ -161,9 +196,9 @@ export default function GenerateClassPage() {
                     id="dbType"
                     value={dbType}
                     onChange={(e) => setDbType(e.target.value)}
-                    className="flex h-10 w-full items-center justify-between rounded-md border border-foreground bg-input text-foreground px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex h-10 w-full items-center justify-between rounded-md border border-border bg-input text-foreground px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    <option value="0">MySQL</option>
+                    <option value="0">MariaDb</option>
                     <option value="1">Oracle</option>
                     <option value="2">PostgreSQL</option>
                     <option value="3">SQL Server</option>
@@ -174,11 +209,12 @@ export default function GenerateClassPage() {
                   <Label htmlFor="connString" className="text-sm font-medium">
                     Connection String
                   </Label>
-                  <Input
+                  <InputWithHistory
+                    ref={connStringRef}
                     id="connString"
                     placeholder="Server=localhost;Database=mydb;User=user;Password=pass;"
                     value={connectionString}
-                    onChange={(e) => setConnectionString(e.target.value)}
+                    onValueChange={setConnectionString}
                     className="h-10"
                   />
                 </div>
@@ -192,11 +228,12 @@ export default function GenerateClassPage() {
                     Caminho
                   </Label>
                   <div className="flex gap-2">
-                    <Input
+                    <InputWithHistory
+                      ref={pathGeralRef}
                       id="pathGeral"
                       placeholder="C:\Projects\Output"
                       value={pathGeral}
-                      onChange={(e) => setPathGeral(e.target.value)}
+                      onValueChange={setPathGeral}
                       className="h-10 flex-1"
                     />
                   </div>
@@ -209,7 +246,7 @@ export default function GenerateClassPage() {
                       id="template"
                       value={template}
                       onChange={(e) => setTemplate(e.target.value)}
-                      className="flex h-10 w-full items-center justify-between rounded-md border border-foreground bg-input text-foreground px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex h-10 w-full items-center justify-between rounded-md border border-border bg-input text-foreground px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <option value="0">DDD</option>
                     <option value="1">Arquitetura Limpa</option>
@@ -220,11 +257,12 @@ export default function GenerateClassPage() {
                   <Label htmlFor="projectName" className="text-sm font-medium">
                     Projeto
                   </Label>
-                  <Input
+                  <InputWithHistory
+                    ref={projectNameRef}
                     id="projectName"
                     placeholder="MyProject"
                     value={projectName}
-                    onChange={(e) => setProjectName(e.target.value)}
+                    onValueChange={setProjectName}
                     className="h-10"
                   />
                 </div>
@@ -233,24 +271,26 @@ export default function GenerateClassPage() {
                   <Label htmlFor="nameSpace" className="text-sm font-medium">
                     Ultimo nome do namespace
                   </Label>
-                  <Input
+                  <InputWithHistory
+                    ref={nameSpaceRef}
                     id="nameSpace"
                     placeholder=".Core"
                     value={nameSpace}
-                    onChange={(e) => setNameSpace(e.target.value)}
+                    onValueChange={setNameSpace}
                     className="h-10"
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="excludePrefixTable" className="text-sm font-medium">
                     Excluir prefixo das tabelas
                   </Label>
-                  <Input
+                  <InputWithHistory
+                    ref={excludePrefixRef}
                     id="excludePrefixTable"
                     placeholder="Base"
                     value={excludePrefixTable}
-                    onChange={(e) => setExcludePrefixTable(e.target.value)}
+                    onValueChange={setExcludePrefixTable}
                     className="h-10"
                   />
                 </div>
@@ -279,8 +319,8 @@ export default function GenerateClassPage() {
           </Card>
 
           {/* Card de Tabelas */}
-          <Card className="shadow-sm">
-            <CardContent className="space-y-3">
+          <Card className="shadow-sm border-border">
+            <CardContent className="space-y-3 mt-5">
               {availableTables && availableTables.length > 0 ? (
                 <>
                   <div className="flex gap-2">
@@ -357,9 +397,9 @@ export default function GenerateClassPage() {
 
               {checkedTables.size > 0 ? (
                 <div className="flex items-center gap-2 text-sm text-muted-foreground bg-primary/5 border border-primary/20 rounded-lg p-3">
-                  <Database className="h-4 w-4 text-primary flex-shrink-0" />
+                  <Database className="h-4 w-4 text-secondary-foreground flex-shrink-0" />
                   <p>
-                    <span className="font-semibold text-primary">
+                    <span className="font-semibold text-secondary-foreground">
                       {checkedTables.size} tabela
                       {checkedTables.size > 1 ? "s" : ""} selecionada
                       {checkedTables.size > 1 ? "s" : ""}
@@ -402,7 +442,7 @@ export default function GenerateClassPage() {
         </div>
 
         <div>
-          <Card className="shadow-sm h-full w-100">
+          <Card className="shadow-sm h-full border-border w-100">
             <CardHeader className="pb-3">
               <CardTitle className="flex items-center gap-2 text-lg">
                 <Layers className="h-5 w-5" />
@@ -500,6 +540,48 @@ export default function GenerateClassPage() {
           </Card>
         </div>
       </div>
+
+      {/* Modal de Sucesso */}
+      <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-500/20">
+                <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
+              </div>
+              <DialogTitle className="text-xl text-secondary-foreground">Classes Geradas com Sucesso!</DialogTitle>
+            </div>
+          </DialogHeader>
+
+          <div className="space-y-2">
+            <div className="p-4 bg-muted/30 dark:bg-muted/50 rounded-lg">
+              <div className="flex items-start gap-3">
+                <FolderOpen className="h-5 w-5 mt-0.5 text-muted-foreground flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium mb-1 text-secondary-foreground">Localização dos arquivos:</p>
+                  <p className="text-sm text-muted-foreground break-all font-mono px-2 py-1 rounded border border-border/50">
+                    {generatedPath}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2 mt-6">
+              <Button
+                onClick={handleCopyPath}
+                className="w-full"
+                variant="default"
+              >
+                <Copy className="mr-2 h-4 w-4" />
+                Copiar Caminho
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Botão Voltar ao Topo */}
+      <ScrollToTop />
     </div>
   );
 }
