@@ -4,7 +4,6 @@ using Development.Assistant.Back.Models;
 using Development.Assistant.Back.Repository;
 using Development.Assistant.Back.Services;
 using Development.Assistant.Back.Utils;
-using Development.Assistant.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -27,6 +26,7 @@ builder.Services.AddScoped<InputHistoryService>();
 
 builder.Services.AddScoped<BaseRepository>();
 builder.Services.AddScoped<UserRepository>();
+builder.Services.AddScoped<MetadataRepository>();
 builder.Services.AddScoped<InputHistoryRepository>();
 
 builder.Services.AddTransient(provider =>
@@ -102,8 +102,6 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 var app = builder.Build();
-
-ServiceLocator.SetLocatorProvider(app.Services);
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
 

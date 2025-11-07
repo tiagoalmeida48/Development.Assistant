@@ -1,3 +1,5 @@
+import type { ApiResponse } from './types'
+
 export interface DatabaseClass {
   database1: string
   database2: string
@@ -35,7 +37,7 @@ export interface InfoClass {
 
 async function apiCall<T>(
   endpoint: string,
-  method: 'GET' | 'POST' | 'PUT' = 'GET',
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'GET',
   params?: Record<string, string>,
   body?: unknown
 ): Promise<T> {
@@ -65,33 +67,29 @@ async function apiCall<T>(
     body: body ? JSON.stringify(body) : undefined,
   })
 
-  if (!response.ok) {
-    let errorMessage = `Erro: ${response.statusText}`
-
-    try {
-      const errorData = await response.json()
-      if (errorData.message) {
-        errorMessage = errorData.message
-      } else if (errorData.error) {
-        errorMessage = `${errorData.error} - ${errorData.details}`
-      }
-    } catch {
-      // Se não conseguir parsear JSON, manter mensagem padrão
-    }
-
-    throw new Error(errorMessage)
-  }
-
   // Pegar o content-type para saber como parsear
   const contentType = response.headers.get('content-type')
 
   // Se for JSON, parsear como JSON
   if (contentType && contentType.includes('application/json')) {
-    return response.json()
+    const data = await response.json() as ApiResponse<T>
+
+    // Se a resposta indicar falha, lançar erro
+    if (!data.success) {
+      throw new Error(data.message || 'Erro desconhecido')
+    }
+
+    // Retornar apenas o result
+    return data.result
   }
 
-  // Se for texto, retornar como texto (para strings como token JWT)
-  return response.text()
+  // Se não for JSON e não for OK, lançar erro
+  if (!response.ok) {
+    throw new Error(`Erro: ${response.statusText}`)
+  }
+
+  // Se for texto, retornar como texto (para casos especiais)
+  return response.text() as T
 }
 
 // ==================== API ====================

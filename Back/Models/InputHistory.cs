@@ -4,22 +4,20 @@ namespace Development.Assistant.Back.Models;
 
 public class InputHistory
 {
-    public int Id { get; set; }
-    public int User { get; set; }
-    public string Input { get; set; }
-    
-    [Column("value_input")]
-    public string ValueInput { get; set; }
-}
+    public InputHistory()
+    {
+    }
 
-public class InputHistoryRequest
-{
-    public InputHistoryRequest(string input, string valueInput)
+    public InputHistory(string input, string valueInput)
     {
         Input = input;
         ValueInput = valueInput;
     }
 
+    public int Id { get; set; }
+    public int User { get; set; }
     public string Input { get; set; }
+
+    [Column("value_input")]
     public string ValueInput { get; set; }
 }

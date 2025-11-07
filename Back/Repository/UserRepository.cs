@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Development.Assistant.Back.Repository;
 
-public class UserRepository : BaseRepository
+public class UserRepository(ApiContext apiContext) : BaseRepository(apiContext)
 {
     public IEnumerable<User> Search(int id = 0, string login = null)
     {

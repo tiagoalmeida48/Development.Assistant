@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Development.Assistant.Back.Repository;
 
-public class InputHistoryRepository : BaseRepository
+public class InputHistoryRepository(ApiContext apiContext) : BaseRepository(apiContext)
 {
     public IEnumerable<InputHistory> Search(int id = 0, string input = null, string valueInput = null)
     {

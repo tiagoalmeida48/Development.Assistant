@@ -1,8 +1,8 @@
 ﻿using Development.Assistant.Back.Utils;
 
-namespace Development.Assistant.Back.Models;
+namespace Development.Assistant.Back.Dto;
 
-public class InfoClass
+public class InfoClassDto
 {
     public string ConnectionString { get; set; }
     public Constants.DbType DbType { get; set; }

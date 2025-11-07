@@ -46,6 +46,13 @@ export interface ErrorResponse {
   details?: string
 }
 
+export interface ApiResponse<T> {
+  success: boolean
+  message: string
+  internalError: number
+  result: T
+}
+
 // ==================== AUTH & USER ====================
 
 export interface User {

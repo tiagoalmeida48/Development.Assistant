@@ -1,3 +1,4 @@
+using Development.Assistant.Back.Dto;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -18,18 +19,16 @@ public class AuthService(UserRepository userRep)
         var user = userRep.Search(id).FirstOrDefault();
         if (user == null)
             throw new Exception("Usuário não encontrado");
-        
-        user.Password = string.Empty;
+
         return user;
     }
 
-    public User GetByLogin(string login)
+    private User GetByLogin(string login)
     {
         var user = userRep.Search(login: login).FirstOrDefault();
         if (user == null)
             throw new Exception("Usuário ou senha inválidos");
-        
-        user.Password = string.Empty;
+
         return user;
     }
 
@@ -38,10 +37,10 @@ public class AuthService(UserRepository userRep)
         var users = userRep.Search();
         return users;
     }
-    
-    public string Login(LoginRequest request)
+
+    public string Login(LoginVo request)
     {
-        var user = userRep.Search(login: request.Login).FirstOrDefault();
+        var user = GetByLogin(request.Login);
 
         if (!VerifyPassword(request.Password, user.Password))
             throw new Exception("Usuário ou senha inválidos");
@@ -51,7 +50,8 @@ public class AuthService(UserRepository userRep)
 
     public bool Create(User request)
     {
-        if (userRep.Search(login: request.Login) != null)
+        var existingUser = userRep.Search(login: request.Login).FirstOrDefault();
+        if (existingUser != null)
             throw new Exception("Usuário já existe");
 
         var user = new User
@@ -67,12 +67,13 @@ public class AuthService(UserRepository userRep)
 
     public bool Update(User request)
     {
-        var oldUser = userRep.Search(login: request.Login).FirstOrDefault();
+        var oldUser = userRep.Search(request.Id).FirstOrDefault();
         if (oldUser == null)
             throw new Exception("Usuário não existe");
 
         var user = new User
         {
+            Id = request.Id,
             Username = request.Username,
             Login = request.Login,
             Password = HashPassword(request.Password)
@@ -86,25 +87,25 @@ public class AuthService(UserRepository userRep)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(Constants.JwtConfig.SecretKey);
-        
+
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Name, user.Username), 
+            new(ClaimTypes.Name, user.Username),
             new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(claims, JwtBearerDefaults.AuthenticationScheme), 
+            Subject = new ClaimsIdentity(claims, JwtBearerDefaults.AuthenticationScheme),
             Expires = DateTime.UtcNow.AddHours(12),
-            Issuer = Constants.JwtConfig.Issuer, 
-            Audience = Constants.JwtConfig.Audience, 
+            Issuer = Constants.JwtConfig.Issuer,
+            Audience = Constants.JwtConfig.Audience,
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 
-        
+
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
@@ -127,7 +128,7 @@ public class AuthService(UserRepository userRep)
         return Convert.ToBase64String(combined);
 
     }
-    
+
     private static byte[] GenerateSalt()
     {
         var buffer = new byte[16];
@@ -160,7 +161,7 @@ public class AuthService(UserRepository userRep)
 
 public static class Access
 {
-        
+
     public static string GetToken(this HttpContext ctx)
     {
         var key = ctx.GetKeyHeader("Authorization");
@@ -172,7 +173,7 @@ public static class Access
 
         return keySpt[0];
     }
-    
+
     public static int DecodeJwt(this string token)
     {
         var handler = new JwtSecurityTokenHandler();

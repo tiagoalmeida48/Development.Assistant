@@ -142,15 +142,15 @@ public class Constants
         return paths[typeClass];
     }
     
-    public static ScriptObject MapInfo(string tableNameOriginal, string tableName, string tableProp, InfoFullClass data)
+    public static ScriptObject MapInfo(string tableNameOriginal, string tableName, string tableProp, DatabaseMetadataVo data)
     {
         return new ScriptObject
         {
             { "table_name_original", tableNameOriginal },
             { "table_name", tableName },
             { "table_prop", tableProp },
-            { "project_name", data.InfoClass.ProjectName },
-            { "namespace", data.InfoClass.NameSpace },
+            { "project_name", data.ProjectName },
+            { "namespace", data.Namespace },
             { "columns_key", data.ColumnsKey },
             { "columns_key_names", data.ColumnsKey.RemoveColumnTypes() },
             { "columns", data.Columns },

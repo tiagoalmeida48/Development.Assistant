@@ -10,7 +10,7 @@ public class InputHistoryService(InputHistoryRepository inputHistoryRepository)
         return inputHistoryRepository.Search(input: input, valueInput: valueInput);
     }
 
-    public bool Create(List<InputHistoryRequest> inputs)
+    public bool Create(IEnumerable<InputHistory> inputs)
     {
         foreach (var input in inputs)
         {

@@ -1,4 +1,4 @@
-namespace Development.Assistant.Back.Models;
+namespace Development.Assistant.Back.Utils;
 
 public class ApiContext
 {

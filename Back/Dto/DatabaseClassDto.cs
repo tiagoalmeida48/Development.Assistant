@@ -1,40 +1,31 @@
-﻿using Development.Assistant.Back.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
+namespace Development.Assistant.Back.Dto;
 
-namespace Development.Assistant.Back.Models;
-
-public class DatabaseClass
+public class DatabaseClassDto
 {
     public string Database1 { get; set; }
     public string Database2 { get; set; }
-    public List<TableClass> Tables { get; set; }
-    public List<RegisterClass> RegisterTables { get; set; }
+    public List<TableClassDto> Tables { get; set; }
+    public List<RegisterClassDto> RegisterTables { get; set; }
 }
 
-public class TableClass
+public class TableClassDto
 {
     public string Database { get; set; } 
     public string Table { get; set; }
-    public List<ColumnInfo> Columns { get; set; }
+    public List<ColumnInfoDto> Columns { get; set; }
     public int TotalRegisters { get; set; }
 }
 
-public class ColumnInfo
+public class ColumnInfoDto
 {
     public string Name { get; set; }
     public string Type { get; set; }
-    
-    [Column("is_primary_key")]
     public bool IsPrimaryKey { get; set; }
-    
-    [Column("is_identity")]
     public bool IsIdentity { get; set; }
-    
-    [Column("is_nullable")]
     public bool IsNullable { get; set; }
 }
 
-public class RegisterClass
+public class RegisterClassDto
 {
     public string Table { get; set; }
     public int TotalRegisters1 { get; set; }

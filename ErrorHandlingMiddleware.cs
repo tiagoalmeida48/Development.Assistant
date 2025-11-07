@@ -1,6 +1,6 @@
 using System.Net;
 using System.Text.Json;
-using Development.Assistant.Back.Models;
+using Development.Assistant.Back.Utils;
 
 namespace Development.Assistant;
 
@@ -21,51 +21,16 @@ public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandling
 
     private static Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
-        HttpStatusCode statusCode;
-        string generalMessage;
-        var details = exception.Message;
-
-        switch (exception)
+        var errorResponse = new ResultApi<object>
         {
-            case ArgumentException: 
-                statusCode = HttpStatusCode.BadRequest;
-                generalMessage = "Os dados fornecidos são inválidos";
-                break;
-
-            case UnauthorizedAccessException:
-                statusCode = HttpStatusCode.Unauthorized;
-                generalMessage = "Acesso não autorizado";
-                break;
-
-            case FileNotFoundException: 
-                statusCode = HttpStatusCode.NotFound;
-                generalMessage = "Recurso não encontrado";
-                break;
-
-            case InvalidOperationException:
-                statusCode = HttpStatusCode.BadRequest;
-                generalMessage = "Operação inválida";
-                break;
-
-            case IOException:
-                statusCode = HttpStatusCode.InternalServerError;
-                generalMessage = "Erro ao acessar arquivos ou diretórios";
-                break;
-
-            default:
-                statusCode = HttpStatusCode.InternalServerError;
-                generalMessage = "Ocorreu um erro no sistema";
-                break;
-        }
-
-        var errorResponse = new ErrorResponse
-        {
-            Error = generalMessage,
-            Details = details
+            Success = false,
+            Message = exception.Message,
+            InternalError = 500,
+            Result = null
         };
 
         context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)statusCode;
+        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
         var options = new JsonSerializerOptions
         {

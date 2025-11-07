@@ -5,16 +5,16 @@ using Development.Assistant.Back.Utils;
 
 namespace Development.Assistant.Back.Domain.Services;
 
-public class CompareDatabaseService(BaseRepository repository, InputHistoryService inputHistorySrv) 
+public class CompareDatabaseService(MetadataRepository repository, InputHistoryService inputHistorySrv) 
 {
-    public async Task<DatabaseClass> CompareAsync(string connectionString1, string connectionString2, Constants.DbType dbType)
+    public DatabaseClass Compare(string connectionString1, string connectionString2, Constants.DbType dbType)
     {
         try
         {
             var database1Task = GetInfoDatabaseAsync(connectionString1, dbType);
             var database2Task = GetInfoDatabaseAsync(connectionString2, dbType);
 
-            var results = await Task.WhenAll(database1Task, database2Task);
+            var results = Task.WhenAll(database1Task, database2Task).Result;
 
             var database1 = results[0];
             var database2 = results[1];
@@ -27,9 +27,9 @@ public class CompareDatabaseService(BaseRepository repository, InputHistoryServi
                 RegisterTables = CompareRegisterLists(database1, database2)
             };
 
-            var inputsValue = new List<InputHistoryRequest>();
-            inputsValue.Add(new InputHistoryRequest(Constants.InputName.Conn1, connectionString1));
-            inputsValue.Add(new InputHistoryRequest(Constants.InputName.Conn2, connectionString2));
+            var inputsValue = new List<InputHistory>();
+            inputsValue.Add(new InputHistory(Constants.InputName.Conn1, connectionString1));
+            inputsValue.Add(new InputHistory(Constants.InputName.Conn2, connectionString2));
           
             inputHistorySrv.Create(inputsValue);
             
