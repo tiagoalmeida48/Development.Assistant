@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState } from "react";
 import {
   Container,
   Typography,
@@ -8,30 +8,35 @@ import {
   Box,
   Stack,
   CircularProgress,
-} from '@mui/material'
+} from "@mui/material";
 import {
   ContentCopy as CopyIcon,
   FolderOpen as FolderIcon,
   Clear as ClearIcon,
-} from '@mui/icons-material'
-import { useSnackbar } from 'notistack'
-import { useCopyProject } from '@/hooks/queries/useProject'
-import { InputWithHistory } from '@/components/InputWithHistory'
+} from "@mui/icons-material";
+import { useSnackbar } from "notistack";
+import { useCopyProject } from "@/hooks/queries/useProject";
+import { InputWithHistory } from "@/components/InputWithHistory";
 
 export default function CopyProjectPage() {
-  const [sourceProjectPath, setSourceProjectPath] = useState('')
-  const [destinationProjectPath, setDestinationProjectPath] = useState('')
-  const [oldNamespace, setOldNamespace] = useState('')
-  const [newNamespace, setNewNamespace] = useState('')
-  const [success, setSuccess] = useState(false)
+  const [sourceProjectPath, setSourceProjectPath] = useState("");
+  const [destinationProjectPath, setDestinationProjectPath] = useState("");
+  const [oldNamespace, setOldNamespace] = useState("");
+  const [newNamespace, setNewNamespace] = useState("");
+  const [success, setSuccess] = useState(false);
 
-  const copyProjectMutation = useCopyProject()
-  const { enqueueSnackbar } = useSnackbar()
+  const copyProjectMutation = useCopyProject();
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleCopy = async () => {
-    if (!sourceProjectPath || !destinationProjectPath || !oldNamespace || !newNamespace) {
-      enqueueSnackbar('Preencha todos os campos', { variant: 'error' })
-      return
+    if (
+      !sourceProjectPath ||
+      !destinationProjectPath ||
+      !oldNamespace ||
+      !newNamespace
+    ) {
+      enqueueSnackbar("Preencha todos os campos", { variant: "error" });
+      return;
     }
 
     try {
@@ -40,27 +45,27 @@ export default function CopyProjectPage() {
         destinationProjectPath,
         oldNamespace,
         newNamespace,
-      })
-      enqueueSnackbar('Projeto copiado com sucesso!', { variant: 'success' })
-      setSuccess(true)
+      });
+      enqueueSnackbar("Projeto copiado com sucesso!", { variant: "success" });
+      setSuccess(true);
     } catch (error) {
       enqueueSnackbar(
-        error instanceof Error ? error.message : 'Erro ao copiar projeto',
-        { variant: 'error' }
-      )
+        error instanceof Error ? error.message : "Erro ao copiar projeto",
+        { variant: "error" }
+      );
     }
-  }
+  };
 
   const handleReset = () => {
-    setSourceProjectPath('')
-    setDestinationProjectPath('')
-    setOldNamespace('')
-    setNewNamespace('')
-    setSuccess(false)
-  }
+    setSourceProjectPath("");
+    setDestinationProjectPath("");
+    setOldNamespace("");
+    setNewNamespace("");
+    setSuccess(false);
+  };
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
+    <Container maxWidth="xl" sx={{ py: 4 }}>
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" fontWeight={700} gutterBottom>
           Copiar Projeto
@@ -73,18 +78,26 @@ export default function CopyProjectPage() {
       <Card>
         <CardContent sx={{ p: 4 }}>
           <Stack spacing={2}>
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                gap: 2,
+              }}
+            >
               <InputWithHistory
                 value={sourceProjectPath}
                 onChange={setSourceProjectPath}
                 inputName="sourceProjectPath"
                 textFieldProps={{
                   fullWidth: true,
-                  label: 'Projeto Origem',
-                  placeholder: 'C:\\Projects\\Source',
+                  label: "Projeto Origem",
+                  placeholder: "C:\\Projects\\Source",
                   disabled: copyProjectMutation.isPending,
                   InputProps: {
-                    startAdornment: <FolderIcon sx={{ mr: 1, color: 'action.active' }} />,
+                    startAdornment: (
+                      <FolderIcon sx={{ mr: 1, color: "action.active" }} />
+                    ),
                   },
                 }}
               />
@@ -95,25 +108,33 @@ export default function CopyProjectPage() {
                 inputName="destinationProjectPath"
                 textFieldProps={{
                   fullWidth: true,
-                  label: 'Projeto Destino',
-                  placeholder: 'C:\\Projects\\Destination',
+                  label: "Projeto Destino",
+                  placeholder: "C:\\Projects\\Destination",
                   disabled: copyProjectMutation.isPending,
                   InputProps: {
-                    startAdornment: <FolderIcon sx={{ mr: 1, color: 'action.active' }} />,
+                    startAdornment: (
+                      <FolderIcon sx={{ mr: 1, color: "action.active" }} />
+                    ),
                   },
                 }}
               />
             </Box>
 
-            <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr' }, gap: 2 }}>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" },
+                gap: 2,
+              }}
+            >
               <InputWithHistory
                 value={oldNamespace}
                 onChange={setOldNamespace}
                 inputName="oldNamespace"
                 textFieldProps={{
                   fullWidth: true,
-                  label: 'Namespace Antigo',
-                  placeholder: 'OldProject.Core',
+                  label: "Namespace Antigo",
+                  placeholder: "OldProject.Core",
                   disabled: copyProjectMutation.isPending,
                 }}
               />
@@ -124,14 +145,14 @@ export default function CopyProjectPage() {
                 inputName="newNamespace"
                 textFieldProps={{
                   fullWidth: true,
-                  label: 'Namespace Novo',
-                  placeholder: 'NewProject.Core',
+                  label: "Namespace Novo",
+                  placeholder: "NewProject.Core",
                   disabled: copyProjectMutation.isPending,
                 }}
               />
             </Box>
 
-            <Box sx={{ display: 'flex', gap: 2 }}>
+            <Box sx={{ display: "flex", gap: 2 }}>
               <Button
                 variant="contained"
                 size="large"
@@ -146,7 +167,7 @@ export default function CopyProjectPage() {
                   )
                 }
               >
-                {copyProjectMutation.isPending ? 'Copiando...' : 'Copiar'}
+                {copyProjectMutation.isPending ? "Copiando..." : "Copiar"}
               </Button>
 
               {success && (
@@ -164,5 +185,5 @@ export default function CopyProjectPage() {
         </CardContent>
       </Card>
     </Container>
-  )
+  );
 }

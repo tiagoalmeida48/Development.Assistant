@@ -1,21 +1,11 @@
-import '@mui/material/styles'
+import "@mui/material/styles";
 
-declare module '@mui/material/styles' {
-  interface Palette {
-    primary: Palette['primary'] & {
-      lighter: string
-    }
-    error: Palette['error'] & {
-      lighter: string
-    }
+declare module "@mui/material/styles" {
+  interface PaletteColor {
+    lighter?: string;
   }
 
-  interface PaletteOptions {
-    primary?: PaletteOptions['primary'] & {
-      lighter?: string
-    }
-    error?: PaletteOptions['error'] & {
-      lighter?: string
-    }
+  interface SimplePaletteColorOptions {
+    lighter?: string;
   }
 }

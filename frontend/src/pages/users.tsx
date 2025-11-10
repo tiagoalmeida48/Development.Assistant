@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState } from "react";
 import {
   Box,
   Container,
@@ -20,59 +20,73 @@ import {
   CircularProgress,
   IconButton,
   Paper,
-} from '@mui/material'
-import { Add as AddIcon, Edit as EditIcon, PersonAdd as PersonAddIcon } from '@mui/icons-material'
-import { useSnackbar } from 'notistack'
-import { useUsers, useCreateUser, useUpdateUser } from '@/hooks/queries/useUsers'
+} from "@mui/material";
+import {
+  Add as AddIcon,
+  Edit as EditIcon,
+  PersonAdd as PersonAddIcon,
+} from "@mui/icons-material";
+import { useSnackbar } from "notistack";
+import {
+  useUsers,
+  useCreateUser,
+  useUpdateUser,
+} from "@/hooks/queries/useUsers";
 
 interface User {
-  id: number
-  username: string
-  login: string
+  id: number;
+  username: string;
+  login: string;
 }
 
 export default function UsersPage() {
-  const { data: users, isLoading: loadingUsers } = useUsers()
-  const createUserMutation = useCreateUser()
-  const updateUserMutation = useUpdateUser()
-  const { enqueueSnackbar } = useSnackbar()
+  const { data: users, isLoading: loadingUsers } = useUsers();
+  const createUserMutation = useCreateUser();
+  const updateUserMutation = useUpdateUser();
+  const { enqueueSnackbar } = useSnackbar();
 
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [editingUser, setEditingUser] = useState<User | null>(null)
-  const [formData, setFormData] = useState({ username: '', login: '', password: '' })
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [formData, setFormData] = useState({
+    username: "",
+    login: "",
+    password: "",
+  });
 
   const handleOpenModal = (user?: User) => {
     if (user) {
-      setEditingUser(user)
-      setFormData({ username: user.username, login: user.login, password: '' })
+      setEditingUser(user);
+      setFormData({ username: user.username, login: user.login, password: "" });
     } else {
-      setEditingUser(null)
-      setFormData({ username: '', login: '', password: '' })
+      setEditingUser(null);
+      setFormData({ username: "", login: "", password: "" });
     }
-    setIsModalOpen(true)
-  }
+    setIsModalOpen(true);
+  };
 
   const handleCloseModal = () => {
-    setIsModalOpen(false)
-    setEditingUser(null)
-    setFormData({ username: '', login: '', password: '' })
-  }
+    setIsModalOpen(false);
+    setEditingUser(null);
+    setFormData({ username: "", login: "", password: "" });
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
-  }
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!formData.username || !formData.login) {
-      enqueueSnackbar('Preencha nome de usuário e login', { variant: 'error' })
-      return
+      enqueueSnackbar("Preencha nome de usuário e login", { variant: "error" });
+      return;
     }
 
     if (!editingUser && !formData.password) {
-      enqueueSnackbar('Senha é obrigatória para novo usuário', { variant: 'error' })
-      return
+      enqueueSnackbar("Senha é obrigatória para novo usuário", {
+        variant: "error",
+      });
+      return;
     }
 
     try {
@@ -82,27 +96,37 @@ export default function UsersPage() {
           username: formData.username,
           login: formData.login,
           password: formData.password,
-        })
-        enqueueSnackbar('Usuário atualizado com sucesso!', { variant: 'success' })
+        });
+        enqueueSnackbar("Usuário atualizado com sucesso!", {
+          variant: "success",
+        });
       } else {
-        await createUserMutation.mutateAsync(formData)
-        enqueueSnackbar('Usuário criado com sucesso!', { variant: 'success' })
+        await createUserMutation.mutateAsync(formData);
+        enqueueSnackbar("Usuário criado com sucesso!", { variant: "success" });
       }
 
-      handleCloseModal()
+      handleCloseModal();
     } catch (error) {
       enqueueSnackbar(
-        error instanceof Error ? error.message : 'Erro ao salvar usuário',
-        { variant: 'error' }
-      )
+        error instanceof Error ? error.message : "Erro ao salvar usuário",
+        { variant: "error" }
+      );
     }
-  }
+  };
 
-  const isLoading = createUserMutation.isPending || updateUserMutation.isPending
+  const isLoading =
+    createUserMutation.isPending || updateUserMutation.isPending;
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+    <Container maxWidth="xl" sx={{ py: 4 }}>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          mb: 4,
+        }}
+      >
         <Box>
           <Typography variant="h4" fontWeight={700} gutterBottom>
             Usuários
@@ -123,7 +147,7 @@ export default function UsersPage() {
 
       {loadingUsers ? (
         <Card>
-          <CardContent sx={{ py: 12, textAlign: 'center' }}>
+          <CardContent sx={{ py: 12, textAlign: "center" }}>
             <CircularProgress size={48} sx={{ mb: 2 }} />
             <Typography variant="h6" fontWeight={600} gutterBottom>
               Carregando usuários...
@@ -135,8 +159,10 @@ export default function UsersPage() {
         </Card>
       ) : !users || users.length === 0 ? (
         <Card>
-          <CardContent sx={{ py: 12, textAlign: 'center' }}>
-            <PersonAddIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+          <CardContent sx={{ py: 12, textAlign: "center" }}>
+            <PersonAddIcon
+              sx={{ fontSize: 64, color: "text.secondary", mb: 2 }}
+            />
             <Typography variant="h6" fontWeight={600} gutterBottom>
               Nenhum usuário cadastrado
             </Typography>
@@ -180,8 +206,15 @@ export default function UsersPage() {
         </TableContainer>
       )}
 
-      <Dialog open={isModalOpen} onClose={handleCloseModal} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingUser ? 'Editar Usuário' : 'Novo Usuário'}</DialogTitle>
+      <Dialog
+        open={isModalOpen}
+        onClose={handleCloseModal}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>
+          {editingUser ? "Editar Usuário" : "Novo Usuário"}
+        </DialogTitle>
         <form onSubmit={handleSubmit}>
           <DialogContent>
             <TextField
@@ -216,7 +249,11 @@ export default function UsersPage() {
               name="password"
               type="password"
               label="Senha"
-              placeholder={editingUser ? 'Deixe em branco para manter a atual' : 'Digite a senha'}
+              placeholder={
+                editingUser
+                  ? "Deixe em branco para manter a atual"
+                  : "Digite a senha"
+              }
               value={formData.password}
               onChange={handleChange}
               disabled={isLoading}
@@ -235,11 +272,11 @@ export default function UsersPage() {
               disabled={isLoading}
               startIcon={isLoading && <CircularProgress size={20} />}
             >
-              {isLoading ? 'Salvando...' : 'Salvar'}
+              {isLoading ? "Salvando..." : "Salvar"}
             </Button>
           </DialogActions>
         </form>
       </Dialog>
     </Container>
-  )
+  );
 }

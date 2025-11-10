@@ -188,23 +188,23 @@ export default function GenerateClassPage() {
     setSearchTable("");
   };
 
-  const getVerticalOrderedTables = (tables: string[], columns: number) => {        
-    if (tables.length === 0) return []
+  const getVerticalOrderedTables = (tables: string[], columns: number) => {
+    if (tables.length === 0) return [];
 
-    const rows = Math.ceil(tables.length / columns)
-    const result: string[] = []
+    const rows = Math.ceil(tables.length / columns);
+    const result: string[] = [];
 
     for (let row = 0; row < rows; row++) {
       for (let col = 0; col < columns; col++) {
-        const index = col * rows + row
+        const index = col * rows + row;
         if (index < tables.length) {
-          result.push(tables[index])
+          result.push(tables[index]);
         }
       }
     }
 
-    return result
-  }
+    return result;
+  };
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -498,44 +498,46 @@ export default function GenerateClassPage() {
                         gap: 1,
                       }}
                     >
-                      {getVerticalOrderedTables(filteredTables, 4).map((table) => (
-                        <FormControlLabel
-                          key={table}
-                          control={
-                            <Checkbox
-                              checked={checkedTables.has(table)}
-                              onChange={() => handleTableToggle(table)}
-                              size="small"
-                            />
-                          }
-                          label={
-                            <Typography
-                              variant="body2"
-                              sx={{
-                                fontFamily: "monospace",
-                                fontSize: "0.875rem",
-                              }}
-                            >
-                              {table}
-                            </Typography>
-                          }
-                          sx={{
-                            m: 0,
-                            py: 0.5,
-                            px: 1,
-                            borderRadius: 1,
-                            bgcolor: checkedTables.has(table)
-                              ? "primary.lighter"
-                              : "transparent",
-                            transition: "background-color 0.2s ease",
-                            "&:hover": {
+                      {getVerticalOrderedTables(filteredTables, 4).map(
+                        (table) => (
+                          <FormControlLabel
+                            key={table}
+                            control={
+                              <Checkbox
+                                checked={checkedTables.has(table)}
+                                onChange={() => handleTableToggle(table)}
+                                size="small"
+                              />
+                            }
+                            label={
+                              <Typography
+                                variant="body2"
+                                sx={{
+                                  fontFamily: "monospace",
+                                  fontSize: "0.875rem",
+                                }}
+                              >
+                                {table}
+                              </Typography>
+                            }
+                            sx={{
+                              m: 0,
+                              py: 0.5,
+                              px: 1,
+                              borderRadius: 1,
                               bgcolor: checkedTables.has(table)
-                                ? "primary.light"
-                                : "action.hover",
-                            },
-                          }}
-                        />
-                      ))}
+                                ? "primary.lighter"
+                                : "transparent",
+                              transition: "background-color 0.2s ease",
+                              "&:hover": {
+                                bgcolor: checkedTables.has(table)
+                                  ? "primary.light"
+                                  : "action.hover",
+                              },
+                            }}
+                          />
+                        )
+                      )}
                     </Box>
                   </Paper>
                 ) : (

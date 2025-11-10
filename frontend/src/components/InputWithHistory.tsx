@@ -1,13 +1,27 @@
-import { Autocomplete, TextField, TextFieldProps, Box, Typography, IconButton, Tooltip } from '@mui/material'
-import { History as HistoryIcon, Delete as DeleteIcon } from '@mui/icons-material'
-import { useInputHistory, useDeleteInputHistory } from '@/hooks/queries/useInputHistory'
-import { useState } from 'react'
+import {
+  Autocomplete,
+  TextField,
+  TextFieldProps,
+  Box,
+  Typography,
+  IconButton,
+  Tooltip,
+} from "@mui/material";
+import {
+  History as HistoryIcon,
+  Delete as DeleteIcon,
+} from "@mui/icons-material";
+import {
+  useInputHistory,
+  useDeleteInputHistory,
+} from "@/hooks/queries/useInputHistory";
+import { useState } from "react";
 
 interface InputWithHistoryProps {
-  value: string
-  onChange: (value: string) => void
-  inputName: string
-  textFieldProps?: Omit<TextFieldProps, 'value' | 'onChange'>
+  value: string;
+  onChange: (value: string) => void;
+  inputName: string;
+  textFieldProps?: Omit<TextFieldProps, "value" | "onChange">;
 }
 
 export function InputWithHistory({
@@ -16,37 +30,39 @@ export function InputWithHistory({
   inputName,
   textFieldProps,
 }: InputWithHistoryProps) {
-  const { data: history } = useInputHistory(inputName)
-  const deleteHistoryMutation = useDeleteInputHistory()
-  const [hoveredOption, setHoveredOption] = useState<string | null>(null)
+  const { data: history } = useInputHistory(inputName);
+  const deleteHistoryMutation = useDeleteInputHistory();
+  const [hoveredOption, setHoveredOption] = useState<string | null>(null);
 
-  const options = history?.map((item) => item.valueInput) || []
-  const uniqueOptions = [...new Set(options)]
+  const options = history?.map((item) => item.valueInput) || [];
+  const uniqueOptions = [...new Set(options)];
 
   const handleDeleteOption = async (e: React.MouseEvent, option: string) => {
-    e.stopPropagation()
-    const itemToDelete = history?.find((item) => item.valueInput === option)
+    e.stopPropagation();
+    const itemToDelete = history?.find((item) => item.valueInput === option);
     if (itemToDelete) {
-      await deleteHistoryMutation.mutateAsync(itemToDelete.id)
+      await deleteHistoryMutation.mutateAsync(itemToDelete.id);
     }
-  }
+  };
 
   return (
     <Autocomplete
       freeSolo
       value={value}
       onChange={(_, newValue) => {
-        onChange(newValue || '')
+        onChange(newValue || "");
       }}
       onInputChange={(_, newValue) => {
-        onChange(newValue)
+        onChange(newValue);
       }}
       options={uniqueOptions}
       filterOptions={(options, { inputValue }) => {
-        if (!inputValue) return options.slice(0, 10)
+        if (!inputValue) return options.slice(0, 10);
         return options
-          .filter((option) => option.toLowerCase().includes(inputValue.toLowerCase()))
-          .slice(0, 10)
+          .filter((option) =>
+            option.toLowerCase().includes(inputValue.toLowerCase())
+          )
+          .slice(0, 10);
       }}
       renderOption={(props, option) => (
         <Box
@@ -55,28 +71,28 @@ export function InputWithHistory({
           onMouseEnter={() => setHoveredOption(option)}
           onMouseLeave={() => setHoveredOption(null)}
           sx={{
-            display: 'flex',
-            alignItems: 'center',
+            display: "flex",
+            alignItems: "center",
             gap: 1,
-            bgcolor: 'background.paper',
-            borderBottom: '1px solid',
-            borderColor: 'divider', 
-            height: '40px',
-            '&:hover': {
-              bgcolor: 'primary.lighter',
+            bgcolor: "background.paper",
+            borderBottom: "1px solid",
+            borderColor: "divider",
+            height: "40px",
+            "&:hover": {
+              bgcolor: "primary.lighter",
             },
-            '&.Mui-focused': {
-              bgcolor: 'primary.lighter',
+            "&.Mui-focused": {
+              bgcolor: "primary.lighter",
             },
           }}
         >
-          <HistoryIcon sx={{ fontSize: 18, color: 'primary.main' }} />
+          <HistoryIcon sx={{ fontSize: 18, color: "primary.main" }} />
           <Typography
             variant="body2"
             sx={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
               flex: 1,
             }}
           >
@@ -89,8 +105,8 @@ export function InputWithHistory({
                 onClick={(e) => handleDeleteOption(e, option)}
                 sx={{
                   p: 0.5,
-                  '&:hover': {
-                    color: 'error.main',
+                  "&:hover": {
+                    color: "error.main",
                   },
                 }}
               >
@@ -101,15 +117,16 @@ export function InputWithHistory({
         </Box>
       )}
       noOptionsText={
-        <Box sx={{ py: 2, textAlign: 'center' }}>
+        <Box sx={{ py: 2, textAlign: "center" }}>
           <Typography variant="body2" color="text.secondary">
             Nenhum histórico encontrado
           </Typography>
         </Box>
       }
       renderInput={(params) => {
-        const { InputProps: autocompleteInputProps, ...otherParams } = params
-        const { InputProps: textFieldInputProps, ...otherTextFieldProps } = textFieldProps || {}
+        const { InputProps: autocompleteInputProps, ...otherParams } = params;
+        const { InputProps: textFieldInputProps, ...otherTextFieldProps } =
+          textFieldProps || {};
 
         return (
           <TextField
@@ -118,16 +135,18 @@ export function InputWithHistory({
             InputProps={{
               ...autocompleteInputProps,
               ...textFieldInputProps,
-              startAdornment: textFieldInputProps?.startAdornment || autocompleteInputProps.startAdornment,
+              startAdornment:
+                textFieldInputProps?.startAdornment ||
+                autocompleteInputProps.startAdornment,
             }}
           />
-        )
+        );
       }}
       ListboxProps={{
         sx: {
-          maxHeight: '300px',
+          maxHeight: "300px",
           padding: 0,
-          '& .MuiAutocomplete-option': {
+          "& .MuiAutocomplete-option": {
             py: 1.5,
             px: 2,
           },
@@ -139,8 +158,8 @@ export function InputWithHistory({
             mt: 1,
             boxShadow: 3,
           },
-        }
+        },
       }}
     />
-  )
+  );
 }

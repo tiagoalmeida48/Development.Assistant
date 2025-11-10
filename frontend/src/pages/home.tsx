@@ -48,7 +48,7 @@ export default function HomePage() {
   ]
 
   return (
-    <Container maxWidth="lg" sx={{ py: 6 }}>
+    <Container maxWidth="xl" sx={{ py: 6 }}>
       <Box sx={{ mb: 6, textAlign: 'center' }}>
         <Typography variant="h4" fontWeight={700} gutterBottom>
           Ferramentas de desenvolvimento para aumentar sua produtividade
