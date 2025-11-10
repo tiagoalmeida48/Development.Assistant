@@ -39,7 +39,7 @@ public class UserController(AuthService authService) : ControllerBase
     {
         var result = new ResultApi<bool>
         {
-            Result = authService.Create(request.MapTo<User>())
+            Result = authService.Create(request.MapTo<UserMod>())
         };
         return result;
     }
@@ -50,7 +50,7 @@ public class UserController(AuthService authService) : ControllerBase
     {
         var result = new ResultApi<bool>
         {
-            Result = authService.Update(request.MapTo<User>())
+            Result = authService.Update(request.MapTo<UserMod>())
         };
         return result;
     }

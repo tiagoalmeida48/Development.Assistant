@@ -11,7 +11,7 @@ namespace Development.Assistant.Back.Repository;
 
 public class MetadataRepository(ApiContext apiContext) : BaseRepository(apiContext)
 {
-    public IEnumerable<ColumnInfo> GetColumnsQuery(string connectionString, Constants.DbType dbType, string tableName, string schema = "dbo_schema")
+    public IEnumerable<ColumnInfo> GetColumnsQuery(string connectionString, string dbType, string tableName, string schema = "dbo_schema")
     {
         var query = dbType switch
         {
@@ -79,7 +79,7 @@ public class MetadataRepository(ApiContext apiContext) : BaseRepository(apiConte
         return con.Query<ColumnInfo>(query).ToList();
     }
 
-    public int GetCountRegistersQuery(string connectionString, Constants.DbType dbType, string tableName, string schema = "dbo_schema")
+    public int GetCountRegistersQuery(string connectionString, string dbType, string tableName, string schema = "dbo_schema")
     {
         var query = dbType switch
         {
@@ -94,7 +94,7 @@ public class MetadataRepository(ApiContext apiContext) : BaseRepository(apiConte
         return con.QueryFirstOrDefault<int>(query);
     }
 
-    public IEnumerable<string> GetTablesQuery(string connectionString, Constants.DbType dbType, string schema = "dbo_schema")
+    public IEnumerable<string> GetTablesQuery(string connectionString, string dbType, string schema = "dbo_schema")
     {
         var query = dbType switch
         {
@@ -109,7 +109,7 @@ public class MetadataRepository(ApiContext apiContext) : BaseRepository(apiConte
         return con.Query<string>(query).ToList();
     }
 
-    public string GetDatabaseName(string connectionString, Constants.DbType dbType)
+    public string GetDatabaseName(string connectionString, string dbType)
     {
         var query = dbType switch
         {
@@ -123,8 +123,25 @@ public class MetadataRepository(ApiContext apiContext) : BaseRepository(apiConte
         using var con = CreateDbConnection(connectionString, dbType);
         return con.QueryFirstOrDefault<string>(query);
     }
+    
+    public IEnumerable<TemplateMod> AllTemplate()
+    {
+        const string query = "SELECT * FROM template";
+        
+        using var con = Conn;
+        return con.Query<TemplateMod>(query);
+    }
 
-    public IDbConnection CreateDbConnection(string connectionString, Constants.DbType dbType)
+    
+    public IEnumerable<DatabaseTypeMod> AllDatabaseType()
+    {
+        const string query = "SELECT * FROM database_type";
+        
+        using var con = Conn;
+        return con.Query<DatabaseTypeMod>(query);
+    }
+
+    public IDbConnection CreateDbConnection(string connectionString, string dbType)
     {
         return dbType switch
         {

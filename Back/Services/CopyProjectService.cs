@@ -11,11 +11,11 @@ public class CopyProjectService(InputHistoryService inputHistorySrv)
         var destinationDir = CopyDirectory(sourceProjectPath, destinationProjectPath, oldNamespace, newNamespace);
         UpdateNamespaceInProject(destinationDir, oldNamespace, newNamespace);
         
-        var inputsValue = new List<InputHistory>();
-        inputsValue.Add(new InputHistory(Constants.InputName.SourcePath, sourceProjectPath));
-        inputsValue.Add(new InputHistory(Constants.InputName.DestPath, destinationProjectPath));
-        inputsValue.Add(new InputHistory(Constants.InputName.OldNamespace, oldNamespace));
-        inputsValue.Add(new InputHistory(Constants.InputName.NewNamespace, newNamespace));
+        var inputsValue = new List<InputHistoryMod>();
+        inputsValue.Add(new InputHistoryMod(Constants.InputName.SourcePath, sourceProjectPath));
+        inputsValue.Add(new InputHistoryMod(Constants.InputName.DestPath, destinationProjectPath));
+        inputsValue.Add(new InputHistoryMod(Constants.InputName.OldNamespace, oldNamespace));
+        inputsValue.Add(new InputHistoryMod(Constants.InputName.NewNamespace, newNamespace));
 
         inputHistorySrv.Create(inputsValue);
         return true;

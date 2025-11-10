@@ -1,10 +1,15 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import type { User } from '@/types'
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { useLogin } from '@/hooks/queries/useAuth'
+
+interface User {
+  username: string
+  login: string
+}
 
 interface AuthContextType {
   user: User | null
   token: string | null
-  login: (token: string, user: User) => void
+  loginMutation: ReturnType<typeof useLogin>
   logout: () => void
   isAuthenticated: boolean
   isLoading: boolean
@@ -16,6 +21,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [token, setToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const loginMutation = useLogin()
 
   useEffect(() => {
     // Carregar token e usuário do localStorage ao iniciar
@@ -24,18 +30,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (storedToken && storedUser) {
       setToken(storedToken)
-      setUser(JSON.parse(storedUser))
+      try {
+        setUser(JSON.parse(storedUser))
+      } catch {
+        localStorage.removeItem('user')
+      }
     }
 
     setIsLoading(false)
   }, [])
 
-  const login = (newToken: string, newUser: User) => {
-    setToken(newToken)
-    setUser(newUser)
-    localStorage.setItem('token', newToken)
-    localStorage.setItem('user', JSON.stringify(newUser))
-  }
+  // Atualizar o estado quando o login for bem-sucedido
+  useEffect(() => {
+    if (loginMutation.isSuccess) {
+      const storedToken = localStorage.getItem('token')
+      const storedUser = localStorage.getItem('user')
+
+      if (storedToken && storedUser) {
+        setToken(storedToken)
+        try {
+          setUser(JSON.parse(storedUser))
+        } catch {
+          localStorage.removeItem('user')
+        }
+      }
+    }
+  }, [loginMutation.isSuccess])
 
   const logout = () => {
     setToken(null)
@@ -47,7 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = {
     user,
     token,
-    login,
+    loginMutation,
     logout,
     isAuthenticated: !!token,
     isLoading,

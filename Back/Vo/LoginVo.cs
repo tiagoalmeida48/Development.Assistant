@@ -1,4 +1,4 @@
-namespace Development.Assistant.Back.Utils;
+namespace Development.Assistant.Back.Vo;
 
 public class LoginVo
 {

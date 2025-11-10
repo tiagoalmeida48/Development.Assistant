@@ -7,7 +7,7 @@ namespace Development.Assistant.Back.Repository;
 
 public class UserRepository(ApiContext apiContext) : BaseRepository(apiContext)
 {
-    public IEnumerable<User> Search(int id = 0, string login = null)
+    public IEnumerable<UserMod> Search(int id = 0, string login = null)
     {
         var param = new DynamicParameters();
         var sb = new StringBuilder();
@@ -27,10 +27,10 @@ public class UserRepository(ApiContext apiContext) : BaseRepository(apiContext)
         }
       
         using var con = Conn;
-        return con.Query<User>(sb.ToString(), param);
+        return con.Query<UserMod>(sb.ToString(), param);
     }
 
-    public bool Create(User user)
+    public bool Create(UserMod user)
     {
         const string sql = "INSERT INTO `user` (Username, Login, Password) VALUES (@Username, @Login, @Password)";
 
@@ -38,7 +38,7 @@ public class UserRepository(ApiContext apiContext) : BaseRepository(apiContext)
         return con.ExecuteScalar<bool>(sql, user);
     }
     
-    public bool Update(User user)
+    public bool Update(UserMod user)
     {
         const string sql = "UPDATE `user` SET Username = @Username, Login = @Login, Password = @Password WHERE Id = @Id";
 

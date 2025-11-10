@@ -7,7 +7,7 @@ namespace Development.Assistant.Back.Domain.Services;
 
 public class CompareDatabaseService(MetadataRepository repository, InputHistoryService inputHistorySrv) 
 {
-    public DatabaseClass Compare(string connectionString1, string connectionString2, Constants.DbType dbType)
+    public DatabaseClass Compare(string connectionString1, string connectionString2, string dbType)
     {
         try
         {
@@ -27,9 +27,9 @@ public class CompareDatabaseService(MetadataRepository repository, InputHistoryS
                 RegisterTables = CompareRegisterLists(database1, database2)
             };
 
-            var inputsValue = new List<InputHistory>();
-            inputsValue.Add(new InputHistory(Constants.InputName.Conn1, connectionString1));
-            inputsValue.Add(new InputHistory(Constants.InputName.Conn2, connectionString2));
+            var inputsValue = new List<InputHistoryMod>();
+            inputsValue.Add(new InputHistoryMod(Constants.InputName.Conn1, connectionString1));
+            inputsValue.Add(new InputHistoryMod(Constants.InputName.Conn2, connectionString2));
           
             inputHistorySrv.Create(inputsValue);
             
@@ -64,7 +64,7 @@ public class CompareDatabaseService(MetadataRepository repository, InputHistoryS
         return registerList;
     }
 
-    private async Task<(string, List<TableClass>)> GetInfoDatabaseAsync(string connectionString, Constants.DbType dbType)
+    private async Task<(string, List<TableClass>)> GetInfoDatabaseAsync(string connectionString, string dbType)
     {
         var databaseName = repository.GetDatabaseName(connectionString, dbType);
         var tableNames = repository.GetTablesQuery(connectionString, dbType).ToList();

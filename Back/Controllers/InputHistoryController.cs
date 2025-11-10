@@ -24,11 +24,11 @@ public class InputHistoryController(InputHistoryService inputHistorySrv) : Contr
 
     [HttpDelete("delete")]
     [Authorize]
-    public ResultApi<bool> Delete(int[] ids)
+    public ResultApi<bool> Delete(int id)
     {
         var result = new ResultApi<bool>
         {
-            Result = inputHistorySrv.Delete(ids)
+            Result = inputHistorySrv.Delete(id)
         };
         return result;
     }

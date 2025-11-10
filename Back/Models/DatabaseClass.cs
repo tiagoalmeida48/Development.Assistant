@@ -1,5 +1,4 @@
-﻿using Development.Assistant.Back.Utils;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Development.Assistant.Back.Models;
 

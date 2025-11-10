@@ -2,7 +2,7 @@ using Development.Assistant.Back.Dto;
 using Development.Assistant.Back.Models;
 using Development.Assistant.Back.Repository;
 using Development.Assistant.Back.Utils;
-using Microsoft.OpenApi.Extensions;
+using Development.Assistant.Back.Vo;
 using Scriban;
 using Scriban.Runtime;
 using Path = System.IO.Path;
@@ -11,7 +11,7 @@ namespace Development.Assistant.Back.Services;
 
 public class ScribanCodeGeneratorService(MetadataRepository repository, InputHistoryService inputHistorySrv)
 {
-    public IEnumerable<string> AllTables(string connectionString, Constants.DbType dbType)
+    public IEnumerable<string> AllTables(string connectionString, string dbType)
     {
         return repository.GetTablesQuery(connectionString, dbType);
     }
@@ -26,12 +26,12 @@ public class ScribanCodeGeneratorService(MetadataRepository repository, InputHis
             var tasks = infoClass.Tables.Select(table => GenerateForTableAsync(table, infoClass));
             Task.WhenAll(tasks).Wait();
             
-            var inputsValue = new List<InputHistory>();
-            inputsValue.Add(new InputHistory(Constants.InputName.ConnString, infoClass.ConnectionString));
-            inputsValue.Add(new InputHistory(Constants.InputName.PathGeral, infoClass.PathGeral));
-            inputsValue.Add(new InputHistory(Constants.InputName.ProjectName, infoClass.ProjectName));
-            inputsValue.Add(new InputHistory(Constants.InputName.NameSpace, infoClass.NameSpace));
-            inputsValue.Add(new InputHistory(Constants.InputName.ExcludePrefixTable, infoClass.ExcludePrefixTable));
+            var inputsValue = new List<InputHistoryMod>();
+            inputsValue.Add(new InputHistoryMod(Constants.InputName.ConnString, infoClass.ConnectionString));
+            inputsValue.Add(new InputHistoryMod(Constants.InputName.PathGeral, infoClass.PathGeral));
+            inputsValue.Add(new InputHistoryMod(Constants.InputName.ProjectName, infoClass.ProjectName));
+            inputsValue.Add(new InputHistoryMod(Constants.InputName.NameSpace, infoClass.NameSpace));
+            inputsValue.Add(new InputHistoryMod(Constants.InputName.ExcludePrefixTable, infoClass.ExcludePrefixTable));
 
             inputHistorySrv.Create(inputsValue);
 
@@ -73,7 +73,7 @@ public class ScribanCodeGeneratorService(MetadataRepository repository, InputHis
             ColumnsKey = columnsKey,
             Columns = columns,
             ExistText = existText,
-            Database = infoClass.DbType.GetDisplayName(),
+            Database = infoClass.DbType,
             ExcludePrefixTable = infoClass.ExcludePrefixTable
         };
 

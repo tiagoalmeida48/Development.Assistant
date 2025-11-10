@@ -6,6 +6,7 @@ using System.Text;
 using Development.Assistant.Back.Models;
 using Development.Assistant.Back.Repository;
 using Development.Assistant.Back.Utils;
+using Development.Assistant.Back.Vo;
 using Konscious.Security.Cryptography;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -14,7 +15,7 @@ namespace Development.Assistant.Back.Services;
 
 public class AuthService(UserRepository userRep)
 {
-    public User Get(int id)
+    public UserMod Get(int id)
     {
         var user = userRep.Search(id).FirstOrDefault();
         if (user == null)
@@ -23,7 +24,7 @@ public class AuthService(UserRepository userRep)
         return user;
     }
 
-    private User GetByLogin(string login)
+    private UserMod GetByLogin(string login)
     {
         var user = userRep.Search(login: login).FirstOrDefault();
         if (user == null)
@@ -32,7 +33,7 @@ public class AuthService(UserRepository userRep)
         return user;
     }
 
-    public IEnumerable<User> All()
+    public IEnumerable<UserMod> All()
     {
         var users = userRep.Search();
         return users;
@@ -48,13 +49,13 @@ public class AuthService(UserRepository userRep)
         return GenerateToken(user);
     }
 
-    public bool Create(User request)
+    public bool Create(UserMod request)
     {
         var existingUser = userRep.Search(login: request.Login).FirstOrDefault();
         if (existingUser != null)
             throw new Exception("Usuário já existe");
 
-        var user = new User
+        var user = new UserMod
         {
             Username = request.Username,
             Login = request.Login,
@@ -65,13 +66,13 @@ public class AuthService(UserRepository userRep)
         return true;
     }
 
-    public bool Update(User request)
+    public bool Update(UserMod request)
     {
         var oldUser = userRep.Search(request.Id).FirstOrDefault();
         if (oldUser == null)
             throw new Exception("Usuário não existe");
 
-        var user = new User
+        var user = new UserMod
         {
             Id = request.Id,
             Username = request.Username,
@@ -83,7 +84,7 @@ public class AuthService(UserRepository userRep)
         return true;
     }
 
-    public string GenerateToken(User user)
+    public string GenerateToken(UserMod user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(Constants.JwtConfig.SecretKey);

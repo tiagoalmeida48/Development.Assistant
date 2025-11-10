@@ -1,8 +1,0 @@
-export { Alert, AlertTitle, AlertDescription } from './alert'
-export { Button } from './button'
-export { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from './card'
-export { Checkbox } from './checkbox'
-export { Dialog, DialogTrigger, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './dialog'
-export { Input } from './input'
-export { InputWithHistory } from './input-with-history'
-export { Label } from './label'

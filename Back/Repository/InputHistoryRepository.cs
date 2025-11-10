@@ -7,7 +7,7 @@ namespace Development.Assistant.Back.Repository;
 
 public class InputHistoryRepository(ApiContext apiContext) : BaseRepository(apiContext)
 {
-    public IEnumerable<InputHistory> Search(int id = 0, string input = null, string valueInput = null)
+    public IEnumerable<InputHistoryMod> Search(int id = 0, string input = null, string valueInput = null)
     {
         var param = new DynamicParameters();
         var sb = new StringBuilder();
@@ -36,7 +36,7 @@ public class InputHistoryRepository(ApiContext apiContext) : BaseRepository(apiC
         sb.Append(" ORDER BY id DESC ");
       
         using var con = Conn;
-        return con.Query<InputHistory>(sb.ToString(), param);
+        return con.Query<InputHistoryMod>(sb.ToString(), param);
     }
 
     public bool Create(string input, string valueInput)
@@ -47,11 +47,11 @@ public class InputHistoryRepository(ApiContext apiContext) : BaseRepository(apiC
         return con.ExecuteScalar<bool>(sql, new { User = _UserLogged, Input = input, ValueInput = valueInput });
     }
 
-    public bool Delete(int[] ids)
+    public bool Delete(int id)
     {
-        const string sql = "DELETE FROM input_history WHERE ID IN @Ids AND USER = @User;";
+        const string sql = "DELETE FROM input_history WHERE ID = @Id AND USER = @User;";
 
         using var con = Conn;
-        return con.ExecuteScalar<bool>(sql, new { User = _UserLogged, Ids = ids });
+        return con.ExecuteScalar<bool>(sql, new { User = _UserLogged, Id = id });
     }
 }

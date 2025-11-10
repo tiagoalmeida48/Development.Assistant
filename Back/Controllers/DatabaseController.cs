@@ -10,17 +10,6 @@ namespace Development.Assistant.Back.Controllers;
 [Route("api/database")]
 public class DatabaseController(CompareDatabaseService compareDatabaseService) : ControllerBase
 {
-    [HttpGet("types")]
-    [Authorize] 
-    public ResultApi<string[]> GetDatabaseTypes()
-    {
-        var result = new ResultApi<string[]>
-        {
-            Result = Enum.GetNames<Constants.DbType>()
-        };
-        return result;
-    }
-    
     [HttpPost("compare-databases")]
     [Authorize]
     public ResultApi<DatabaseClassDto> CompareDatabases([FromBody] ConnectionStringDto request)

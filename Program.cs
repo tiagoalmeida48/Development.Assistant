@@ -21,6 +21,7 @@ TypeMapper.Initialize(finalPath, ["Development.Assistant.Back.Models"], []);
 builder.Services.AddScoped<CopyProjectService>();
 builder.Services.AddScoped<CompareDatabaseService>();
 builder.Services.AddScoped<ScribanCodeGeneratorService>();
+builder.Services.AddScoped<MetadataService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<InputHistoryService>();
 

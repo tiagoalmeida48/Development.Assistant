@@ -1,47 +1,45 @@
-import { useState, useEffect } from 'react'
-import { Plus, Pencil, Loader2, User as UserIcon, RefreshCw } from 'lucide-react'
-import { toast } from 'sonner'
-import { api } from '@/api'
-import { Button, Input, Label, Card, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui'
-import { useAsyncAction } from '@/hooks/useAsyncAction'
-import type { User } from '@/types'
+import { useState } from 'react'
+import {
+  Box,
+  Container,
+  Typography,
+  Button,
+  Card,
+  CardContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  CircularProgress,
+  IconButton,
+  Paper,
+} from '@mui/material'
+import { Add as AddIcon, Edit as EditIcon, PersonAdd as PersonAddIcon } from '@mui/icons-material'
+import { useSnackbar } from 'notistack'
+import { useUsers, useCreateUser, useUpdateUser } from '@/hooks/queries/useUsers'
+
+interface User {
+  id: number
+  username: string
+  login: string
+}
 
 export default function UsersPage() {
-  const [users, setUsers] = useState<User[]>([])
+  const { data: users, isLoading: loadingUsers } = useUsers()
+  const createUserMutation = useCreateUser()
+  const updateUserMutation = useUpdateUser()
+  const { enqueueSnackbar } = useSnackbar()
+
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingUser, setEditingUser] = useState<User | null>(null)
   const [formData, setFormData] = useState({ username: '', login: '', password: '' })
-
-  const { execute: executeCreate, loading: loadingCreate } = useAsyncAction()
-  const { execute: executeUpdate, loading: loadingUpdate } = useAsyncAction()
-  const { execute: executeLoadUsers, loading: loadingUsers } = useAsyncAction()
-
-  // Carregar usuários ao montar o componente
-  useEffect(() => {
-    loadUsers()
-  }, [])
-
-  const loadUsers = async () => {
-    try {
-      await executeLoadUsers(async () => {
-        const data = await api.user.getAll()
-        console.log('Dados recebidos da API:', data)
-
-        // Garantir que data é um array
-        if (Array.isArray(data)) {
-          setUsers(data)
-        } else {
-          console.error('API retornou formato inválido:', data)
-          setUsers([])
-          toast.error('Formato de dados inválido recebido da API')
-        }
-      })
-    } catch (error) {
-      console.error('Erro ao carregar usuários:', error)
-      toast.error(error instanceof Error ? error.message : 'Erro ao carregar usuários')
-      setUsers([])
-    }
-  }
 
   const handleOpenModal = (user?: User) => {
     if (user) {
@@ -61,205 +59,187 @@ export default function UsersPage() {
   }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }))
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!formData.username || !formData.login) {
-      toast.error('Preencha nome de usuário e login')
+      enqueueSnackbar('Preencha nome de usuário e login', { variant: 'error' })
       return
     }
 
     if (!editingUser && !formData.password) {
-      toast.error('Senha é obrigatória para novo usuário')
+      enqueueSnackbar('Senha é obrigatória para novo usuário', { variant: 'error' })
       return
     }
 
     try {
       if (editingUser) {
-        // Update
-        await executeUpdate(() =>
-          api.user.update(editingUser.id, formData.username, formData.login, formData.password)
-        )
-        toast.success('Usuário atualizado com sucesso!')
+        await updateUserMutation.mutateAsync({
+          id: editingUser.id,
+          username: formData.username,
+          login: formData.login,
+          password: formData.password,
+        })
+        enqueueSnackbar('Usuário atualizado com sucesso!', { variant: 'success' })
       } else {
-        // Create
-        await executeCreate(() =>
-          api.user.create(formData.username, formData.login, formData.password)
-        )
-        toast.success('Usuário criado com sucesso!')
+        await createUserMutation.mutateAsync(formData)
+        enqueueSnackbar('Usuário criado com sucesso!', { variant: 'success' })
       }
 
       handleCloseModal()
-      // Recarregar lista de usuários após sucesso
-      await loadUsers()
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Erro ao salvar usuário')
+      enqueueSnackbar(
+        error instanceof Error ? error.message : 'Erro ao salvar usuário',
+        { variant: 'error' }
+      )
     }
   }
 
-  const isLoading = loadingCreate || loadingUpdate
+  const isLoading = createUserMutation.isPending || updateUserMutation.isPending
 
   return (
-    <div className="container mx-auto py-6 px-4 max-w-7xl">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-card-foreground">Usuários</h1>
-          <p className="text-sm text-muted-foreground mt-1">
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+        <Box>
+          <Typography variant="h4" fontWeight={700} gutterBottom>
+            Usuários
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
             Gerencie os usuários do sistema
-          </p>
-        </div>
+          </Typography>
+        </Box>
 
-        <div className="flex gap-2">
-          <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={() => handleOpenModal()}>
-                <Plus className="mr-2 h-4 w-4" />
-                Novo Usuário
-              </Button>
-            </DialogTrigger>
+        <Button
+          variant="contained"
+          startIcon={<AddIcon />}
+          onClick={() => handleOpenModal()}
+        >
+          Novo Usuário
+        </Button>
+      </Box>
 
-            <DialogContent className="sm:max-w-md border-border text-secondary-foreground">
-              <DialogHeader>
-                <DialogTitle>
-                  {editingUser ? 'Editar Usuário' : 'Novo Usuário'}
-                </DialogTitle>
-              </DialogHeader>
-
-              <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-                <div className="space-y-2">
-                  <Label htmlFor="username">Nome de Usuário</Label>
-                  <Input
-                    id="username"
-                    name="username"
-                    placeholder="Nome completo"
-                    value={formData.username}
-                    onChange={handleChange}
-                    disabled={isLoading}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="login">Login</Label>
-                  <Input
-                    id="login"
-                    name="login"
-                    placeholder="Login para acesso"
-                    value={formData.login}
-                    onChange={handleChange}
-                    disabled={isLoading}
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="password">Senha</Label>
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    placeholder="Digite a senha"
-                    value={formData.password}
-                    onChange={handleChange}
-                    disabled={isLoading}
-                    required
-                  />
-                </div>
-
-                <div className="flex gap-2 justify-end pt-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleCloseModal}
-                    disabled={isLoading}
-                  >
-                    Cancelar
-                  </Button>
-                  <Button type="submit" disabled={isLoading}>
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Salvando...
-                      </>
-                    ) : (
-                      'Salvar'
-                    )}
-                  </Button>
-                </div>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
-
-      {loadingUsers && users.length === 0 ? (
-        <Card className="p-12">
-          <div className="flex flex-col items-center justify-center text-center space-y-4">
-            <Loader2 className="w-12 h-12 text-primary animate-spin" />
-            <div>
-              <h3 className="text-lg font-semibold text-card-foreground mb-1">
-                Carregando usuários...
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Aguarde um momento
-              </p>
-            </div>
-          </div>
+      {loadingUsers ? (
+        <Card>
+          <CardContent sx={{ py: 12, textAlign: 'center' }}>
+            <CircularProgress size={48} sx={{ mb: 2 }} />
+            <Typography variant="h6" fontWeight={600} gutterBottom>
+              Carregando usuários...
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Aguarde um momento
+            </Typography>
+          </CardContent>
         </Card>
-      ) : users.length === 0 ? (
-        <Card className="p-12">
-          <div className="flex flex-col items-center justify-center text-center space-y-4">
-            <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center">
-              <UserIcon className="w-10 h-10 text-muted-foreground" />
-            </div>
-            <div>
-              <h3 className="text-lg font-semibold text-card-foreground mb-1">
-                Nenhum usuário cadastrado
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                Clique em "Novo Usuário" para começar
-              </p>
-            </div>
-          </div>
+      ) : !users || users.length === 0 ? (
+        <Card>
+          <CardContent sx={{ py: 12, textAlign: 'center' }}>
+            <PersonAddIcon sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+            <Typography variant="h6" fontWeight={600} gutterBottom>
+              Nenhum usuário cadastrado
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Clique em "Novo Usuário" para começar
+            </Typography>
+          </CardContent>
         </Card>
       ) : (
-        <Card className="border-border">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="border-b border-border bg-muted/50">
-                <tr>
-                  <th className="text-left p-4 text-sm font-semibold text-card-foreground">ID</th>
-                  <th className="text-left p-4 text-sm font-semibold text-card-foreground">Nome</th>
-                  <th className="text-left p-4 text-sm font-semibold text-card-foreground">Login</th>
-                  <th className="text-right p-4 text-sm font-semibold text-card-foreground">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Array.isArray(users) && users.map((user) => (
-                  <tr key={user.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
-                    <td className="p-4 text-sm text-muted-foreground">{user.id}</td>
-                    <td className="p-4 text-sm text-card-foreground font-medium">{user.username}</td>
-                    <td className="p-4 text-sm text-muted-foreground">{user.login}</td>
-                    <td className="p-4 text-right">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleOpenModal(user)}
-                      >
-                        <Pencil className="mr-2 h-3 w-3" />
-                        Editar
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </Card>
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>ID</TableCell>
+                <TableCell>Nome</TableCell>
+                <TableCell>Login</TableCell>
+                <TableCell align="right">Ações</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {users.map((user) => (
+                <TableRow key={user.id} hover>
+                  <TableCell>{user.id}</TableCell>
+                  <TableCell>
+                    <Typography fontWeight={500}>{user.username}</Typography>
+                  </TableCell>
+                  <TableCell>{user.login}</TableCell>
+                  <TableCell align="right">
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={() => handleOpenModal(user)}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
-    </div>
+
+      <Dialog open={isModalOpen} onClose={handleCloseModal} maxWidth="sm" fullWidth>
+        <DialogTitle>{editingUser ? 'Editar Usuário' : 'Novo Usuário'}</DialogTitle>
+        <form onSubmit={handleSubmit}>
+          <DialogContent>
+            <TextField
+              fullWidth
+              id="username"
+              name="username"
+              label="Nome de Usuário"
+              placeholder="Nome completo"
+              value={formData.username}
+              onChange={handleChange}
+              disabled={isLoading}
+              required
+              margin="normal"
+            />
+
+            <TextField
+              fullWidth
+              id="login"
+              name="login"
+              label="Login"
+              placeholder="Login para acesso"
+              value={formData.login}
+              onChange={handleChange}
+              disabled={isLoading}
+              required
+              margin="normal"
+            />
+
+            <TextField
+              fullWidth
+              id="password"
+              name="password"
+              type="password"
+              label="Senha"
+              placeholder={editingUser ? 'Deixe em branco para manter a atual' : 'Digite a senha'}
+              value={formData.password}
+              onChange={handleChange}
+              disabled={isLoading}
+              required={!editingUser}
+              margin="normal"
+            />
+          </DialogContent>
+
+          <DialogActions sx={{ px: 3, pb: 2 }}>
+            <Button onClick={handleCloseModal} disabled={isLoading}>
+              Cancelar
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={isLoading}
+              startIcon={isLoading && <CircularProgress size={20} />}
+            >
+              {isLoading ? 'Salvando...' : 'Salvar'}
+            </Button>
+          </DialogActions>
+        </form>
+      </Dialog>
+    </Container>
   )
 }

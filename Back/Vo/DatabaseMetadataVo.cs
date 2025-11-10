@@ -1,6 +1,6 @@
 using Development.Assistant.Back.Models;
 
-namespace Development.Assistant.Back.Utils;
+namespace Development.Assistant.Back.Vo;
 
 public class DatabaseMetadataVo
 {

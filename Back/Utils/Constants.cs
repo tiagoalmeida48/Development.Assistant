@@ -1,22 +1,22 @@
-﻿using Development.Assistant.Back.Models;
+﻿using Development.Assistant.Back.Vo;
 using Scriban.Runtime;
 
 namespace Development.Assistant.Back.Utils;
 
 public class Constants
 {
-    public enum DbType
+    public class DbType
     {
-        MariaDb,
-        Oracle,
-        PostgreSql,
-        SqlServer
+        public const string MariaDb = "MariaDb";
+        public const string PostgreSql = "PostgreSql";
+        public const string SqlServer = "SqlServer";   
+        public const string Oracle = "Oracle";
     }
 
-    public enum Template
+    public class Template
     {
-        DDD,
-        CleanArchitecture,
+        public const string DDD = "DDD";
+        public const string CleanArchitecture = "Clean";   
     }
 
     public enum TypeClass

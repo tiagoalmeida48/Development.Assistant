@@ -2,13 +2,11 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Development.Assistant.Back.Models;
 
-public class InputHistory
+public class InputHistoryMod
 {
-    public InputHistory()
-    {
-    }
-
-    public InputHistory(string input, string valueInput)
+    public InputHistoryMod() { }
+    
+    public InputHistoryMod(string input, string valueInput)
     {
         Input = input;
         ValueInput = valueInput;

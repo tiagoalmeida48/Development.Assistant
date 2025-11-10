@@ -1,71 +1,93 @@
-import { useState, useEffect, useRef } from "react";
-import { toast } from "sonner";
-import { api } from "@/api";
-import { useAsyncAction } from "@/hooks/useAsyncAction";
-import { useLocalStorage } from "@/hooks/useLocalStorage";
-import { validateFields } from "@/utils";
+import { useState, useEffect } from "react";
 import {
-  Button,
+  Container,
+  Typography,
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
-  Label,
-  Checkbox,
+  Button,
+  Box,
+  Stack,
+  CircularProgress,
+  Chip,
   Dialog,
-  DialogContent,
-  DialogHeader,
   DialogTitle,
-} from "@/components/ui";
-import { InputWithHistory, type InputWithHistoryRef } from "@/components/ui/input-with-history";
-import { ScrollToTop } from "@/components/ScrollToTop";
+  DialogContent,
+  DialogActions,
+  Checkbox,
+  FormControlLabel,
+  Paper,
+  TextField,
+  InputAdornment,
+} from "@mui/material";
 import {
-  CheckCircle2,
-  Settings,
-  Loader2,
-  Database,
-  FolderOpen,
-  CheckSquare,
-  Square,
-  FileCode,
-  Layers,
-  Copy,
-} from "lucide-react";
+  Storage as DatabaseIcon,
+  Code as CodeIcon,
+  FolderOpen as FolderIcon,
+  CheckCircle as CheckCircleIcon,
+  ContentCopy as CopyIcon,
+  Clear as ClearIcon,
+  Layers as LayersIcon,
+  Search as SearchIcon,
+  CheckBox as CheckBoxIcon,
+  CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon,
+} from "@mui/icons-material";
+import { useSnackbar } from "notistack";
+import {
+  useGetAllTables,
+  useCreateClass,
+} from "@/hooks/queries/useCodeGenerator";
+import { InputSelect } from "@/components/InputSelect";
+import { InputWithHistory } from "@/components/InputWithHistory";
+import { useTemplates, useDatabaseTypes } from "@/hooks/queries/useMetadata";
 
 export default function GenerateClassPage() {
   const [connectionString, setConnectionString] = useState("");
-  const [dbType, setDbType] = useLocalStorage("gen-db-type", "0");
-  const [template, setTemplate] = useLocalStorage("gen-template", "0");
+  const [dbType, setDbType] = useState("");
+  const [template, setTemplate] = useState("");
   const [pathGeral, setPathGeral] = useState("");
   const [projectName, setProjectName] = useState("");
   const [nameSpace, setNameSpace] = useState("");
   const [excludePrefixTable, setExcludePrefixTable] = useState("");
-  const [selectedTables, setSelectedTables] = useState("");
   const [checkedTables, setCheckedTables] = useState<Set<string>>(new Set());
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [generatedPath, setGeneratedPath] = useState("");
+  const [searchTable, setSearchTable] = useState("");
 
-  const connStringRef = useRef<InputWithHistoryRef>(null);
-  const pathGeralRef = useRef<InputWithHistoryRef>(null);
-  const projectNameRef = useRef<InputWithHistoryRef>(null);
-  const nameSpaceRef = useRef<InputWithHistoryRef>(null);
-  const excludePrefixRef = useRef<InputWithHistoryRef>(null);
-
+  const getAllTablesMutation = useGetAllTables();
+  const createClassMutation = useCreateClass();
   const {
-    loading: loadingTables,
-    data: availableTables,
-    execute: executeFetchTables,
-  } = useAsyncAction<string[]>();
+    data: templates,
+    isLoading: isLoadingTemplates,
+    isError: isErrorTemplates,
+  } = useTemplates();
   const {
-    loading: generating,
-    success: generateSuccess,
-    execute: executeGenerate,
-    reset: resetGenerate,
-  } = useAsyncAction();
+    data: databaseTypes,
+    isLoading: isLoadingDatabaseTypes,
+    isError: isErrorDatabaseTypes,
+  } = useDatabaseTypes();
+  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
-    setSelectedTables(Array.from(checkedTables).join(", "));
-  }, [checkedTables]);
+    if (databaseTypes && databaseTypes.length > 0 && !dbType) {
+      setDbType(databaseTypes[0].id);
+    }
+  }, [databaseTypes, dbType]);
+
+  useEffect(() => {
+    if (templates && templates.length > 0 && !template) {
+      setTemplate(templates[0].id);
+    }
+  }, [templates, template]);
+
+  const availableTables = getAllTablesMutation.data;
+
+  const filteredTables = availableTables
+    ? [...availableTables]
+        .filter((table) =>
+          table.toLowerCase().includes(searchTable.toLowerCase())
+        )
+        .sort((a, b) => a.localeCompare(b))
+    : [];
 
   const handleTableToggle = (table: string) => {
     const newChecked = new Set(checkedTables);
@@ -88,74 +110,71 @@ export default function GenerateClassPage() {
   };
 
   const handleLoadTables = async () => {
-    if (!validateFields({ connectionString }, "Preencha a string de conexão")) {
+    if (!connectionString) {
+      enqueueSnackbar("Preencha a string de conexão", { variant: "error" });
       return;
     }
 
-    await executeFetchTables(() =>
-      api.codeGenerator.getAllTables(connectionString, parseInt(dbType)),
-    );
-    setCheckedTables(new Set());
+    try {
+      await getAllTablesMutation.mutateAsync({
+        connectionString,
+        dbType: dbType,
+      });
+      setCheckedTables(new Set());
+    } catch (error) {
+      enqueueSnackbar(
+        error instanceof Error ? error.message : "Erro ao carregar tabelas",
+        { variant: "error" }
+      );
+    }
   };
 
   const handleGenerate = async () => {
     if (
-      !validateFields({
-        connectionString,
-        pathGeral,
-        projectName,
-        nameSpace,
-        selectedTables,
-      })
+      !connectionString ||
+      !pathGeral ||
+      !projectName ||
+      !nameSpace ||
+      checkedTables.size === 0
     ) {
+      enqueueSnackbar(
+        "Preencha todos os campos e selecione pelo menos uma tabela",
+        {
+          variant: "error",
+        }
+      );
       return;
     }
 
-    const tables = selectedTables
-      .split(",")
-      .map((t) => t.trim())
-      .filter((t) => t.length > 0);
-
-    if (tables.length === 0) {
-      toast.error("Informe pelo menos uma tabela");
-      return;
-    }
-
-    await executeGenerate(async () => {
-      await api.codeGenerator.createClass({
+    try {
+      await createClassMutation.mutateAsync({
         connectionString,
-        dbType: parseInt(dbType),
-        template: parseInt(template),
-        tables,
+        dbType: dbType,
+        template: template,
+        tables: Array.from(checkedTables),
         pathGeral,
         projectName,
         nameSpace,
-        excludePrefixTable
+        excludePrefixTable,
       });
-
-      // Salva o caminho e mostra o modal
       setGeneratedPath(pathGeral);
       setShowSuccessModal(true);
-
-      toast.success("Classes geradas com sucesso!", {
-        description:
-          "As classes e camadas foram geradas no diretório especificado.",
-      });
-    });
+      enqueueSnackbar("Classes geradas com sucesso!", { variant: "success" });
+    } catch (error) {
+      enqueueSnackbar(
+        error instanceof Error ? error.message : "Erro ao gerar classes",
+        { variant: "error" }
+      );
+    }
   };
 
   const handleCopyPath = async () => {
     try {
       await navigator.clipboard.writeText(generatedPath);
-      toast.success("Caminho copiado!", {
-        description: "Cole no explorador de arquivos"
-      });
-      // Fecha o modal após copiar
+      enqueueSnackbar("Caminho copiado!", { variant: "success" });
       setShowSuccessModal(false);
     } catch (err) {
-      toast.error("Erro ao copiar", {
-        description: "Não foi possível copiar o caminho para a área de transferência"
-      });
+      enqueueSnackbar("Erro ao copiar caminho", { variant: "error" });
     }
   };
 
@@ -165,423 +184,475 @@ export default function GenerateClassPage() {
     setProjectName("");
     setNameSpace("");
     setExcludePrefixTable("");
-    setSelectedTables("");
     setCheckedTables(new Set());
-    resetGenerate();
+    setSearchTable("");
   };
 
+  const getVerticalOrderedTables = (tables: string[], columns: number) => {        
+    if (tables.length === 0) return []
+
+    const rows = Math.ceil(tables.length / columns)
+    const result: string[] = []
+
+    for (let row = 0; row < rows; row++) {
+      for (let col = 0; col < columns; col++) {
+        const index = col * rows + row
+        if (index < tables.length) {
+          result.push(tables[index])
+        }
+      }
+    }
+
+    return result
+  }
+
   return (
-    <div className="container mx-auto py-6 px-4 max-w-7xl">
-      <div className="mb-6">
-        <h1 className="text-2xl text-secondary-foreground font-bold mb-2">Gerar Classes</h1>
-      </div>
+    <Container maxWidth="xl" sx={{ py: 4 }}>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" fontWeight={700} gutterBottom>
+          Gerar Classes
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          Gere classes e camadas de arquitetura
+        </Typography>
+      </Box>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2 space-y-4">
-          {/* Card de Configuração */}
-          <Card className="shadow-sm hover:shadow-md border-border transition-shadow">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Settings className="h-5 w-5" />
-                Configuração
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid gap-4 grid-cols-3 sm:grid-cols-3">
-                <div className="space-y-2">
-                  <Label htmlFor="dbType" className="text-sm font-medium">
-                    Tipo de Banco
-                  </Label>
-                  <select
-                    id="dbType"
+      <Box sx={{ display: "flex", flexDirection: "column" }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 3,
+            flexDirection: { xs: "column", lg: "row" },
+          }}
+        >
+          <Card sx={{ mb: 3, flex: 1, height: 355 }}>
+            <CardContent sx={{ p: 3 }}>
+              <Stack spacing={2}>
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: { xs: "1fr", sm: "200px 1fr" },
+                    gap: 2,
+                  }}
+                >
+                  <InputSelect
                     value={dbType}
-                    onChange={(e) => setDbType(e.target.value)}
-                    className="flex h-10 w-full items-center justify-between rounded-md border border-border bg-input text-foreground px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <option value="0">MariaDb</option>
-                    <option value="1">Oracle</option>
-                    <option value="2">PostgreSQL</option>
-                    <option value="3">SQL Server</option>
-                  </select>
-                </div>
+                    onChange={setDbType}
+                    label="Tipo de Banco"
+                    options={databaseTypes}
+                    isLoading={isLoadingDatabaseTypes}
+                    isError={isErrorDatabaseTypes}
+                    errorMessage="Erro ao carregar tipos de banco"
+                  />
 
-                <div className="space-y-2 col-span-2 w-full">
-                  <Label htmlFor="connString" className="text-sm font-medium">
-                    Connection String
-                  </Label>
                   <InputWithHistory
-                    ref={connStringRef}
-                    id="connString"
-                    placeholder="Server=localhost;Database=mydb;User=user;Password=pass;"
                     value={connectionString}
-                    onValueChange={setConnectionString}
-                    className="h-10"
+                    onChange={setConnectionString}
+                    inputName="connString"
+                    textFieldProps={{
+                      fullWidth: true,
+                      label: "Connection String",
+                      placeholder: "Server=localhost;Database=mydb;",
+                      disabled: getAllTablesMutation.isPending,
+                    }}
                   />
-                </div>
+                </Box>
 
-                <div className="space-y-2 sm:col-span-2">
-                  <Label
-                    htmlFor="pathGeral"
-                    className="flex items-center gap-1.5 text-sm font-medium"
-                  >
-                    <FolderOpen className="h-4 w-4" />
-                    Caminho
-                  </Label>
-                  <div className="flex gap-2">
-                    <InputWithHistory
-                      ref={pathGeralRef}
-                      id="pathGeral"
-                      placeholder="C:\Projects\Output"
-                      value={pathGeral}
-                      onValueChange={setPathGeral}
-                      className="h-10 flex-1"
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="template" className="text-sm font-medium">
-                    Template
-                  </Label>
-                  <select
-                      id="template"
-                      value={template}
-                      onChange={(e) => setTemplate(e.target.value)}
-                      className="flex h-10 w-full items-center justify-between rounded-md border border-border bg-input text-foreground px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-primary disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    <option value="0">DDD</option>
-                    <option value="1">Arquitetura Limpa</option>
-                  </select>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="projectName" className="text-sm font-medium">
-                    Projeto
-                  </Label>
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: { xs: "1fr", sm: "1fr 200px" },
+                    gap: 2,
+                  }}
+                >
                   <InputWithHistory
-                    ref={projectNameRef}
-                    id="projectName"
-                    placeholder="MyProject"
+                    value={pathGeral}
+                    onChange={setPathGeral}
+                    inputName="pathGeral"
+                    textFieldProps={{
+                      fullWidth: true,
+                      label: "Caminho",
+                      placeholder: "C:\\Projects\\Output",
+                      InputProps: {
+                        startAdornment: (
+                          <FolderIcon sx={{ mr: 1, color: "action.active" }} />
+                        ),
+                      },
+                    }}
+                  />
+
+                  <InputSelect
+                    value={template}
+                    onChange={setTemplate}
+                    label="Template"
+                    options={templates}
+                    isLoading={isLoadingTemplates}
+                    isError={isErrorTemplates}
+                    errorMessage="Erro ao carregar templates"
+                    selectProps={{ sx: { width: 200 } }}
+                  />
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" },
+                    gap: 2,
+                  }}
+                >
+                  <InputWithHistory
                     value={projectName}
-                    onValueChange={setProjectName}
-                    className="h-10"
+                    onChange={setProjectName}
+                    inputName="projectName"
+                    textFieldProps={{
+                      fullWidth: true,
+                      label: "Projeto",
+                      placeholder: "MyProject",
+                    }}
                   />
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="nameSpace" className="text-sm font-medium">
-                    Ultimo nome do namespace
-                  </Label>
                   <InputWithHistory
-                    ref={nameSpaceRef}
-                    id="nameSpace"
-                    placeholder=".Core"
                     value={nameSpace}
-                    onValueChange={setNameSpace}
-                    className="h-10"
+                    onChange={setNameSpace}
+                    inputName="nameSpace"
+                    textFieldProps={{
+                      fullWidth: true,
+                      label: "Namespace",
+                      placeholder: ".Core",
+                    }}
                   />
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="excludePrefixTable" className="text-sm font-medium">
-                    Excluir prefixo das tabelas
-                  </Label>
                   <InputWithHistory
-                    ref={excludePrefixRef}
-                    id="excludePrefixTable"
-                    placeholder="Base"
                     value={excludePrefixTable}
-                    onValueChange={setExcludePrefixTable}
-                    className="h-10"
+                    onChange={setExcludePrefixTable}
+                    inputName="excludePrefixTable"
+                    textFieldProps={{
+                      fullWidth: true,
+                      label: "Excluir prefixo",
+                      placeholder: "Base",
+                    }}
                   />
-                </div>
+                </Box>
 
-                <div className="sm:col-span-3">
-                  <Button
-                    onClick={handleLoadTables}
-                    disabled={loadingTables}
-                    className="w-full h-10"
-                  >
-                    {loadingTables ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Carregando Tabelas...
-                      </>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  size="large"
+                  onClick={handleLoadTables}
+                  disabled={getAllTablesMutation.isPending}
+                  startIcon={
+                    getAllTablesMutation.isPending ? (
+                      <CircularProgress size={20} />
                     ) : (
-                      <>
-                        <Database className="mr-2 h-4 w-4" />
-                        Carregar Tabelas
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
+                      <DatabaseIcon />
+                    )
+                  }
+                >
+                  {getAllTablesMutation.isPending
+                    ? "Carregando..."
+                    : "Carregar Tabelas"}
+                </Button>
+              </Stack>
             </CardContent>
           </Card>
 
-          {/* Card de Tabelas */}
-          <Card className="shadow-sm border-border">
-            <CardContent className="space-y-3 mt-5">
-              {availableTables && availableTables.length > 0 ? (
-                <>
-                  <div className="flex gap-2">
+          <Card sx={{ width: 350, height: 355 }}>
+            <CardContent sx={{ p: 3 }}>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}
+              >
+                <LayersIcon />
+                <Typography variant="h6" fontWeight={600}>
+                  {template === "DDD" ? "Estrutura DDD" : "Arquitetura Limpa"}
+                </Typography>
+              </Box>
+              {template === "DDD" ? (
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                  {[
+                    "1 - Api/Controllers",
+                    "2 - App/Dto",
+                    "2 - App/Interfaces",
+                    "2 - App/Services",
+                    "3 - Domain/Interfaces",
+                    "3 - Domain/Models",
+                    "3 - Domain/Services",
+                    "4 - Repository",
+                  ].map((item) => (
+                    <Typography
+                      key={item}
+                      variant="body2"
+                      sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                    >
+                      <CodeIcon sx={{ fontSize: 16 }} />
+                      {item}
+                    </Typography>
+                  ))}
+                </Box>
+              ) : (
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                  {[
+                    "1 - Domain/Entities",
+                    "1 - Domain/Interfaces Repositories",
+                    "2 - Application/Interfaces Services",
+                    "2 - Application/Services",
+                    "2 - Application/Records",
+                    "3 - Infra/Repositories",
+                    "3 - Infra/Models",
+                    "4 - Api/Controllers",
+                    "4 - Api/GraphQl",
+                  ].map((item) => (
+                    <Typography
+                      key={item}
+                      variant="body2"
+                      sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                    >
+                      <CodeIcon sx={{ fontSize: 16 }} />
+                      {item}
+                    </Typography>
+                  ))}
+                </Box>
+              )}
+            </CardContent>
+          </Card>
+        </Box>
+        <Card>
+          <CardContent sx={{ p: 3 }}>
+            {availableTables && availableTables.length > 0 ? (
+              <>
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 2,
+                    mb: 3,
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  <TextField
+                    size="small"
+                    placeholder="Buscar tabelas..."
+                    value={searchTable}
+                    onChange={(e) => setSearchTable(e.target.value)}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <SearchIcon fontSize="small" />
+                        </InputAdornment>
+                      ),
+                    }}
+                    sx={{ flex: 1, minWidth: 200 }}
+                  />
+                  <Box sx={{ display: "flex", gap: 1 }}>
                     <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
+                      variant="outlined"
+                      size="small"
                       onClick={handleSelectAll}
                       disabled={
                         !availableTables ||
                         checkedTables.size === availableTables.length
                       }
-                      className="flex-1 h-9"
+                      startIcon={<CheckBoxIcon />}
                     >
-                      <CheckSquare className="h-4 w-4 mr-1.5" />
                       Todas
                     </Button>
                     <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
+                      variant="outlined"
+                      size="small"
                       onClick={handleClearAll}
                       disabled={checkedTables.size === 0}
-                      className="flex-1 h-9"
+                      startIcon={<CheckBoxOutlineBlankIcon />}
                     >
-                      <Square className="h-4 w-4 mr-1.5" />
                       Limpar
                     </Button>
-                  </div>
+                  </Box>
+                </Box>
 
-                  <div className="bg-gradient-to-br from-muted/50 to-muted border rounded-lg p-3">
-                    <div className="columns-1 sm:columns-2 gap-2 space-y-2">
-                      {[...availableTables]
-                        .sort((a, b) => a.localeCompare(b))
-                        .map((table, idx) => (
-                          <button
-                            type="button"
-                            key={idx}
-                            className={`
-                          w-full flex items-center gap-1.5 px-3 py-2 rounded-lg border transition-all duration-200 cursor-pointer
-                          focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1 break-inside-avoid
-                          ${
-                            checkedTables.has(table)
-                              ? "bg-primary text-primary-foreground border-primary shadow-md transform scale-[1.02]"
-                              : "bg-card border-border hover:border-primary/50 hover:bg-accent hover:shadow-sm active:scale-[0.98]"
-                          }
-                        `}
-                            onClick={() => handleTableToggle(table)}
-                          >
+                {filteredTables.length > 0 ? (
+                  <Paper
+                    sx={{
+                      p: 2,
+                      bgcolor: "action.hover",
+                      mb: 2,
+                      maxHeight: 400,
+                      overflow: "auto",
+                      "&::-webkit-scrollbar": {
+                        width: 8,
+                      },
+                      "&::-webkit-scrollbar-track": {
+                        bgcolor: "transparent",
+                      },
+                      "&::-webkit-scrollbar-thumb": {
+                        bgcolor: "divider",
+                        borderRadius: 4,
+                      },
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: "grid",
+                        gridTemplateColumns: {
+                          xs: "1fr",
+                          sm: "1fr 1fr",
+                          md: "repeat(4, 1fr)",
+                        },
+                        gap: 1,
+                      }}
+                    >
+                      {getVerticalOrderedTables(filteredTables, 4).map((table) => (
+                        <FormControlLabel
+                          key={table}
+                          control={
                             <Checkbox
-                              id={`table-${idx}`}
                               checked={checkedTables.has(table)}
-                              className={`flex-shrink-0 pointer-events-none h-4 w-4 ${checkedTables.has(table) ? "border-primary-foreground" : ""}`}
+                              onChange={() => handleTableToggle(table)}
+                              size="small"
                             />
-                            <span
-                              className={`flex-1 font-mono text-xs font-medium select-none text-left truncate`}
-                              title={table}
+                          }
+                          label={
+                            <Typography
+                              variant="body2"
+                              sx={{
+                                fontFamily: "monospace",
+                                fontSize: "0.875rem",
+                              }}
                             >
                               {table}
-                            </span>
-                            {checkedTables.has(table) && (
-                              <CheckCircle2 className="h-4 w-4 flex-shrink-0 animate-in zoom-in duration-200" />
-                            )}
-                          </button>
-                        ))}
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="text-center py-8 text-sm text-muted-foreground">
-                  Carregue as tabelas do banco de dados para começar
-                </div>
-              )}
+                            </Typography>
+                          }
+                          sx={{
+                            m: 0,
+                            py: 0.5,
+                            px: 1,
+                            borderRadius: 1,
+                            bgcolor: checkedTables.has(table)
+                              ? "primary.lighter"
+                              : "transparent",
+                            transition: "background-color 0.2s ease",
+                            "&:hover": {
+                              bgcolor: checkedTables.has(table)
+                                ? "primary.light"
+                                : "action.hover",
+                            },
+                          }}
+                        />
+                      ))}
+                    </Box>
+                  </Paper>
+                ) : (
+                  <Box sx={{ py: 4, textAlign: "center" }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Nenhuma tabela encontrada com o termo "{searchTable}"
+                    </Typography>
+                  </Box>
+                )}
 
-              {checkedTables.size > 0 ? (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground bg-primary/5 border border-primary/20 rounded-lg p-3">
-                  <Database className="h-4 w-4 text-secondary-foreground flex-shrink-0" />
-                  <p>
-                    <span className="font-semibold text-secondary-foreground">
-                      {checkedTables.size} tabela
-                      {checkedTables.size > 1 ? "s" : ""} selecionada
-                      {checkedTables.size > 1 ? "s" : ""}
-                    </span>
-                  </p>
-                </div>
-              ) : null}
-
-              <div className="flex gap-3">
-                <Button
-                  onClick={handleGenerate}
-                  disabled={generating}
-                  className="flex-1 h-10"
+                <Box
+                  sx={{
+                    display: "flex",
+                    gap: 2,
+                    mb: 2,
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                  }}
                 >
-                  {generating ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Gerando...
-                    </>
-                  ) : (
-                    <>
-                      <Settings className="mr-2 h-4 w-4" />
-                      Gerar
-                    </>
+                  {checkedTables.size > 0 && (
+                    <Chip
+                      icon={<DatabaseIcon />}
+                      label={`${checkedTables.size} de ${
+                        availableTables.length
+                      } tabela${checkedTables.size > 1 ? "s" : ""} selecionada${
+                        checkedTables.size > 1 ? "s" : ""
+                      }`}
+                      color="primary"
+                      variant="filled"
+                    />
                   )}
-                </Button>
+                  {searchTable && (
+                    <Chip
+                      icon={<SearchIcon />}
+                      label={`${filteredTables.length} resultado${
+                        filteredTables.length !== 1 ? "s" : ""
+                      }`}
+                      size="small"
+                      variant="outlined"
+                    />
+                  )}
+                </Box>
 
-                {generateSuccess && (
+                <Box sx={{ display: "flex", gap: 2 }}>
                   <Button
+                    fullWidth
+                    variant="contained"
+                    size="large"
+                    onClick={handleGenerate}
+                    disabled={createClassMutation.isPending}
+                    startIcon={
+                      createClassMutation.isPending ? (
+                        <CircularProgress size={20} />
+                      ) : (
+                        <CodeIcon />
+                      )
+                    }
+                  >
+                    {createClassMutation.isPending ? "Gerando..." : "Gerar"}
+                  </Button>
+
+                  <Button
+                    variant="outlined"
+                    size="large"
                     onClick={handleReset}
-                    variant="outline"
-                    className="h-10"
+                    startIcon={<ClearIcon />}
                   >
                     Limpar
                   </Button>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                </Box>
+              </>
+            ) : (
+              <Box sx={{ textAlign: "center", py: 8 }}>
+                <Typography variant="body2" color="text.secondary">
+                  Carregue as tabelas do banco de dados para começar
+                </Typography>
+              </Box>
+            )}
+          </CardContent>
+        </Card>
+      </Box>
 
-        <div>
-          <Card className="shadow-sm h-full border-border w-100">
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Layers className="h-5 w-5" />
-                Estrutura de Classes DDD
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4 text-sm">
-                {/* Presentation Layer */}
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-secondary-foreground">
-                    <FileCode className="h-4 w-4" />
-                    <span>1 - Api/Controllers</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-secondary-foreground">
-                    <FileCode className="h-4 w-4" />
-                    <span>2 - App/Dto</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-secondary-foreground">
-                    <FileCode className="h-4 w-4" />
-                    <span>2 - App/Interfaces</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-secondary-foreground">
-                    <FileCode className="h-4 w-4" />
-                    <span>2 - App/Services</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-secondary-foreground">
-                    <FileCode className="h-4 w-4" />
-                    <span>3 - Domain/Interfaces</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-secondary-foreground">
-                    <FileCode className="h-4 w-4" />
-                    <span>3 - Domain/Models</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-secondary-foreground">
-                    <FileCode className="h-4 w-4" />
-                    <span>3 - Domain/Services</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-secondary-foreground">
-                    <FileCode className="h-4 w-4" />
-                    <span>4 - Repository</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-            <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2 text-lg">
-                <Layers className="h-5 w-5" />
-                Estrutura de Classes Arquitetura Limpa
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4 text-sm">
-                {/* Presentation Layer */}
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-secondary-foreground">
-                    <FileCode className="h-4 w-4" />
-                    <span>1 - Domain/Entities</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-secondary-foreground">
-                    <FileCode className="h-4 w-4" />
-                    <span>1 - Domain/Interfaces Repositories</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-secondary-foreground">
-                    <FileCode className="h-4 w-4" />
-                    <span>2 - Application/Interfaces Services</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-secondary-foreground">
-                    <FileCode className="h-4 w-4" />
-                    <span>2 - Application/Services</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-secondary-foreground">
-                    <FileCode className="h-4 w-4" />
-                    <span>2 - Application/Records</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-secondary-foreground">
-                    <FileCode className="h-4 w-4" />
-                    <span>3 - Infra/Repositories</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-secondary-foreground">
-                    <FileCode className="h-4 w-4" />
-                    <span>3 - Infra/Models</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-secondary-foreground">
-                    <FileCode className="h-4 w-4" />
-                    <span>4 - Api/Controllers</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-secondary-foreground">
-                    <FileCode className="h-4 w-4" />
-                    <span>4 - Api/GraphQl</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* Modal de Sucesso */}
-      <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-500/20">
-                <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
-              </div>
-              <DialogTitle className="text-xl text-secondary-foreground">Classes Geradas com Sucesso!</DialogTitle>
-            </div>
-          </DialogHeader>
-
-          <div className="space-y-2">
-            <div className="p-4 bg-muted/30 dark:bg-muted/50 rounded-lg">
-              <div className="flex items-start gap-3">
-                <FolderOpen className="h-5 w-5 mt-0.5 text-muted-foreground flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium mb-1 text-secondary-foreground">Localização dos arquivos:</p>
-                  <p className="text-sm text-muted-foreground break-all font-mono px-2 py-1 rounded border border-border/50">
-                    {generatedPath}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-2 mt-6">
-              <Button
-                onClick={handleCopyPath}
-                className="w-full"
-                variant="default"
-              >
-                <Copy className="mr-2 h-4 w-4" />
-                Copiar Caminho
-              </Button>
-            </div>
-          </div>
+      <Dialog
+        open={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        maxWidth="sm"
+        aria-colspan={2}
+        fullWidth
+      >
+        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <CheckCircleIcon color="success" sx={{ fontSize: 32 }} />
+          Classes Geradas com Sucesso!
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ p: 2, bgcolor: "action.hover", borderRadius: 1 }}>
+            <Typography variant="body2" fontWeight={600} gutterBottom>
+              Localização dos arquivos:
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{ fontFamily: "monospace", wordBreak: "break-all" }}
+            >
+              {generatedPath}
+            </Typography>
+          </Box>
         </DialogContent>
+        <DialogActions sx={{ p: 3 }}>
+          <Button
+            variant="contained"
+            onClick={handleCopyPath}
+            startIcon={<CopyIcon />}
+            fullWidth
+          >
+            Copiar Caminho
+          </Button>
+        </DialogActions>
       </Dialog>
-
-      {/* Botão Voltar ao Topo */}
-      <ScrollToTop />
-    </div>
+    </Container>
   );
 }

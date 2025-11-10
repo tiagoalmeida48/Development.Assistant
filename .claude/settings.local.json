@@ -18,7 +18,8 @@
       "Bash(test:*)",
       "Bash(du:*)",
       "Bash(dotnet msbuild:*)",
-      "Bash(dotnet clean:*)"
+      "Bash(dotnet clean:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

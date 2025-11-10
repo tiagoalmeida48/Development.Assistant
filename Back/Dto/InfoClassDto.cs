@@ -5,8 +5,8 @@ namespace Development.Assistant.Back.Dto;
 public class InfoClassDto
 {
     public string ConnectionString { get; set; }
-    public Constants.DbType DbType { get; set; }
-    public Constants.Template Template { get; set; }
+    public string DbType { get; set; }
+    public string Template { get; set; }
     public string PathGeral { get; set; }
     public string ProjectName { get; set; }
     public string NameSpace { get; set; }
