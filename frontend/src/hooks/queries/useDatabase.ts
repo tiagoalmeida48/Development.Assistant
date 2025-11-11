@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
 import { api } from '@/lib/axios'
 
 interface DatabaseClass {
@@ -30,10 +30,25 @@ interface ConnectionStringDto {
 }
 
 export function useCompareDatabases() {
-  return useMutation({
-    mutationFn: async (data: ConnectionStringDto) => {
-      const response = await api.post<DatabaseClass>('/database/compare-databases', data)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
+  const [data, setData] = useState<DatabaseClass | null>(null)
+
+  const mutate = async (params: ConnectionStringDto) => {
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const response = await api.post<DatabaseClass>('/database/compare-databases', params)
+      setData(response.data)
       return response.data
-    },
-  })
+    } catch (err) {
+      setError(err as Error)
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return { mutate, isLoading, error, data }
 }

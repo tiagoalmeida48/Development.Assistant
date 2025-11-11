@@ -1,3 +1,4 @@
+using Development.Assistant.Back.Exceptions;
 using System.Net;
 using System.Text.Json;
 using Development.Assistant.Back.Utils;
@@ -21,16 +22,23 @@ public class ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandling
 
     private static Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
+        var (statusCode, internalError) = exception switch
+        {
+            UnauthorizedException => (HttpStatusCode.Unauthorized, 401),
+            NotFoundException => (HttpStatusCode.NotFound, 404),
+            BadRequestException => (HttpStatusCode.BadRequest, 400),
+            _ => (HttpStatusCode.InternalServerError, 500)
+        };
         var errorResponse = new ResultApi<object>
         {
             Success = false,
             Message = exception.Message,
-            InternalError = 500,
+            InternalError = internalError,
             Result = null
         };
 
         context.Response.ContentType = "application/json";
-        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+        context.Response.StatusCode = (int)statusCode;
 
         var options = new JsonSerializerOptions
         {

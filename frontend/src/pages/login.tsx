@@ -17,7 +17,7 @@ import { useAuth } from '@/contexts/AuthContext'
 
 export default function LoginPage() {
   const navigate = useNavigate()
-  const { loginMutation } = useAuth()
+  const { loginMutation, syncAuthFromStorage } = useAuth()
   const { enqueueSnackbar } = useSnackbar()
   const [formData, setFormData] = useState({ login: '', password: '' })
 
@@ -30,14 +30,13 @@ export default function LoginPage() {
     }
 
     try {
-      await loginMutation.mutateAsync(formData)
-      enqueueSnackbar('Login realizado com sucesso!', { variant: 'success' })
+      await loginMutation.mutate(formData)
+
+      syncAuthFromStorage()
       navigate('/')
     } catch (error) {
-      enqueueSnackbar(
-        error instanceof Error ? error.message : 'Erro ao fazer login',
-        { variant: 'error' }
-      )
+      const errorMessage = loginMutation.getErrorMessage() || 'Erro ao fazer login'
+      enqueueSnackbar(errorMessage, { variant: 'error' })
     }
   }
 
@@ -93,9 +92,10 @@ export default function LoginPage() {
                 placeholder="Digite seu login"
                 value={formData.login}
                 onChange={handleChange}
-                disabled={loginMutation.isPending}
+                disabled={loginMutation.isLoading}
                 required
                 margin="normal"
+                autoComplete="username"
               />
 
               <TextField
@@ -107,9 +107,10 @@ export default function LoginPage() {
                 placeholder="Digite sua senha"
                 value={formData.password}
                 onChange={handleChange}
-                disabled={loginMutation.isPending}
+                disabled={loginMutation.isLoading}
                 required
                 margin="normal"
+                autoComplete="current-password"
               />
 
               <Button
@@ -117,13 +118,13 @@ export default function LoginPage() {
                 fullWidth
                 variant="contained"
                 size="large"
-                disabled={loginMutation.isPending}
+                disabled={loginMutation.isLoading}
                 startIcon={
-                  loginMutation.isPending ? <CircularProgress size={20} /> : <LoginIcon />
+                  loginMutation.isLoading ? <CircularProgress size={20} /> : <LoginIcon />
                 }
                 sx={{ mt: 3 }}
               >
-                {loginMutation.isPending ? 'Entrando...' : 'Entrar'}
+                {loginMutation.isLoading ? 'Entrando...' : 'Entrar'}
               </Button>
             </Box>
           </CardContent>

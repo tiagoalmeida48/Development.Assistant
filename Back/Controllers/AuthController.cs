@@ -21,4 +21,15 @@ public class AuthController(AuthService authService) : ControllerBase
         };
         return response;
     }
+
+    [HttpGet("validate-token")]
+    [AllowAnonymous]
+    public ResultApi<bool> ValidateToken(string token)
+    {
+        var response = new ResultApi<bool>
+        {
+            Result = authService.ValidateToken(token)
+        };
+        return response;   
+    }
 }

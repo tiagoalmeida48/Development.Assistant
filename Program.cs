@@ -50,24 +50,33 @@ builder.Services.AddControllers();
 builder.Services.AddCors();
 
 builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = Constants.JwtConfig.GetValidationParameters();
+    options.Events = new JwtBearerEvents
     {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
+        OnChallenge = async context =>
         {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = Constants.JwtConfig.Issuer,
-            ValidAudience = Constants.JwtConfig.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Constants.JwtConfig.SecretKey))
-        };
-    });
+            context.HandleResponse();
+            var errorResponse = new ResultApi<object>
+            {
+                Success = false,
+                Message = context.Error ?? "Token inválido ou ausente",
+                InternalError = 401,
+                Result = null
+            };
 
+            context.Response.StatusCode = 401;
+            context.Response.ContentType = "application/json";
+
+            await context.Response.WriteAsJsonAsync(errorResponse);
+        }
+    };
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -106,13 +115,13 @@ var app = builder.Build();
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
+app.UseCors(options => options.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod());
+
 app.UseRouting();
 
 app.UseAuthentication();
 
 app.UseAuthorization();
-
-app.UseCors(options => options.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod());
 
 app.UseDefaultFiles();
 

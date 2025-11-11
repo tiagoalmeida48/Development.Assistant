@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useState, useEffect } from 'react'
 import { api } from '@/lib/axios'
 
 interface DatabaseType {
@@ -11,22 +11,54 @@ interface Template {
   name: string
 }
 
-
 export function useTemplates() {
-  return useQuery({
-    queryKey: ['templates'],
-    queryFn: async () => {
+  const [data, setData] = useState<Template[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true)
       const response = await api.get<Template[]>('/metadata/all-template')
-      return response.data
-    },
-  })
+      setData(response.data)
+      setError(null)
+    } catch (err) {
+      setError(err as Error)
+      setData([])
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  return { data, isLoading, error, refetch: fetchData }
 }
+
 export function useDatabaseTypes() {
-  return useQuery({
-    queryKey: ['database-types'],
-    queryFn: async () => {
+  const [data, setData] = useState<DatabaseType[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true)
       const response = await api.get<DatabaseType[]>('/metadata/all-database-type')
-      return response.data
-    },
-  })
+      setData(response.data)
+      setError(null)
+    } catch (err) {
+      setError(err as Error)
+      setData([])
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  return { data, isLoading, error, refetch: fetchData }
 }

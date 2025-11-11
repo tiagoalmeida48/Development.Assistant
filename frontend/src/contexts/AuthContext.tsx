@@ -11,6 +11,7 @@ interface AuthContextType {
   token: string | null
   loginMutation: ReturnType<typeof useLogin>
   logout: () => void
+  syncAuthFromStorage: () => void
   isAuthenticated: boolean
   isLoading: boolean
 }
@@ -23,8 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true)
   const loginMutation = useLogin()
 
-  useEffect(() => {
-    // Carregar token e usuário do localStorage ao iniciar
+  const syncAuthFromStorage = () => {
     const storedToken = localStorage.getItem('token')
     const storedUser = localStorage.getItem('user')
 
@@ -34,26 +34,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(JSON.parse(storedUser))
       } catch {
         localStorage.removeItem('user')
+        setUser(null)
+        setToken(null)
       }
+    } else {
+      setUser(null)
+      setToken(null)
     }
+  }
 
+  useEffect(() => {
+    syncAuthFromStorage()
     setIsLoading(false)
   }, [])
 
-  // Atualizar o estado quando o login for bem-sucedido
   useEffect(() => {
     if (loginMutation.isSuccess) {
-      const storedToken = localStorage.getItem('token')
-      const storedUser = localStorage.getItem('user')
-
-      if (storedToken && storedUser) {
-        setToken(storedToken)
-        try {
-          setUser(JSON.parse(storedUser))
-        } catch {
-          localStorage.removeItem('user')
-        }
-      }
+      syncAuthFromStorage()
     }
   }, [loginMutation.isSuccess])
 
@@ -69,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     token,
     loginMutation,
     logout,
+    syncAuthFromStorage,
     isAuthenticated: !!token,
     isLoading,
   }

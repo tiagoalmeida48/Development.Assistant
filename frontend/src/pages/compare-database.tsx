@@ -37,7 +37,7 @@ export default function CompareDatabasePage() {
   const {
     data: databaseTypes,
     isLoading: isLoadingDbTypes,
-    isError: isErrorDbTypes,
+    error: isErrorDbTypes,
   } = useDatabaseTypes();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -58,7 +58,7 @@ export default function CompareDatabasePage() {
     }
 
     try {
-      await compareMutation.mutateAsync({
+      await compareMutation.mutate({
         connectionString1,
         connectionString2,
         dbType: dbType,
@@ -104,7 +104,7 @@ export default function CompareDatabasePage() {
                 label="Tipo de Banco"
                 options={databaseTypes}
                 isLoading={isLoadingDbTypes}
-                isError={isErrorDbTypes}
+                error={!!isErrorDbTypes}
                 errorMessage="Erro ao carregar tipos de banco"
               />
 
@@ -116,7 +116,7 @@ export default function CompareDatabasePage() {
                   fullWidth: true,
                   label: "Connection String - Banco 1",
                   placeholder: "Server=localhost;Database=db1;",
-                  disabled: compareMutation.isPending,
+                  disabled: compareMutation.isLoading,
                 }}
               />
             </Box>
@@ -128,7 +128,7 @@ export default function CompareDatabasePage() {
                 fullWidth: true,
                 label: "Connection String - Banco 2",
                 placeholder: "Server=localhost;Database=db2;",
-                disabled: compareMutation.isPending,
+                disabled: compareMutation.isLoading,
               }}
             />
 
@@ -137,16 +137,16 @@ export default function CompareDatabasePage() {
               variant="contained"
               size="large"
               onClick={handleCompare}
-              disabled={compareMutation.isPending}
+              disabled={compareMutation.isLoading}
               startIcon={
-                compareMutation.isPending ? (
+                compareMutation.isLoading ? (
                   <CircularProgress size={20} />
                 ) : (
                   <CompareIcon />
                 )
               }
             >
-              {compareMutation.isPending ? "Comparando..." : "Comparar Bancos"}
+              {compareMutation.isLoading ? "Comparando..." : "Comparar Bancos"}
             </Button>
           </Stack>
         </CardContent>
@@ -154,7 +154,6 @@ export default function CompareDatabasePage() {
 
       {result && (
         <>
-          {/* Diferenças de Estrutura */}
           {result.tables && result.tables.length > 0 && (
             <Card sx={{ mb: 3 }}>
               <CardContent sx={{ p: 3 }}>
@@ -222,7 +221,6 @@ export default function CompareDatabasePage() {
             </Card>
           )}
 
-          {/* Diferenças de Registros */}
           {result.registerTables && result.registerTables.length > 0 && (
             <Card sx={{ mb: 3 }}>
               <CardContent sx={{ p: 3 }}>
@@ -280,7 +278,6 @@ export default function CompareDatabasePage() {
             </Card>
           )}
 
-          {/* Bancos Idênticos */}
           {!hasDifferences && (
             <Card>
               <CardContent sx={{ py: 8, textAlign: "center" }}>

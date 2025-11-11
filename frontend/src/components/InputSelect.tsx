@@ -48,8 +48,7 @@ import {
     selectProps,
   }: InputSelectProps) {
     return (
-      <FormControl fullWidth={fullWidth} disabled={disabled || isLoading}
-  error={error || isError}>
+      <FormControl fullWidth={fullWidth} disabled={disabled || isLoading} error={error || isError}>
         <InputLabel>{label}</InputLabel>
         <Select
           value={value}
@@ -84,8 +83,7 @@ import {
 
           {isError ? (
             <MenuItem disabled>
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color:     
-  'error.main' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'error.main' }}>
                 <ErrorIcon fontSize="small" />
                 <Typography variant="body2">
                   {errorMessage || 'Erro ao carregar opções'}
@@ -99,7 +97,7 @@ import {
                 <Typography variant="body2">Carregando...</Typography>
               </Box>
             </MenuItem>
-          ) : options.length === 0 ? (
+          ) : !options || options.length === 0 ? (
             <MenuItem disabled>
               <Typography variant="body2" color="text.secondary">
                 Nenhuma opção disponível
@@ -114,8 +112,7 @@ import {
           )}
         </Select>
         {(helperText || (isError && errorMessage)) && (
-          <FormHelperText>{isError && errorMessage ? errorMessage :
-  helperText}</FormHelperText>
+          <FormHelperText>{isError && errorMessage ? errorMessage : helperText}</FormHelperText>
         )}
       </FormControl>
     )

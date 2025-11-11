@@ -1,5 +1,7 @@
 ﻿using Development.Assistant.Back.Vo;
+using Microsoft.IdentityModel.Tokens;
 using Scriban.Runtime;
+using System.Text;
 
 namespace Development.Assistant.Back.Utils;
 
@@ -164,6 +166,21 @@ public class Constants
         public static string SecretKey => "MinhaSuperChaveSecretaComMaisDe32CaracteresParaSeguranca!@#2024";
         public static string Issuer => "DevelopmentAssistant";
         public static string Audience => "DevelopmentAssistantApp";
+        
+        public static TokenValidationParameters GetValidationParameters()
+        {
+            return new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = Issuer,
+                ValidAudience = Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(SecretKey)),
+                ClockSkew = TimeSpan.Zero
+            };
+        }
     }
 
     public class InputName
@@ -180,4 +197,7 @@ public class Constants
         public const string NameSpace = "nameSpace";
         public const string ExcludePrefixTable = "excludePrefixTable";
     }
+    
+    
+
 }

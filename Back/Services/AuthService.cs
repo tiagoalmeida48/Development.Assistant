@@ -84,10 +84,31 @@ public class AuthService(UserRepository userRep)
         return true;
     }
 
+    public bool ValidateToken(string token)
+    {
+        if (token.IsEmpty())
+            return false;
+
+        try
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            tokenHandler.ValidateToken(token, Constants.JwtConfig.GetValidationParameters(), out _);
+            return true;
+        }
+        catch (SecurityTokenException)
+        {
+            return false;
+        }
+        catch (ArgumentException)
+        {
+            return false;
+        }
+    }
+    
     public string GenerateToken(UserMod user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(Constants.JwtConfig.SecretKey);
+        var key = Encoding.UTF8.GetBytes(Constants.JwtConfig.SecretKey);
 
         var claims = new List<Claim>
         {
@@ -162,7 +183,6 @@ public class AuthService(UserRepository userRep)
 
 public static class Access
 {
-
     public static string GetToken(this HttpContext ctx)
     {
         var key = ctx.GetKeyHeader("Authorization");

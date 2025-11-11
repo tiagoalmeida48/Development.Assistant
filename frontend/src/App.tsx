@@ -47,7 +47,6 @@ function Layout({ children }: { children: React.ReactNode }) {
     navigate(path);
   };
 
-  // Não mostrar navbar na página de login
   if (location.pathname === "/login") {
     return <>{children}</>;
   }

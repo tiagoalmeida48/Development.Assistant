@@ -29,21 +29,21 @@ export default function HomePage() {
       description: 'Copie projetos e renomeie namespaces',
       icon: CopyIcon,
       href: '/copy-project' as const,
-      color: '#8b5cf6',
+      color: '#2563eb',
     },
     {
       title: 'Gerar Classes',
       description: 'Gere classes e camadas de arquitetura',
       icon: CodeIcon,
       href: '/generate-class' as const,
-      color: '#10b981',
+      color: '#2563eb',
     },
     {
       title: 'Usuários',
       description: 'Gerencie os usuários do sistema',
       icon: UsersIcon,
       href: '/users' as const,
-      color: '#f59e0b',
+      color: '#2563eb',
     },
   ]
 

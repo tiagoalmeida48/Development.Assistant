@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState, useEffect } from 'react'
 import { api } from '@/lib/axios'
 
 interface User {
@@ -21,50 +21,116 @@ interface UserUpdateDto {
 }
 
 export function useUsers() {
-  return useQuery({
-    queryKey: ['users'],
-    queryFn: async () => {
+  const [data, setData] = useState<User[] | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true)
       const response = await api.get<User[]>('/user/all')
-      return response.data
-    },
-  })
+      setData(response.data)
+      setError(null)
+    } catch (err) {
+      setError(err as Error)
+      setData(null)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  return { data, isLoading, error, refetch: fetchData }
 }
 
 export function useUser(id: number) {
-  return useQuery({
-    queryKey: ['user', id],
-    queryFn: async () => {
+  const [data, setData] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
+
+  const fetchData = async () => {
+    if (!id) {
+      setIsLoading(false)
+      return
+    }
+
+    try {
+      setIsLoading(true)
       const response = await api.get<User>(`/user/get?id=${id}`)
-      return response.data
-    },
-    enabled: !!id,
-  })
+      setData(response.data)
+      setError(null)
+    } catch (err) {
+      setError(err as Error)
+      setData(null)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [id])
+
+  return { data, isLoading, error, refetch: fetchData }
 }
 
 export function useCreateUser() {
-  const queryClient = useQueryClient()
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
+  const [data, setData] = useState<boolean | null>(null)
 
-  return useMutation({
-    mutationFn: async (data: UserCreateDto) => {
-      const response = await api.post<boolean>('/user/create', data)
+  const mutate = async (params: UserCreateDto, onSuccessCallback?: () => void) => {
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const response = await api.post<boolean>('/user/create', params)
+      setData(response.data)
+
+      if (onSuccessCallback) {
+        onSuccessCallback()
+      }
+
       return response.data
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] })
-    },
-  })
+    } catch (err) {
+      setError(err as Error)
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return { mutate, isLoading, error, data }
 }
 
 export function useUpdateUser() {
-  const queryClient = useQueryClient()
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
+  const [data, setData] = useState<boolean | null>(null)
 
-  return useMutation({
-    mutationFn: async (data: UserUpdateDto) => {
-      const response = await api.put<boolean>('/user/update', data)
+  const mutate = async (params: UserUpdateDto, onSuccessCallback?: () => void) => {
+    try {
+      setIsLoading(true)
+      setError(null)
+
+      const response = await api.put<boolean>('/user/update', params)
+      setData(response.data)
+
+      if (onSuccessCallback) {
+        onSuccessCallback()
+      }
+
       return response.data
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['users'] })
-    },
-  })
+    } catch (err) {
+      setError(err as Error)
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return { mutate, isLoading, error, data }
 }

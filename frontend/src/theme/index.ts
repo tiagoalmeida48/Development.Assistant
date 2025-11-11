@@ -245,5 +245,4 @@ export const darkTheme = createTheme({
   },
 });
 
-// Exporta theme para compatibilidade
 export const theme = lightTheme;

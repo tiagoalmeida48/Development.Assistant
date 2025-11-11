@@ -91,7 +91,7 @@ export default function UsersPage() {
 
     try {
       if (editingUser) {
-        await updateUserMutation.mutateAsync({
+        await updateUserMutation.mutate({
           id: editingUser.id,
           username: formData.username,
           login: formData.login,
@@ -101,7 +101,7 @@ export default function UsersPage() {
           variant: "success",
         });
       } else {
-        await createUserMutation.mutateAsync(formData);
+        await createUserMutation.mutate(formData);
         enqueueSnackbar("Usuário criado com sucesso!", { variant: "success" });
       }
 
@@ -115,7 +115,7 @@ export default function UsersPage() {
   };
 
   const isLoading =
-    createUserMutation.isPending || updateUserMutation.isPending;
+    createUserMutation.isLoading || updateUserMutation.isLoading;
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>

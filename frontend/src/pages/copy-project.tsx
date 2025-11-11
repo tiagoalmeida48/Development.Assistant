@@ -40,7 +40,7 @@ export default function CopyProjectPage() {
     }
 
     try {
-      await copyProjectMutation.mutateAsync({
+      await copyProjectMutation.mutate({
         sourceProjectPath,
         destinationProjectPath,
         oldNamespace,
@@ -93,7 +93,7 @@ export default function CopyProjectPage() {
                   fullWidth: true,
                   label: "Projeto Origem",
                   placeholder: "C:\\Projects\\Source",
-                  disabled: copyProjectMutation.isPending,
+                  disabled: copyProjectMutation.isLoading,
                   InputProps: {
                     startAdornment: (
                       <FolderIcon sx={{ mr: 1, color: "action.active" }} />
@@ -110,7 +110,7 @@ export default function CopyProjectPage() {
                   fullWidth: true,
                   label: "Projeto Destino",
                   placeholder: "C:\\Projects\\Destination",
-                  disabled: copyProjectMutation.isPending,
+                  disabled: copyProjectMutation.isLoading,
                   InputProps: {
                     startAdornment: (
                       <FolderIcon sx={{ mr: 1, color: "action.active" }} />
@@ -135,7 +135,7 @@ export default function CopyProjectPage() {
                   fullWidth: true,
                   label: "Namespace Antigo",
                   placeholder: "OldProject.Core",
-                  disabled: copyProjectMutation.isPending,
+                  disabled: copyProjectMutation.isLoading,
                 }}
               />
 
@@ -147,7 +147,7 @@ export default function CopyProjectPage() {
                   fullWidth: true,
                   label: "Namespace Novo",
                   placeholder: "NewProject.Core",
-                  disabled: copyProjectMutation.isPending,
+                  disabled: copyProjectMutation.isLoading,
                 }}
               />
             </Box>
@@ -158,16 +158,16 @@ export default function CopyProjectPage() {
                 size="large"
                 fullWidth
                 onClick={handleCopy}
-                disabled={copyProjectMutation.isPending}
+                disabled={copyProjectMutation.isLoading}
                 startIcon={
-                  copyProjectMutation.isPending ? (
+                  copyProjectMutation.isLoading ? (
                     <CircularProgress size={20} />
                   ) : (
                     <CopyIcon />
                   )
                 }
               >
-                {copyProjectMutation.isPending ? "Copiando..." : "Copiar"}
+                {copyProjectMutation.isLoading ? "Copiando..." : "Copiar"}
               </Button>
 
               {success && (

@@ -58,12 +58,12 @@ export default function GenerateClassPage() {
   const {
     data: templates,
     isLoading: isLoadingTemplates,
-    isError: isErrorTemplates,
+    error: isErrorTemplates,
   } = useTemplates();
   const {
     data: databaseTypes,
     isLoading: isLoadingDatabaseTypes,
-    isError: isErrorDatabaseTypes,
+    error: isErrorDatabaseTypes,
   } = useDatabaseTypes();
   const { enqueueSnackbar } = useSnackbar();
 
@@ -116,7 +116,7 @@ export default function GenerateClassPage() {
     }
 
     try {
-      await getAllTablesMutation.mutateAsync({
+      await getAllTablesMutation.mutate({
         connectionString,
         dbType: dbType,
       });
@@ -147,7 +147,7 @@ export default function GenerateClassPage() {
     }
 
     try {
-      await createClassMutation.mutateAsync({
+      await createClassMutation.mutate({
         connectionString,
         dbType: dbType,
         template: template,
@@ -241,7 +241,7 @@ export default function GenerateClassPage() {
                     label="Tipo de Banco"
                     options={databaseTypes}
                     isLoading={isLoadingDatabaseTypes}
-                    isError={isErrorDatabaseTypes}
+                    error={!!isErrorDatabaseTypes}
                     errorMessage="Erro ao carregar tipos de banco"
                   />
 
@@ -253,7 +253,7 @@ export default function GenerateClassPage() {
                       fullWidth: true,
                       label: "Connection String",
                       placeholder: "Server=localhost;Database=mydb;",
-                      disabled: getAllTablesMutation.isPending,
+                      disabled: getAllTablesMutation.isLoading,
                     }}
                   />
                 </Box>
@@ -287,7 +287,7 @@ export default function GenerateClassPage() {
                     label="Template"
                     options={templates}
                     isLoading={isLoadingTemplates}
-                    isError={isErrorTemplates}
+                    error={!!isErrorTemplates}
                     errorMessage="Erro ao carregar templates"
                     selectProps={{ sx: { width: 200 } }}
                   />
@@ -339,16 +339,16 @@ export default function GenerateClassPage() {
                   variant="contained"
                   size="large"
                   onClick={handleLoadTables}
-                  disabled={getAllTablesMutation.isPending}
+                  disabled={getAllTablesMutation.isLoading}
                   startIcon={
-                    getAllTablesMutation.isPending ? (
+                    getAllTablesMutation.isLoading ? (
                       <CircularProgress size={20} />
                     ) : (
                       <DatabaseIcon />
                     )
                   }
                 >
-                  {getAllTablesMutation.isPending
+                  {getAllTablesMutation.isLoading
                     ? "Carregando..."
                     : "Carregar Tabelas"}
                 </Button>
@@ -587,16 +587,16 @@ export default function GenerateClassPage() {
                     variant="contained"
                     size="large"
                     onClick={handleGenerate}
-                    disabled={createClassMutation.isPending}
+                    disabled={createClassMutation.isLoading}
                     startIcon={
-                      createClassMutation.isPending ? (
+                      createClassMutation.isLoading ? (
                         <CircularProgress size={20} />
                       ) : (
                         <CodeIcon />
                       )
                     }
                   >
-                    {createClassMutation.isPending ? "Gerando..." : "Gerar"}
+                    {createClassMutation.isLoading ? "Gerando..." : "Gerar"}
                   </Button>
 
                   <Button

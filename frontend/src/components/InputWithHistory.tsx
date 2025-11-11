@@ -41,7 +41,7 @@ export function InputWithHistory({
     e.stopPropagation();
     const itemToDelete = history?.find((item) => item.valueInput === option);
     if (itemToDelete) {
-      await deleteHistoryMutation.mutateAsync(itemToDelete.id);
+      await deleteHistoryMutation.mutate(itemToDelete.id);
     }
   };
 

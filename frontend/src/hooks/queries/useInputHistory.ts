@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useState, useEffect } from 'react'
 import { api } from '@/lib/axios'
 
 interface InputHistory {
@@ -9,32 +9,67 @@ interface InputHistory {
 }
 
 export function useInputHistory(input: string, valueInput?: string) {
-  return useQuery({
-    queryKey: ['input-history', input, valueInput],
-    queryFn: async () => {
+  const [data, setData] = useState<InputHistory[] | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
+
+  const fetchData = async () => {
+    if (!input) {
+      setIsLoading(false)
+      return
+    }
+
+    try {
+      setIsLoading(true)
       const params = new URLSearchParams({ input })
       if (valueInput) {
         params.append('valueInput', valueInput)
       }
       const response = await api.get<InputHistory[]>(`/inputhistory/all?${params}`)
-      return response.data
-    },
-    enabled: !!input,
-  })
+      setData(response.data)
+      setError(null)
+    } catch (err) {
+      setError(err as Error)
+      setData(null)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchData()
+  }, [input, valueInput])
+
+  return { data, isLoading, error, refetch: fetchData }
 }
 
 export function useDeleteInputHistory() {
-  const queryClient = useQueryClient()
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
+  const [data, setData] = useState<boolean | null>(null)
 
-  return useMutation({
-    mutationFn: async (id: number) => {
+  const mutate = async (id: number, onSuccessCallback?: () => void) => {
+    try {
+      setIsLoading(true)
+      setError(null)
+
       const response = await api.delete<boolean>('/inputhistory/delete', {
         params: { id },
       })
+      setData(response.data)
+
+      if (onSuccessCallback) {
+        onSuccessCallback()
+      }
+
       return response.data
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['input-history'] })
-    },
-  })
+    } catch (err) {
+      setError(err as Error)
+      throw err
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return { mutate, isLoading, error, data }
 }
