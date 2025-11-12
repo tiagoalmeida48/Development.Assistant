@@ -241,6 +241,7 @@ export default function UsersPage() {
               disabled={isLoading}
               required
               margin="normal"
+              autoComplete="username"
             />
 
             <TextField
@@ -259,6 +260,7 @@ export default function UsersPage() {
               disabled={isLoading}
               required={!editingUser}
               margin="normal"
+              autoComplete="current-password"
             />
           </DialogContent>
 

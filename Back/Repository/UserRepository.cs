@@ -7,6 +7,14 @@ namespace Development.Assistant.Back.Repository;
 
 public class UserRepository(ApiContext apiContext) : BaseRepository(apiContext)
 {
+    public UserMod GetUserLogged()
+    {
+        const string sql = "SELECT * FROM `user` WHERE ID = @UserLogged LIMIT 1";
+
+        using var con = Conn;
+        return con.QueryFirstOrDefault<UserMod>(sql, new { UserLogged = _UserLogged });
+    }
+
     public IEnumerable<UserMod> Search(int id = 0, string login = null)
     {
         var param = new DynamicParameters();
@@ -29,7 +37,7 @@ public class UserRepository(ApiContext apiContext) : BaseRepository(apiContext)
         using var con = Conn;
         return con.Query<UserMod>(sb.ToString(), param);
     }
-
+    
     public bool Create(UserMod user)
     {
         const string sql = "INSERT INTO `user` (Username, Login, Password) VALUES (@Username, @Login, @Password)";

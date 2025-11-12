@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link } from "react-router-dom";
 import {
   Container,
   Typography,
@@ -6,73 +6,81 @@ import {
   CardContent,
   Box,
   Avatar,
-} from '@mui/material'
+} from "@mui/material";
 import {
   Storage as DatabaseIcon,
   ContentCopy as CopyIcon,
   Code as CodeIcon,
   People as UsersIcon,
   ArrowForward as ArrowIcon,
-} from '@mui/icons-material'
+} from "@mui/icons-material";
 
 export default function HomePage() {
   const features = [
     {
-      title: 'Comparar Bancos de Dados',
-      description: 'Compare estruturas e dados entre dois bancos',
+      title: "Comparar Bancos de Dados",
+      description: "Compare estruturas e dados entre dois bancos",
       icon: DatabaseIcon,
-      href: '/compare-database' as const,
-      color: '#2563eb',
+      href: "/compare-database" as const,
+      color: "#2563eb",
     },
     {
-      title: 'Copiar Projeto',
-      description: 'Copie projetos e renomeie namespaces',
+      title: "Copiar Projeto",
+      description: "Copie projetos e renomeie namespaces",
       icon: CopyIcon,
-      href: '/copy-project' as const,
-      color: '#2563eb',
+      href: "/copy-project" as const,
+      color: "#2563eb",
     },
     {
-      title: 'Gerar Classes',
-      description: 'Gere classes e camadas de arquitetura',
+      title: "Gerar Classes",
+      description: "Gere classes e camadas de arquitetura",
       icon: CodeIcon,
-      href: '/generate-class' as const,
-      color: '#2563eb',
+      href: "/generate-class" as const,
+      color: "#2563eb",
     },
     {
-      title: 'Usuários',
-      description: 'Gerencie os usuários do sistema',
+      title: "Usuários",
+      description: "Gerencie os usuários do sistema",
       icon: UsersIcon,
-      href: '/users' as const,
-      color: '#2563eb',
+      href: "/users" as const,
+      color: "#2563eb",
     },
-  ]
+  ];
 
   return (
     <Container maxWidth="xl" sx={{ py: 6 }}>
-      <Box sx={{ mb: 6, textAlign: 'center' }}>
+      <Box sx={{ mb: 6, textAlign: "center" }}>
         <Typography variant="h4" fontWeight={700} gutterBottom>
-          Ferramentas de desenvolvimento para aumentar sua produtividade
+          Ferramentas para auxiliar no desenvolvimento
         </Typography>
       </Box>
 
       <Box
         sx={{
-          display: 'grid',
-          gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)', md: 'repeat(3, 1fr)' },
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            sm: "repeat(2, 1fr)",
+            md: "repeat(3, 1fr)",
+          },
           gap: 3,
         }}
       >
         {features.map((feature) => {
-          const Icon = feature.icon
+          const Icon = feature.icon;
           return (
-            <Link key={feature.href} to={feature.href} style={{ textDecoration: 'none' }}>
+            <Link
+              key={feature.href}
+              to={feature.href}
+              style={{ textDecoration: "none" }}
+            >
               <Card
                 sx={{
-                  height: '100%',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s',
-                  '&:hover': {
-                    transform: 'translateY(-8px) scale(1.02)',
+                  height: "100%",
+                  cursor: "pointer",
+                  transition: "all 0.3s",
+                  "&:hover": {
+                    transform: "translateY(-8px) scale(1.02)",
                     boxShadow: 6,
                   },
                 }}
@@ -93,22 +101,30 @@ export default function HomePage() {
                     {feature.title}
                   </Typography>
 
-                  <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                  <Typography
+                    variant="body2"
+                    color="text.secondary"
+                    sx={{ mb: 2 }}
+                  >
                     {feature.description}
                   </Typography>
 
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="caption" fontWeight={600} color="primary">
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Typography
+                      variant="caption"
+                      fontWeight={600}
+                      color="primary"
+                    >
                       Acessar ferramenta
                     </Typography>
-                    <ArrowIcon sx={{ fontSize: 16, color: 'primary.main' }} />
+                    <ArrowIcon sx={{ fontSize: 16, color: "primary.main" }} />
                   </Box>
                 </CardContent>
               </Card>
             </Link>
-          )
+          );
         })}
       </Box>
     </Container>
-  )
+  );
 }

@@ -1,7 +1,5 @@
 ﻿using Development.Assistant.Back.Models;
 using Development.Assistant.Back.Repository;
-using Development.Assistant.Back.Services;
-using Development.Assistant.Back.Utils;
 
 namespace Development.Assistant.Back.Domain.Services;
 

@@ -30,6 +30,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { PrivateRoute } from "@/components/PrivateRoute";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
+import React from "react";
 
 function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();

@@ -30,7 +30,7 @@ export function InputWithHistory({
   inputName,
   textFieldProps,
 }: InputWithHistoryProps) {
-  const { data: history } = useInputHistory(inputName);
+  const { data: history, refetch } = useInputHistory(inputName);
   const deleteHistoryMutation = useDeleteInputHistory();
   const [hoveredOption, setHoveredOption] = useState<string | null>(null);
 
@@ -41,14 +41,21 @@ export function InputWithHistory({
     e.stopPropagation();
     const itemToDelete = history?.find((item) => item.valueInput === option);
     if (itemToDelete) {
-      await deleteHistoryMutation.mutate(itemToDelete.id);
+      await deleteHistoryMutation.mutate(itemToDelete.id).then(() => {
+        refetch();
+      });
     }
   };
+
+  const handleOnFocus = () => {
+    refetch();
+  }
 
   return (
     <Autocomplete
       freeSolo
       value={value}
+      onFocus={handleOnFocus}
       onChange={(_, newValue) => {
         onChange(newValue || "");
       }}
@@ -64,28 +71,31 @@ export function InputWithHistory({
           )
           .slice(0, 10);
       }}
-      renderOption={(props, option) => (
-        <Box
-          component="li"
-          {...props}
-          onMouseEnter={() => setHoveredOption(option)}
-          onMouseLeave={() => setHoveredOption(null)}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-            bgcolor: "background.paper",
-            borderBottom: "1px solid",
-            borderColor: "divider",
-            height: "40px",
-            "&:hover": {
-              bgcolor: "primary.lighter",
-            },
-            "&.Mui-focused": {
-              bgcolor: "primary.lighter",
-            },
-          }}
-        >
+      renderOption={(props, option) => {
+        const { key, ...otherProps } = props;
+        return (
+          <Box
+            component="li"
+            key={key}
+            {...otherProps}
+            onMouseEnter={() => setHoveredOption(option)}
+            onMouseLeave={() => setHoveredOption(null)}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              bgcolor: "background.paper",
+              borderBottom: "1px solid",
+              borderColor: "divider",
+              height: "40px",
+              "&:hover": {
+                bgcolor: "primary.lighter",
+              },
+              "&.Mui-focused": {
+                bgcolor: "primary.lighter",
+              },
+            }}
+          >
           <HistoryIcon sx={{ fontSize: 18, color: "primary.main" }} />
           <Typography
             variant="body2"
@@ -115,7 +125,8 @@ export function InputWithHistory({
             </Tooltip>
           )}
         </Box>
-      )}
+        );
+      }}
       noOptionsText={
         <Box sx={{ py: 2, textAlign: "center" }}>
           <Typography variant="body2" color="text.secondary">

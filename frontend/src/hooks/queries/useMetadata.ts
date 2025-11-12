@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { api } from '@/lib/axios'
 
 interface DatabaseType {
@@ -15,6 +15,7 @@ export function useTemplates() {
   const [data, setData] = useState<Template[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
+  const hasFetched = useRef(false)
 
   const fetchData = async () => {
     try {
@@ -31,7 +32,10 @@ export function useTemplates() {
   }
 
   useEffect(() => {
-    fetchData()
+    if (!hasFetched.current) {
+      hasFetched.current = true
+      fetchData()
+    }
   }, [])
 
   return { data, isLoading, error, refetch: fetchData }
@@ -41,6 +45,7 @@ export function useDatabaseTypes() {
   const [data, setData] = useState<DatabaseType[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
+  const hasFetched = useRef(false)
 
   const fetchData = async () => {
     try {
@@ -57,7 +62,10 @@ export function useDatabaseTypes() {
   }
 
   useEffect(() => {
-    fetchData()
+    if (!hasFetched.current) {
+      hasFetched.current = true
+      fetchData()
+    }
   }, [])
 
   return { data, isLoading, error, refetch: fetchData }

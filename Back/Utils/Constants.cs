@@ -53,12 +53,16 @@ public class Constants
         { "bigint", "long" },
         { "double", "double" },
         { "longblob", "byte[]" },
+        { "mediumblob", "byte[]" },
+        { "mediumtext", "string" },
+        { "longtext", "string" },
         { "decimal", "decimal" },
         { "float", "float" },
         { "bool", "bool" },
         { "bit", "bool" },
         { "datetime", "DateTime" },
         { "date", "DateTime" },
+        { "time", "TimeSpan" },
         { "varchar", "string" },
         { "char", "string" },
         { "nvarchar", "string" },
@@ -75,7 +79,7 @@ public class Constants
         { "timestamp with time zone", "datetime" },
         { "bpchar", "bool" },
         { "int4", "int" },
-        { "int8", "int" },
+        { "int8", "long" },
         { "integer", "int" },
         { "smallint", "int" },
         { "numeric", "decimal" },
@@ -114,32 +118,32 @@ public class Constants
         return templateNames[typeClass];
     }
 
-    public static string GetPath(TypeClass typeClass, string pathGeral)
+    public static string GetPath(TypeClass typeClass)
     {
         var paths = new Dictionary<TypeClass, string>
         {
-            {TypeClass.DDD_Controller, Path.Combine(pathGeral, @"1 - Api\Controllers")},
-            {TypeClass.DDD_Dto, Path.Combine(pathGeral, @"2 - App\Dto")},
-            {TypeClass.DDD_InterfaceApp, Path.Combine(pathGeral, @"2 - App\Interfaces")},
-            {TypeClass.DDD_ServiceApp, Path.Combine(pathGeral, @"2 - App\Services")},
-            {TypeClass.DDD_InterfaceRepo, Path.Combine(pathGeral, @"3 - Domain\Interfaces\Repository")},
-            {TypeClass.DDD_InterfaceSrv, Path.Combine(pathGeral, @"3 - Domain\Interfaces\Services")},
-            {TypeClass.DDD_Model, Path.Combine(pathGeral, @"3 - Domain\Models")},
-            {TypeClass.DDD_Service, Path.Combine(pathGeral, @"3 - Domain\Services")},
-            {TypeClass.DDD_Repository, Path.Combine(pathGeral, "4 - Repository")},
+            {TypeClass.DDD_Controller, @"1 - Api\Controllers"},
+            {TypeClass.DDD_Dto, @"2 - App\Dto"},
+            {TypeClass.DDD_InterfaceApp, @"2 - App\Interfaces"},
+            {TypeClass.DDD_ServiceApp, @"2 - App\Services"},
+            {TypeClass.DDD_InterfaceRepo, @"3 - Domain\Interfaces\Repository"},
+            {TypeClass.DDD_InterfaceSrv, @"3 - Domain\Interfaces\Services"},
+            {TypeClass.DDD_Model, @"3 - Domain\Models"},
+            {TypeClass.DDD_Service, @"3 - Domain\Services"},
+            {TypeClass.DDD_Repository, "4 - Repository"},
             
-            {TypeClass.Clean_DomainEntity, Path.Combine(pathGeral, @"1 - Domain\Entities")},
-            {TypeClass.Clean_DomainInterface, Path.Combine(pathGeral, @"1 - Domain\Interfaces")},
-            {TypeClass.Clean_AppRecord, Path.Combine(pathGeral, @"2 - Application\Records")},
-            {TypeClass.Clean_AppInterface, Path.Combine(pathGeral, @"2 - Application\Interfaces")},
-            {TypeClass.Clean_AppService, Path.Combine(pathGeral, @"2 - Application\Services")},
-            {TypeClass.Clean_AppServiceGet, Path.Combine(pathGeral, @"2 - Application\Services")},
-            {TypeClass.Clean_AppServiceValidation, Path.Combine(pathGeral, @"2 - Application\Services")},
-            {TypeClass.Clean_Repository, Path.Combine(pathGeral, @"3 - Infra\Repositories")},
-            {TypeClass.Clean_RepositoryModel, Path.Combine(pathGeral, @"3 - Infra\Models")},
-            {TypeClass.Clean_Controller, Path.Combine(pathGeral, @"4 - Api\Controllers")},
-            {TypeClass.Clean_GraphQlMutation, Path.Combine(pathGeral, @"4 - Api\GraphQl")},
-            {TypeClass.Clean_GraphQlQuery, Path.Combine(pathGeral, @"4 - Api\GraphQl")}
+            {TypeClass.Clean_DomainEntity, @"1 - Domain\Entities"},
+            {TypeClass.Clean_DomainInterface, @"1 - Domain\Interfaces"},
+            {TypeClass.Clean_AppRecord, @"2 - Application\Records"},
+            {TypeClass.Clean_AppInterface, @"2 - Application\Interfaces"},
+            {TypeClass.Clean_AppService, @"2 - Application\Services"},
+            {TypeClass.Clean_AppServiceGet, @"2 - Application\Services"},
+            {TypeClass.Clean_AppServiceValidation, @"2 - Application\Services"},
+            {TypeClass.Clean_Repository, @"3 - Infra\Repositories"},
+            {TypeClass.Clean_RepositoryModel, @"3 - Infra\Models"},
+            {TypeClass.Clean_Controller, @"4 - Api\Controllers"},
+            {TypeClass.Clean_GraphQlMutation, @"4 - Api\GraphQl"},
+            {TypeClass.Clean_GraphQlQuery, @"4 - Api\GraphQl"}
         };
         return paths[typeClass];
     }
@@ -192,12 +196,8 @@ public class Constants
         public const string OldNamespace = "oldNs";
         public const string NewNamespace = "newNs";
         public const string ConnString = "connString";
-        public const string PathGeral = "pathGeral";
         public const string ProjectName = "projectName";
         public const string NameSpace = "nameSpace";
         public const string ExcludePrefixTable = "excludePrefixTable";
     }
-    
-    
-
 }

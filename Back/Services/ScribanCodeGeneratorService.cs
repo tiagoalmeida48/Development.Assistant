@@ -5,6 +5,7 @@ using Development.Assistant.Back.Utils;
 using Development.Assistant.Back.Vo;
 using Scriban;
 using Scriban.Runtime;
+using System.IO.Compression;
 using Path = System.IO.Path;
 
 namespace Development.Assistant.Back.Services;
@@ -16,26 +17,24 @@ public class ScribanCodeGeneratorService(MetadataRepository repository, InputHis
         return repository.GetTablesQuery(connectionString, dbType);
     }
 
-    public bool CreateClass(InfoClassDto infoClass)
+    public async Task<byte[]> CreateClassAsync(InfoClassDto infoClass)
     {
         try
         {
-            if (Directory.Exists(infoClass.PathGeral))
-                Directory.Delete(infoClass.PathGeral, true);
-            
-            var tasks = infoClass.Tables.Select(table => GenerateForTableAsync(table, infoClass));
-            Task.WhenAll(tasks).Wait();
-            
+            var generatedFiles = new Dictionary<string, string>();
+
+            var tasks = infoClass.Tables.Select(table => GenerateForTableAsync(table, infoClass, generatedFiles));
+            await Task.WhenAll(tasks);
+
             var inputsValue = new List<InputHistoryMod>();
             inputsValue.Add(new InputHistoryMod(Constants.InputName.ConnString, infoClass.ConnectionString));
-            inputsValue.Add(new InputHistoryMod(Constants.InputName.PathGeral, infoClass.PathGeral));
             inputsValue.Add(new InputHistoryMod(Constants.InputName.ProjectName, infoClass.ProjectName));
             inputsValue.Add(new InputHistoryMod(Constants.InputName.NameSpace, infoClass.NameSpace));
             inputsValue.Add(new InputHistoryMod(Constants.InputName.ExcludePrefixTable, infoClass.ExcludePrefixTable));
 
             inputHistorySrv.Create(inputsValue);
 
-            return true;
+            return CreateZipFile(generatedFiles);
         }
         catch (Exception ex)
         {
@@ -43,7 +42,23 @@ public class ScribanCodeGeneratorService(MetadataRepository repository, InputHis
         }
     }
 
-    private async Task GenerateForTableAsync(string table, InfoClassDto infoClass)
+    private static byte[] CreateZipFile(Dictionary<string, string> files)
+    {
+        using var memoryStream = new MemoryStream();
+        using (var archive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
+        {
+            foreach (var file in files)
+            {
+                var entry = archive.CreateEntry(file.Key);
+                using var entryStream = entry.Open();
+                using var streamWriter = new StreamWriter(entryStream);
+                streamWriter.Write(file.Value);
+            }
+        }
+        return memoryStream.ToArray();
+    }
+
+    private async Task GenerateForTableAsync(string table, InfoClassDto infoClass, Dictionary<string, string> generatedFiles)
     { 
         var tbName = table.ConvertToPascalCase();
         var tbProp = tbName.ConvertToCamelCase();
@@ -64,7 +79,6 @@ public class ScribanCodeGeneratorService(MetadataRepository repository, InputHis
     
         var databaseMetadata = new DatabaseMetadataVo
         {
-            PathGeral = infoClass.PathGeral,
             ProjectName = infoClass.ProjectName,
             Namespace = infoClass.NameSpace,
             TableName = tbName,
@@ -82,41 +96,41 @@ public class ScribanCodeGeneratorService(MetadataRepository repository, InputHis
         if (infoClass.Template == Constants.Template.DDD)
         {
             generateTasks = [
-                GenerateAndSaveAsync(Constants.TypeClass.DDD_Controller, databaseMetadata, "", "Controller"),
-                GenerateAndSaveAsync(Constants.TypeClass.DDD_Dto, databaseMetadata, "", "DisplayDto"),
-                GenerateAndSaveAsync(Constants.TypeClass.DDD_Dto, databaseMetadata, "", "CreateDto"),
-                GenerateAndSaveAsync(Constants.TypeClass.DDD_Dto, databaseMetadata, "", "UpdateDto"),
-                GenerateAndSaveAsync(Constants.TypeClass.DDD_InterfaceApp, databaseMetadata, "I", "AppService"),
-                GenerateAndSaveAsync(Constants.TypeClass.DDD_ServiceApp, databaseMetadata, "", "AppService"),
-                GenerateAndSaveAsync(Constants.TypeClass.DDD_Model, databaseMetadata, "", "Mod"),
-                GenerateAndSaveAsync(Constants.TypeClass.DDD_Service, databaseMetadata, "", "Service"),
-                GenerateAndSaveAsync(Constants.TypeClass.DDD_InterfaceRepo, databaseMetadata, "I", "Repository"),
-                GenerateAndSaveAsync(Constants.TypeClass.DDD_InterfaceSrv, databaseMetadata, "I", "Service"),
-                GenerateAndSaveAsync(Constants.TypeClass.DDD_Repository, databaseMetadata, "", "Repository")
+                GenerateAndSaveAsync(Constants.TypeClass.DDD_Controller, databaseMetadata, "", "Controller", generatedFiles),
+                GenerateAndSaveAsync(Constants.TypeClass.DDD_Dto, databaseMetadata, "", "DisplayDto", generatedFiles),
+                GenerateAndSaveAsync(Constants.TypeClass.DDD_Dto, databaseMetadata, "", "CreateDto", generatedFiles),
+                GenerateAndSaveAsync(Constants.TypeClass.DDD_Dto, databaseMetadata, "", "UpdateDto", generatedFiles),
+                GenerateAndSaveAsync(Constants.TypeClass.DDD_InterfaceApp, databaseMetadata, "I", "AppService", generatedFiles),
+                GenerateAndSaveAsync(Constants.TypeClass.DDD_ServiceApp, databaseMetadata, "", "AppService", generatedFiles),
+                GenerateAndSaveAsync(Constants.TypeClass.DDD_Model, databaseMetadata, "", "Mod", generatedFiles),
+                GenerateAndSaveAsync(Constants.TypeClass.DDD_Service, databaseMetadata, "", "Service", generatedFiles),
+                GenerateAndSaveAsync(Constants.TypeClass.DDD_InterfaceRepo, databaseMetadata, "I", "Repository", generatedFiles),
+                GenerateAndSaveAsync(Constants.TypeClass.DDD_InterfaceSrv, databaseMetadata, "I", "Service", generatedFiles),
+                GenerateAndSaveAsync(Constants.TypeClass.DDD_Repository, databaseMetadata, "", "Repository", generatedFiles)
             ];
         }
         else
         {
             generateTasks = [
-                GenerateAndSaveAsync(Constants.TypeClass.Clean_DomainEntity, databaseMetadata, "", "Entity"),
-                GenerateAndSaveAsync(Constants.TypeClass.Clean_DomainInterface, databaseMetadata, "I", "Repository"),
-                GenerateAndSaveAsync(Constants.TypeClass.Clean_AppRecord, databaseMetadata, "", "Record"),
-                GenerateAndSaveAsync(Constants.TypeClass.Clean_AppInterface, databaseMetadata, "I", "Service"),
-                GenerateAndSaveAsync(Constants.TypeClass.Clean_AppService, databaseMetadata, "_", "Service"),
-                GenerateAndSaveAsync(Constants.TypeClass.Clean_AppServiceGet, databaseMetadata, "", "GetService"),
-                GenerateAndSaveAsync(Constants.TypeClass.Clean_AppServiceValidation, databaseMetadata, "", "ValidationService"),
-                GenerateAndSaveAsync(Constants.TypeClass.Clean_Repository, databaseMetadata, "", "Repository"),
-                GenerateAndSaveAsync(Constants.TypeClass.Clean_RepositoryModel, databaseMetadata, "", "Mod"),
-                GenerateAndSaveAsync(Constants.TypeClass.Clean_Controller, databaseMetadata, "", "Controller"),
-                GenerateAndSaveAsync(Constants.TypeClass.Clean_GraphQlMutation, databaseMetadata, "", "Mutation"),
-                GenerateAndSaveAsync(Constants.TypeClass.Clean_GraphQlQuery, databaseMetadata, "", "Query")
+                GenerateAndSaveAsync(Constants.TypeClass.Clean_DomainEntity, databaseMetadata, "", "Entity", generatedFiles),
+                GenerateAndSaveAsync(Constants.TypeClass.Clean_DomainInterface, databaseMetadata, "I", "Repository", generatedFiles),
+                GenerateAndSaveAsync(Constants.TypeClass.Clean_AppRecord, databaseMetadata, "", "Record", generatedFiles),
+                GenerateAndSaveAsync(Constants.TypeClass.Clean_AppInterface, databaseMetadata, "I", "Service", generatedFiles),
+                GenerateAndSaveAsync(Constants.TypeClass.Clean_AppService, databaseMetadata, "_", "Service", generatedFiles),
+                GenerateAndSaveAsync(Constants.TypeClass.Clean_AppServiceGet, databaseMetadata, "", "GetService", generatedFiles),
+                GenerateAndSaveAsync(Constants.TypeClass.Clean_AppServiceValidation, databaseMetadata, "", "ValidationService", generatedFiles),
+                GenerateAndSaveAsync(Constants.TypeClass.Clean_Repository, databaseMetadata, "", "Repository", generatedFiles),
+                GenerateAndSaveAsync(Constants.TypeClass.Clean_RepositoryModel, databaseMetadata, "", "Mod", generatedFiles),
+                GenerateAndSaveAsync(Constants.TypeClass.Clean_Controller, databaseMetadata, "", "Controller", generatedFiles),
+                GenerateAndSaveAsync(Constants.TypeClass.Clean_GraphQlMutation, databaseMetadata, "", "Mutation", generatedFiles),
+                GenerateAndSaveAsync(Constants.TypeClass.Clean_GraphQlQuery, databaseMetadata, "", "Query", generatedFiles)
             ];
         }
-        
+
         await Task.WhenAll(generateTasks);
     }
 
-    private static async Task GenerateAndSaveAsync(Constants.TypeClass typeClass, DatabaseMetadataVo data, string prefix, string suffix)
+    private static async Task GenerateAndSaveAsync(Constants.TypeClass typeClass, DatabaseMetadataVo data, string prefix, string suffix, Dictionary<string, string> generatedFiles)
     {
         Constants.TypeClass[] allowedTextTypes = [
             Constants.TypeClass.DDD_Dto, Constants.TypeClass.DDD_Model, Constants.TypeClass.DDD_InterfaceRepo, Constants.TypeClass.DDD_Repository,
@@ -124,7 +138,7 @@ public class ScribanCodeGeneratorService(MetadataRepository repository, InputHis
         ];
         if (data.TableName.EndsWith("Text", StringComparison.OrdinalIgnoreCase) && !allowedTextTypes.Contains(typeClass)) return;
         if (data.TableName.EndsWith("Text", StringComparison.OrdinalIgnoreCase) && suffix is "CreateDto" or "UpdateDto") return;
-        
+
         var templateName = Constants.GetTemplateName(typeClass);
         var templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates", $"{templateName}.scriban");
         var templateText = await File.ReadAllTextAsync(templatePath);
@@ -135,15 +149,15 @@ public class ScribanCodeGeneratorService(MetadataRepository repository, InputHis
 
         var tableNameStartWithPrefix = data.TableName.StartsWith(data.ExcludePrefixTable, StringComparison.OrdinalIgnoreCase);
         var tablePropStartWithPrefix = data.TableProp.StartsWith(data.ExcludePrefixTable, StringComparison.OrdinalIgnoreCase);
-        
+
         var newTableName = tableNameStartWithPrefix ? data.TableName.Replace(data.ExcludePrefixTable, "", StringComparison.OrdinalIgnoreCase) : data.TableName;
         var newTableProp = tablePropStartWithPrefix ? data.TableProp.Replace(data.ExcludePrefixTable, "", StringComparison.OrdinalIgnoreCase) : data.TableProp;
 
         var model = Constants.MapInfo(data.TableNameOriginal, newTableName, newTableProp.ConvertToCamelCase(), data);
-        
+
         context.PushGlobal(model);
         var result = await template.RenderAsync(context);
-        
+
         if (typeClass == Constants.TypeClass.Clean_AppRecord)
             result = result.Replace(", )", ")");
 
@@ -152,11 +166,12 @@ public class ScribanCodeGeneratorService(MetadataRepository repository, InputHis
                       or Constants.TypeClass.Clean_GraphQlMutation or Constants.TypeClass.Clean_GraphQlQuery)
             groupFolder = newTableName;
 
-        var path = Constants.GetPath(typeClass, data.PathGeral);
-        var newPath = Path.Combine(path, groupFolder);
-        if (!Directory.Exists(newPath))
-            Directory.CreateDirectory(newPath);
+        var path = Constants.GetPath(typeClass);
+        var fileRelativePath = Path.Combine(path, groupFolder, $"{prefix}{newTableName}{suffix}.cs");
 
-        await File.WriteAllTextAsync($"{Path.Combine(newPath, $"{prefix}{newTableName}{suffix}")}.cs", result);
+        lock (generatedFiles)
+        {
+            generatedFiles[fileRelativePath] = result;
+        }
     }
 }

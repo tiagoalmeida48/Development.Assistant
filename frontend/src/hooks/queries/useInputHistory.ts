@@ -8,7 +8,7 @@ interface InputHistory {
   valueInput: string
 }
 
-export function useInputHistory(input: string, valueInput?: string) {
+export function useInputHistory(input: string, valueInput?: string, enabled: boolean = false) {
   const [data, setData] = useState<InputHistory[] | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
@@ -37,7 +37,7 @@ export function useInputHistory(input: string, valueInput?: string) {
   }
 
   useEffect(() => {
-    fetchData()
+     enabled && fetchData()
   }, [input, valueInput])
 
   return { data, isLoading, error, refetch: fetchData }

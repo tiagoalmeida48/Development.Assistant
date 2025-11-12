@@ -71,6 +71,10 @@ public class AuthService(UserRepository userRep)
         var oldUser = userRep.Search(request.Id).FirstOrDefault();
         if (oldUser == null)
             throw new Exception("Usuário não existe");
+        
+        var userLogged = userRep.GetUserLogged();
+        if (userLogged.Id != request.Id && userLogged.Login != "admin")
+            throw new Exception("Acesso negado, você só pode alterar seu próprio usuário");
 
         var user = new UserMod
         {

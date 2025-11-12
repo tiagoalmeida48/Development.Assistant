@@ -11,7 +11,6 @@ import {
   Chip,
   Dialog,
   DialogTitle,
-  DialogContent,
   DialogActions,
   Checkbox,
   FormControlLabel,
@@ -22,14 +21,13 @@ import {
 import {
   Storage as DatabaseIcon,
   Code as CodeIcon,
-  FolderOpen as FolderIcon,
   CheckCircle as CheckCircleIcon,
-  ContentCopy as CopyIcon,
   Clear as ClearIcon,
   Layers as LayersIcon,
   Search as SearchIcon,
   CheckBox as CheckBoxIcon,
   CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon,
+  Download as DownloadIcon,
 } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
 import {
@@ -44,14 +42,14 @@ export default function GenerateClassPage() {
   const [connectionString, setConnectionString] = useState("");
   const [dbType, setDbType] = useState("");
   const [template, setTemplate] = useState("");
-  const [pathGeral, setPathGeral] = useState("");
   const [projectName, setProjectName] = useState("");
   const [nameSpace, setNameSpace] = useState("");
   const [excludePrefixTable, setExcludePrefixTable] = useState("");
   const [checkedTables, setCheckedTables] = useState<Set<string>>(new Set());
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [generatedPath, setGeneratedPath] = useState("");
   const [searchTable, setSearchTable] = useState("");
+  const [generatedBlob, setGeneratedBlob] = useState<Blob | null>(null);
+  const [generatedFilename, setGeneratedFilename] = useState<string>("");
 
   const getAllTablesMutation = useGetAllTables();
   const createClassMutation = useCreateClass();
@@ -71,13 +69,13 @@ export default function GenerateClassPage() {
     if (databaseTypes && databaseTypes.length > 0 && !dbType) {
       setDbType(databaseTypes[0].id);
     }
-  }, [databaseTypes, dbType]);
+  }, [databaseTypes]);
 
   useEffect(() => {
     if (templates && templates.length > 0 && !template) {
       setTemplate(templates[0].id);
     }
-  }, [templates, template]);
+  }, [templates]);
 
   const availableTables = getAllTablesMutation.data;
 
@@ -132,7 +130,6 @@ export default function GenerateClassPage() {
   const handleGenerate = async () => {
     if (
       !connectionString ||
-      !pathGeral ||
       !projectName ||
       !nameSpace ||
       checkedTables.size === 0
@@ -147,19 +144,18 @@ export default function GenerateClassPage() {
     }
 
     try {
-      await createClassMutation.mutate({
+      const result = await createClassMutation.mutate({
         connectionString,
         dbType: dbType,
         template: template,
         tables: Array.from(checkedTables),
-        pathGeral,
         projectName,
         nameSpace,
         excludePrefixTable,
       });
-      setGeneratedPath(pathGeral);
+      setGeneratedBlob(result.blob);
+      setGeneratedFilename(result.filename);
       setShowSuccessModal(true);
-      enqueueSnackbar("Classes geradas com sucesso!", { variant: "success" });
     } catch (error) {
       enqueueSnackbar(
         error instanceof Error ? error.message : "Erro ao gerar classes",
@@ -168,19 +164,29 @@ export default function GenerateClassPage() {
     }
   };
 
-  const handleCopyPath = async () => {
+  const handleDownload = () => {
+    if (!generatedBlob) {
+      enqueueSnackbar("Nenhum arquivo para baixar", { variant: "error" });
+      return;
+    }
+
     try {
-      await navigator.clipboard.writeText(generatedPath);
-      enqueueSnackbar("Caminho copiado!", { variant: "success" });
+      const url = window.URL.createObjectURL(generatedBlob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = generatedFilename || `${projectName || "classes"}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
       setShowSuccessModal(false);
     } catch (err) {
-      enqueueSnackbar("Erro ao copiar caminho", { variant: "error" });
+      enqueueSnackbar("Erro ao fazer download", { variant: "error" });
     }
   };
 
   const handleReset = () => {
     setConnectionString("");
-    setPathGeral("");
     setProjectName("");
     setNameSpace("");
     setExcludePrefixTable("");
@@ -261,26 +267,10 @@ export default function GenerateClassPage() {
                 <Box
                   sx={{
                     display: "grid",
-                    gridTemplateColumns: { xs: "1fr", sm: "1fr 200px" },
+                    gridTemplateColumns: { xs: "1fr", sm: "200px 1fr" },
                     gap: 2,
                   }}
                 >
-                  <InputWithHistory
-                    value={pathGeral}
-                    onChange={setPathGeral}
-                    inputName="pathGeral"
-                    textFieldProps={{
-                      fullWidth: true,
-                      label: "Caminho",
-                      placeholder: "C:\\Projects\\Output",
-                      InputProps: {
-                        startAdornment: (
-                          <FolderIcon sx={{ mr: 1, color: "action.active" }} />
-                        ),
-                      },
-                    }}
-                  />
-
                   <InputSelect
                     value={template}
                     onChange={setTemplate}
@@ -291,15 +281,7 @@ export default function GenerateClassPage() {
                     errorMessage="Erro ao carregar templates"
                     selectProps={{ sx: { width: 200 } }}
                   />
-                </Box>
 
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: { xs: "1fr", sm: "repeat(3, 1fr)" },
-                    gap: 2,
-                  }}
-                >
                   <InputWithHistory
                     value={projectName}
                     onChange={setProjectName}
@@ -310,14 +292,22 @@ export default function GenerateClassPage() {
                       placeholder: "MyProject",
                     }}
                   />
+                </Box>
 
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)" },
+                    gap: 2,
+                  }}
+                >
                   <InputWithHistory
                     value={nameSpace}
                     onChange={setNameSpace}
                     inputName="nameSpace"
                     textFieldProps={{
                       fullWidth: true,
-                      label: "Namespace",
+                      label: "Ultimo nome do namespace",
                       placeholder: ".Core",
                     }}
                   />
@@ -633,31 +623,25 @@ export default function GenerateClassPage() {
         aria-colspan={2}
         fullWidth
       >
-        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+        <DialogTitle
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            margin: "10px auto",
+            gap: 2,
+          }}
+        >
           <CheckCircleIcon color="success" sx={{ fontSize: 32 }} />
           Classes Geradas com Sucesso!
         </DialogTitle>
-        <DialogContent>
-          <Box sx={{ p: 2, bgcolor: "action.hover", borderRadius: 1 }}>
-            <Typography variant="body2" fontWeight={600} gutterBottom>
-              Localização dos arquivos:
-            </Typography>
-            <Typography
-              variant="body2"
-              sx={{ fontFamily: "monospace", wordBreak: "break-all" }}
-            >
-              {generatedPath}
-            </Typography>
-          </Box>
-        </DialogContent>
-        <DialogActions sx={{ p: 3 }}>
+        <DialogActions sx={{ p: 3, pt: 0 }}>
           <Button
             variant="contained"
-            onClick={handleCopyPath}
-            startIcon={<CopyIcon />}
+            onClick={handleDownload}
+            startIcon={<DownloadIcon />}
             fullWidth
           >
-            Copiar Caminho
+            Baixar Arquivos
           </Button>
         </DialogActions>
       </Dialog>

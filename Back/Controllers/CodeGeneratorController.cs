@@ -22,13 +22,11 @@ public class CodeGeneratorController(ScribanCodeGeneratorService scribanCodeGene
     }
     
     [HttpPost("create-class")]
-    [Authorize] 
-    public ResultApi<bool> CreateClass([FromBody] InfoClassDto input)
+    [Authorize]
+    public async Task<IActionResult> CreateClass([FromBody] InfoClassDto input)
     {
-        var result = new ResultApi<bool>
-        {
-            Result = scribanCodeGeneratorService.CreateClass(input)
-        };
-        return result;
+        var zipBytes = await scribanCodeGeneratorService.CreateClassAsync(input);
+        var fileName = $"{input.ProjectName}.zip";
+        return File(zipBytes, "application/zip", fileName);
     }
 }
