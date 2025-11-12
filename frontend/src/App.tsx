@@ -29,6 +29,7 @@ import UsersPage from "@/pages/users";
 import { useTheme } from "@/hooks/useTheme";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { PrivateRoute } from "@/components/PrivateRoute";
+import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 
 function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
@@ -139,7 +140,23 @@ function Layout({ children }: { children: React.ReactNode }) {
               </>
             )}
 
-            <IconButton onClick={toggleTheme} color="inherit">
+            <IconButton
+              onClick={toggleTheme}
+              color="inherit"
+              sx={{
+                backgroundColor: theme === "light" ? "#fef3c7" : "#1e293b",
+                color: theme === "light" ? "#f59e0b" : "#60a5fa",
+                border:
+                  theme === "light"
+                    ? "0.5px solid #fbbf24"
+                    : "0.5px solid #3b82f6",
+                "&:hover": {
+                  backgroundColor: theme === "light" ? "#fde68a" : "#334155",
+                  transform: "scale(1.05)",
+                },
+                transition: "all 0.3s ease",
+              }}
+            >
               {theme === "light" ? <DarkModeIcon /> : <LightModeIcon />}
             </IconButton>
           </Toolbar>
@@ -153,6 +170,7 @@ function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTopButton />
       <AuthProvider>
         <Layout>
           <Routes>

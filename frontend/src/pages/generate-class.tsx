@@ -222,7 +222,7 @@ export default function GenerateClassPage() {
           sx={{
             display: "flex",
             gap: 3,
-            flexDirection: { xs: "column", lg: "row" },
+            flexDirection: { xs: "column", md: "row" },
           }}
         >
           <Card sx={{ mb: 3, flex: 1, height: 355 }}>
@@ -356,7 +356,13 @@ export default function GenerateClassPage() {
             </CardContent>
           </Card>
 
-          <Card sx={{ width: 350, height: 355 }}>
+          <Card
+            sx={{
+              width: { xs: "100%", md: 350 },
+              height: 355,
+              mb: 3,
+            }}
+          >
             <CardContent sx={{ p: 3 }}>
               <Box
                 sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}
