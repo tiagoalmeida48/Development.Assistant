@@ -47,7 +47,7 @@ import { UsersPage } from "@/features/users";
 import { ProfilePage } from "@/features/profile";
 import JsonToolsPage from "@/pages/json-tools";
 import Base64ToolsPage from "@/pages/base64-tools";
-import CryptographyToolsPage from "@/pages/cryptography-tools";
+import { CryptographyPage } from "@/features/cryptography";
 import { useTheme } from "@/shared/hooks/use-theme";
 import { AuthProvider, useAuth, PrivateRoute } from "@/features/auth";
 import { ScrollToTopButton } from "@/shared/components/scroll-to-top-button";
@@ -628,7 +628,7 @@ export default function App() {
               path="/cryptography-tools"
               element={
                 <PrivateRoute>
-                  <CryptographyToolsPage />
+                  <CryptographyPage />
                 </PrivateRoute>
               }
             />

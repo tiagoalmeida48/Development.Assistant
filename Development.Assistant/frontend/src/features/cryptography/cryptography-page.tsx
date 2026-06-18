@@ -21,9 +21,9 @@ import { InputWithHistory } from "@/shared/components/input-with-history";
 import {
   useCryptography,
   type CryptographyOperation,
-} from "@/hooks/queries/useCryptography";
+} from "./use-cryptography";
 
-export default function CryptographyToolsPage() {
+export default function CryptographyPage() {
   const { enqueueSnackbar } = useSnackbar();
   const [key, setKey] = useState("");
   const [text, setText] = useState("");
