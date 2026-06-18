@@ -33,7 +33,7 @@ import { useSnackbar } from "notistack";
 import {
   useGetAllTables,
   useCreateClass,
-} from "@/hooks/queries/useCodeGenerator";
+} from "./use-code-generator";
 import { InputSelect } from "@/shared/components/input-select";
 import { InputWithHistory } from "@/shared/components/input-with-history";
 import { useTemplates, useDatabaseTypes } from "@/shared/hooks/use-metadata";

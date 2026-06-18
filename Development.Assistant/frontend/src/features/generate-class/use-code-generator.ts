@@ -1,15 +1,6 @@
 import { useState } from 'react'
 import { api } from '@/shared/api/axios'
-
-interface InfoClass {
-  connectionString: string
-  dbType: string
-  template: string
-  tables: string[]
-  projectName: string
-  nameSpace: string
-  excludePrefixTable: string
-}
+import type { InfoClass } from './types'
 
 export function useGetAllTables() {
   const [isLoading, setIsLoading] = useState(false)

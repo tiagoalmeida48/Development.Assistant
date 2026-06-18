@@ -41,7 +41,7 @@ import {
 } from "@mui/icons-material";
 import { CompareDatabasePage } from "@/features/compare-database";
 import { CopyProjectPage } from "@/features/copy-project";
-import GenerateClassPage from "@/pages/generate-class";
+import { GenerateClassPage } from "@/features/generate-class";
 import { LoginPage } from "@/features/auth";
 import { UsersPage } from "@/features/users";
 import { ProfilePage } from "@/features/profile";
