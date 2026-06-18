@@ -1,8 +1,8 @@
-using Development.Assistant.Api.Middleware;
-using Development.Assistant.Domain.Services;
-using Development.Assistant.Infrastructure.Repositories;
-using Development.Assistant.Shared;
-using Development.Assistant.Shared.Http;
+using Development.Assistant.Middleware;
+using Development.Assistant.Modules.Services;
+using Development.Assistant.Modules.Repository;
+using Development.Assistant.Modules.Common;
+using Development.Assistant.Modules.Common.Http;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerUI;
@@ -14,7 +14,7 @@ Constants.JwtConfig.Configure(builder.Configuration);
 var dirPath = AppDomain.CurrentDomain.BaseDirectory;
 var finalPath = Path.Combine(dirPath, "Development.Assistant.dll");
 
-TypeMapper.Initialize(finalPath, ["Development.Assistant.Domain.Models"], []);
+TypeMapper.Initialize(finalPath, ["Development.Assistant.Modules.Models"], []);
 
 builder.Services.AddScoped<CopyProjectService>();
 builder.Services.AddScoped<CompareDatabaseService>();

@@ -34,7 +34,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="Infrastructure\Templates\*.scriban">
+		<Content Include="Modules\Services\Templates\*.scriban">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 			<TargetPath>Templates\%(Filename)%(Extension)</TargetPath>
