@@ -16,7 +16,7 @@ import {
   Download as DownloadIcon,
 } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
-import { useCopyProjectZip } from "@/hooks/queries/useProject";
+import { useCopyProjectZip } from "./use-project";
 import { InputWithHistory } from "@/shared/components/input-with-history";
 
 export default function CopyProjectPage() {

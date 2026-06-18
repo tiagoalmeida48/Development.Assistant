@@ -40,7 +40,7 @@ import {
   AccountCircle as AccountIcon,
 } from "@mui/icons-material";
 import { CompareDatabasePage } from "@/features/compare-database";
-import CopyProjectPage from "@/pages/copy-project";
+import { CopyProjectPage } from "@/features/copy-project";
 import GenerateClassPage from "@/pages/generate-class";
 import { LoginPage } from "@/features/auth";
 import { UsersPage } from "@/features/users";
