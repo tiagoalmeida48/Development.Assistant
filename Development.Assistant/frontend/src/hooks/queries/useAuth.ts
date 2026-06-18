@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { api, ApiError } from '@/lib/axios'
+import { api, type ApiError } from '@/shared/api/axios'
 
 interface LoginDto {
   login: string

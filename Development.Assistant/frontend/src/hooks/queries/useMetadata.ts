@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { api } from '@/lib/axios'
+import { api } from '@/shared/api/axios'
 
 interface DatabaseType {
   id: string

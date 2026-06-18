@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { api } from '@/lib/axios'
+import { api } from '@/shared/api/axios'
 
 interface User {
   id: number

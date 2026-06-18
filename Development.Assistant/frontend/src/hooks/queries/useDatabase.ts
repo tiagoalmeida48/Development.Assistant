@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { api } from '@/lib/axios'
+import { api } from '@/shared/api/axios'
 
 interface DatabaseClass {
   database1: string
