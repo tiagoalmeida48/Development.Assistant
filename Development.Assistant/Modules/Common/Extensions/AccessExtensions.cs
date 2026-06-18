@@ -1,4 +1,5 @@
-using Development.Assistant.Modules.Common.Exceptions;
+
+using Development.Assistant.Modules.Common.Extensions;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace Development.Assistant.Modules.Common.Http;

@@ -1,6 +1,6 @@
-﻿namespace Development.Assistant.Modules.Common;
+﻿namespace Development.Assistant.Modules.Common.Extensions;
 
-public static class Extensions
+public static class StringExtensions
 {
     extension(string value)
     {

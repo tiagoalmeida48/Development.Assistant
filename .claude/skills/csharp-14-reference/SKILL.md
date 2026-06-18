@@ -29,7 +29,7 @@ public static class Enumerable
 }
 ```
 
-**Já em uso no projeto** — `Shared/SerializerExt.cs`:
+**Já em uso no projeto** — `Modules/Common/Serializer.cs`:
 ```csharp
 extension(object entityToSer)
 {
@@ -94,7 +94,7 @@ Estes não são novidade do C# 14, mas são o padrão deste repo — use sempre:
 ## Notas .NET 10 relevantes ao backend
 
 - **APIs retornam 401/403 em vez de redirects** — alinhado ao uso de JWT Bearer aqui (sem cookie auth).
-- **System.Text.Json** é o serializador do projeto (não Newtonsoft) — ver `JsonOptions` em `SerializerExt.cs`.
+- **System.Text.Json** é o serializador do projeto (não Newtonsoft) — ver `JsonOptions` em `Serializer.cs`.
 - LTS até novembro/2028.
 
 Convenções completas do projeto em `docs/ARCHITECTURE.md` → "Convenções de código". Doc oficial: https://learn.microsoft.com/dotnet/csharp/whats-new/csharp-14

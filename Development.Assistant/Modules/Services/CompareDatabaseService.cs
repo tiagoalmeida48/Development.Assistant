@@ -1,6 +1,6 @@
 using Development.Assistant.Modules.Vo;
 using Development.Assistant.Modules.Repository;
-using Development.Assistant.Modules.Common.Exceptions;
+using Development.Assistant.Modules.Common;
 
 namespace Development.Assistant.Modules.Services;
 

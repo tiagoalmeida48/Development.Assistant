@@ -1,5 +1,4 @@
 using Development.Assistant.Modules.Common;
-using Development.Assistant.Modules.Common.Exceptions;
 using System.Text.Json;
 
 namespace Development.Assistant.Middleware;

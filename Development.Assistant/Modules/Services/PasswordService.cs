@@ -1,4 +1,5 @@
 using Konscious.Security.Cryptography;
+using Development.Assistant.Modules.Common.Extensions;
 using Development.Assistant.Modules.Common;
 using System.Security.Cryptography;
 using System.Text;

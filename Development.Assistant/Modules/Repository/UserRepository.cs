@@ -1,4 +1,5 @@
-﻿using Dapper;
+using Development.Assistant.Modules.Common.Extensions;
+using Dapper;
 using Development.Assistant.Modules.Models;
 using Development.Assistant.Modules.Common;
 using System.Text;

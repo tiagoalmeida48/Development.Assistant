@@ -1,8 +1,8 @@
 using Development.Assistant.Modules.Record;
+using Development.Assistant.Modules.Common.Extensions;
 using Development.Assistant.Modules.Models;
 using Development.Assistant.Modules.Repository;
 using Development.Assistant.Modules.Common;
-using Development.Assistant.Modules.Common.Exceptions;
 using Scriban;
 using Scriban.Functions;
 using Scriban.Runtime;

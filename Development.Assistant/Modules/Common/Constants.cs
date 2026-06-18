@@ -1,4 +1,5 @@
 using Development.Assistant.Modules.Record;
+using Development.Assistant.Modules.Common.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Scriban.Runtime;
 using System.Text;

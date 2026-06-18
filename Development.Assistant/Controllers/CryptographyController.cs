@@ -1,6 +1,5 @@
 using Development.Assistant.Modules.Record;
 using Development.Assistant.Modules.Common;
-using Development.Assistant.Modules.Common.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

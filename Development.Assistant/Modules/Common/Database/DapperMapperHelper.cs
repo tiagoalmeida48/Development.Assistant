@@ -2,7 +2,7 @@ using Dapper;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Reflection;
 
-namespace Development.Assistant.Modules.Common;
+namespace Development.Assistant.Modules.Common.Database;
 
 public static class TypeMapper
 {
