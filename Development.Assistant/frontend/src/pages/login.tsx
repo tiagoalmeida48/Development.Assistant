@@ -13,6 +13,7 @@ import {
   IconButton,
   Chip,
   Stack,
+  alpha,
 } from "@mui/material";
 import {
   DarkMode as DarkModeIcon,
@@ -87,8 +88,10 @@ export default function LoginPage() {
           zIndex: 2,
           border: "1px solid",
           borderColor: "divider",
-          backgroundColor:
-            theme === "light" ? "rgba(255,255,255,0.72)" : "rgba(255,255,255,0.06)",
+          backgroundColor: (muiTheme) =>
+            theme === "light"
+              ? alpha(muiTheme.palette.common.white, 0.72)
+              : alpha(muiTheme.palette.common.white, 0.06),
           color: theme === "light" ? "warning.dark" : "primary.light",
           "&:hover": {
             backgroundColor: "action.hover",
@@ -161,7 +164,7 @@ export default function LoginPage() {
                     bgcolor: "primary.main",
                     color: "primary.contrastText",
                     mb: 2,
-                    boxShadow: "0 16px 34px rgba(20, 125, 111, 0.3)",
+                    boxShadow: (theme) => `0 6px 16px ${alpha(theme.palette.primary.main, 0.18)}`,
                   }}
                 >
                   <LoginIcon sx={{ fontSize: 32 }} />

@@ -130,9 +130,9 @@ const baseThemeOptions: ThemeOptions = {
           boxShadow: "none",
         },
         contained: ({ theme }) => ({
-          boxShadow: `0 12px 26px ${alpha(theme.palette.primary.main, 0.22)}`,
+          boxShadow: `0 6px 16px ${alpha(theme.palette.primary.main, 0.18)}`,
           "&:hover": {
-            boxShadow: `0 16px 34px ${alpha(theme.palette.primary.main, 0.3)}`,
+            boxShadow: `0 10px 22px ${alpha(theme.palette.primary.main, 0.24)}`,
             transform: "translateY(-1px)",
           },
         }),
@@ -154,8 +154,8 @@ const baseThemeOptions: ThemeOptions = {
           backgroundColor: theme.palette.mode === "light" ? "#ffffff" : "#1f1f1f",
           boxShadow:
             theme.palette.mode === "light"
-              ? "0 18px 55px rgba(32, 42, 38, 0.1)"
-              : "0 18px 55px rgba(0, 0, 0, 0.28)",
+              ? "0 8px 24px rgba(32, 42, 38, 0.08)"
+              : "0 8px 24px rgba(0, 0, 0, 0.24)",
           backgroundImage: "none",
         }),
       },
@@ -170,8 +170,8 @@ const baseThemeOptions: ThemeOptions = {
         elevation1: ({ theme }) => ({
           boxShadow:
             theme.palette.mode === "light"
-              ? "0 14px 38px rgba(32, 42, 38, 0.08)"
-              : "0 14px 38px rgba(0, 0, 0, 0.26)",
+              ? "0 6px 18px rgba(32, 42, 38, 0.06)"
+              : "0 6px 18px rgba(0, 0, 0, 0.22)",
         }),
       },
     },
@@ -241,8 +241,8 @@ const baseThemeOptions: ThemeOptions = {
           border: `1px solid ${alpha(theme.palette.text.primary, 0.1)}`,
           boxShadow:
             theme.palette.mode === "light"
-              ? "0 26px 70px rgba(32, 42, 38, 0.18)"
-              : "0 26px 70px rgba(0, 0, 0, 0.52)",
+              ? "0 16px 44px rgba(32, 42, 38, 0.16)"
+              : "0 16px 44px rgba(0, 0, 0, 0.46)",
         }),
       },
     },
@@ -278,6 +278,7 @@ export const lightTheme = createTheme({
       light: "#d69e2e",
       dark: "#80510f",
       lighter: "#fff4d6",
+      contrastText: "#000000",
     },
     info: {
       main: "#2f80a7",
@@ -331,6 +332,7 @@ export const darkTheme = createTheme({
       light: "#ffe09b",
       dark: "#c9942b",
       lighter: "#453214",
+      contrastText: "#08110f",
     },
     info: {
       main: "#72c4df",

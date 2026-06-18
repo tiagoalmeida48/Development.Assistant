@@ -28,6 +28,7 @@ export default function CryptographyToolsPage() {
   const [key, setKey] = useState("");
   const [text, setText] = useState("");
   const [result, setResult] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const cryptographyMutation = useCryptography();
 
@@ -36,6 +37,8 @@ export default function CryptographyToolsPage() {
       enqueueSnackbar("Informe o texto a processar", { variant: "error" });
       return;
     }
+
+    setError(null);
 
     try {
       const output = await cryptographyMutation.mutate({
@@ -48,11 +51,12 @@ export default function CryptographyToolsPage() {
         operation === "Encrypt" ? "Texto criptografado" : "Texto descriptografado",
         { variant: "success" }
       );
-    } catch (error) {
-      enqueueSnackbar(
-        error instanceof Error ? error.message : "Erro ao processar",
-        { variant: "error" }
-      );
+    } catch (caught) {
+      const message =
+        caught instanceof Error ? caught.message : "Erro ao processar o texto";
+      setResult("");
+      setError(message);
+      enqueueSnackbar(message, { variant: "error" });
     }
   };
 
@@ -65,6 +69,7 @@ export default function CryptographyToolsPage() {
   const handleClear = () => {
     setText("");
     setResult("");
+    setError(null);
   };
 
   return (
@@ -87,7 +92,10 @@ export default function CryptographyToolsPage() {
 
             <InputWithHistory
               value={key}
-              onChange={setKey}
+              onChange={(value) => {
+                setKey(value);
+                if (error) setError(null);
+              }}
               inputName="cryptographyKey"
               textFieldProps={{
                 fullWidth: true,
@@ -100,7 +108,10 @@ export default function CryptographyToolsPage() {
               fullWidth
               label="Texto"
               value={text}
-              onChange={(event) => setText(event.target.value)}
+              onChange={(event) => {
+                setText(event.target.value);
+                if (error) setError(null);
+              }}
               placeholder="Texto a criptografar ou descriptografar"
             />
 
@@ -137,11 +148,25 @@ export default function CryptographyToolsPage() {
               </Button>
             </Stack>
 
+            {error && (
+              <Alert
+                severity="error"
+                id="cryptography-error"
+                role="alert"
+                onClose={() => setError(null)}
+              >
+                {error}
+              </Alert>
+            )}
+
             <TextField
               fullWidth
               label="Resultado"
               value={result}
+              error={Boolean(error)}
+              helperText={error ? "A operação falhou. Verifique a chave e o texto." : " "}
               InputProps={{ readOnly: true }}
+              aria-describedby={error ? "cryptography-error" : undefined}
               placeholder="O resultado aparecerá aqui"
             />
           </Stack>

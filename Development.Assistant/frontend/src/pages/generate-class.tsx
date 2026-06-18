@@ -226,12 +226,13 @@ export default function GenerateClassPage() {
       <Box sx={{ display: "flex", flexDirection: "column" }}>
         <Box
           sx={{
-            display: "flex",
+            display: "grid",
             gap: 3,
-            flexDirection: { xs: "column", md: "row" },
+            gridTemplateColumns: { xs: "1fr", md: "2fr 1fr" },
+            alignItems: "stretch",
           }}
         >
-          <Card sx={{ mb: 3, flex: 1, height: 355 }}>
+          <Card sx={{ mb: 3, minHeight: 355 }}>
             <CardContent sx={{ p: 3 }}>
               <Stack spacing={2}>
                 <Box
@@ -349,8 +350,8 @@ export default function GenerateClassPage() {
 
           <Card
             sx={{
-              width: { xs: "100%", md: 350 },
-              height: 355,
+              width: "100%",
+              minHeight: 355,
               mb: 3,
             }}
           >
@@ -628,7 +629,8 @@ export default function GenerateClassPage() {
           sx={{
             display: "flex",
             alignItems: "center",
-            margin: "10px auto",
+            my: 1,
+            mx: "auto",
             gap: 2,
           }}
         >

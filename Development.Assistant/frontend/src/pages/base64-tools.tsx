@@ -53,9 +53,12 @@ export default function Base64ToolsPage() {
   const [base64Value, setBase64Value] = useState("");
   const [fileName, setFileName] = useState("");
   const [previewUrl, setPreviewUrl] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const handleFileToBase64 = (file: File | null) => {
     if (!file) return;
+
+    setError(null);
 
     const reader = new FileReader();
     reader.onload = () => {
@@ -65,14 +68,22 @@ export default function Base64ToolsPage() {
       setPreviewUrl(file.type.startsWith("image/") ? result : "");
       enqueueSnackbar("Arquivo convertido para Base64", { variant: "success" });
     };
+    reader.onerror = () => {
+      const message = "Não foi possível ler o arquivo. Tente outro.";
+      setError(message);
+      enqueueSnackbar(message, { variant: "error" });
+    };
     reader.readAsDataURL(file);
   };
 
   const handleBase64ToFile = () => {
+    setError(null);
     try {
       const input = sanitizeBase64Input(base64Value);
       if (!input) {
-        enqueueSnackbar("Informe um conteúdo Base64", { variant: "error" });
+        const message = "Informe um conteúdo Base64";
+        setError(message);
+        enqueueSnackbar(message, { variant: "error" });
         return;
       }
 
@@ -106,7 +117,9 @@ export default function Base64ToolsPage() {
 
       enqueueSnackbar("Base64 convertido para arquivo", { variant: "success" });
     } catch {
-      enqueueSnackbar("Base64 inválido para conversão", { variant: "error" });
+      const message = "Base64 inválido para conversão";
+      setError(message);
+      enqueueSnackbar(message, { variant: "error" });
     }
   };
 
@@ -119,6 +132,7 @@ export default function Base64ToolsPage() {
     setBase64Value("");
     setFileName("");
     setPreviewUrl("");
+    setError(null);
   };
 
   return (
@@ -172,13 +186,30 @@ export default function Base64ToolsPage() {
               </Button>
             </Stack>
 
+            {error && (
+              <Alert
+                severity="error"
+                id="base64-error"
+                role="alert"
+                onClose={() => setError(null)}
+              >
+                {error}
+              </Alert>
+            )}
+
             {fileName && <Alert severity="success">Arquivo carregado: {fileName}</Alert>}
 
             {previewUrl && (
               <Box
                 component="img"
                 src={previewUrl}
-                alt="Preview"
+                alt={fileName ? `Pré-visualização de ${fileName}` : "Pré-visualização da imagem"}
+                onError={() => {
+                  setPreviewUrl("");
+                  enqueueSnackbar("Não foi possível exibir a pré-visualização da imagem", {
+                    variant: "warning",
+                  });
+                }}
                 sx={{
                   maxWidth: 320,
                   borderRadius: 2,
@@ -193,7 +224,12 @@ export default function Base64ToolsPage() {
               multiline
               minRows={18}
               value={base64Value}
-              onChange={(event) => setBase64Value(event.target.value)}
+              onChange={(event) => {
+                setBase64Value(event.target.value);
+                if (error) setError(null);
+              }}
+              error={Boolean(error)}
+              aria-describedby={error ? "base64-error" : undefined}
               placeholder="Cole aqui um Base64 ou carregue um arquivo para converter"
             />
           </Stack>

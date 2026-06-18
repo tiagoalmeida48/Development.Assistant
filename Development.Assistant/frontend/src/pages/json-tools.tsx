@@ -12,7 +12,9 @@ import {
   Tabs,
   TextField,
   Typography,
+  alpha,
 } from "@mui/material";
+import type { Theme } from "@mui/material/styles";
 import {
   ContentCopy as CopyIcon,
   Difference as CompareIcon,
@@ -20,10 +22,50 @@ import {
 } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
 
+/** Esconde visualmente, mantendo o texto disponível ao leitor de tela. */
+const visuallyHiddenSx = {
+  position: "absolute",
+  width: 1,
+  height: 1,
+  padding: 0,
+  margin: -1,
+  overflow: "hidden",
+  clip: "rect(0 0 0 0)",
+  whiteSpace: "nowrap",
+  border: 0,
+} as const;
+
+type DiffType = "missing-left" | "missing-right" | "different";
+
 type DiffPath = {
   path: string;
-  type: "missing-left" | "missing-right" | "different";
+  type: DiffType;
 };
+
+type PaletteColor = "success" | "error" | "warning";
+
+/**
+ * Descritor por tipo de divergência: cada tipo carrega cor, glyph e rótulo,
+ * de modo que a diferença seja comunicada por três canais (cor + símbolo +
+ * texto), nunca só por cor. `missing-left` = só existe no JSON B (adicionado);
+ * `missing-right` = só existe no JSON A (removido); `different` = valor alterado.
+ */
+const DIFF_META: Record<DiffType, { glyph: string; label: string; color: PaletteColor }> = {
+  "missing-left": { glyph: "+", label: "adicionado", color: "success" },
+  "missing-right": { glyph: "−", label: "removido", color: "error" },
+  different: { glyph: "~", label: "alterado", color: "warning" },
+};
+
+/**
+ * Cor do glyph do diff. No modo claro usa o tom `.dark` (Regra do Tom Escuro
+ * do DESIGN.md): o `.main` ocre do warning fica no limite de contraste como
+ * símbolo pequeno; o `.dark` o firma com folga. No escuro o `.main` já contrasta.
+ */
+function glyphColor(color: PaletteColor, theme: Theme) {
+  return theme.palette.mode === "light"
+    ? theme.palette[color].dark
+    : theme.palette[color].main;
+}
 
 function compareJson(left: unknown, right: unknown, basePath = "$"): DiffPath[] {
   if (Array.isArray(left) && Array.isArray(right)) {
@@ -78,41 +120,79 @@ function compareJson(left: unknown, right: unknown, basePath = "$"): DiffPath[] 
   return [];
 }
 
-function hasDiffInBranch(path: string, diffs: Set<string>) {
-  for (const diff of diffs) {
-    if (diff === path || diff.startsWith(`${path}.`) || diff.startsWith(`${path}[`)) {
-      return true;
+/**
+ * Resolve o tipo de divergência relevante para um branch. Uma correspondência
+ * exata no path (folha) vence; caso contrário, devolve o tipo de qualquer
+ * descendente divergente. Retorna null quando o branch é idêntico nos dois lados.
+ */
+function resolveDiffType(path: string, diffs: Map<string, DiffType>): DiffType | null {
+  const exact = diffs.get(path);
+  if (exact) return exact;
+  for (const [diffPath, type] of diffs) {
+    if (diffPath.startsWith(`${path}.`) || diffPath.startsWith(`${path}[`)) {
+      return type;
     }
   }
-  return false;
+  return null;
+}
+
+const sharedSx = {
+  fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
+  fontSize: 13,
+  lineHeight: 1.7,
+} as const;
+
+/**
+ * Gutter monospace com o glyph do diff (+ / − / ~) à esquerda da linha. É o
+ * canal não-cromático: junto da cor e do aria-label, garante que a divergência
+ * seja perceptível sem depender de cor (WCAG 1.4.1).
+ */
+function DiffGutter({ type }: { type: DiffType | null }) {
+  const meta = type ? DIFF_META[type] : null;
+  return (
+    <Box
+      component="span"
+      aria-hidden={!meta}
+      sx={{
+        ...sharedSx,
+        display: "inline-block",
+        width: "1.4ch",
+        flexShrink: 0,
+        textAlign: "center",
+        fontWeight: 800,
+        color: meta ? (theme: Theme) => glyphColor(meta.color, theme) : "transparent",
+        userSelect: "none",
+      }}
+    >
+      {meta ? meta.glyph : " "}
+    </Box>
+  );
 }
 
 function renderJsonNode(
   value: unknown,
   currentPath: string,
-  diffPaths: Set<string>,
+  diffPaths: Map<string, DiffType>,
   depth = 0
 ): React.ReactNode {
-  const isDifferent = hasDiffInBranch(currentPath, diffPaths);
-  const sharedSx = {
-    fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace",
-    fontSize: 13,
-    lineHeight: 1.7,
+  const diffType = resolveDiffType(currentPath, diffPaths);
+  const branchColor = diffType ? DIFF_META[diffType].color : null;
+
+  const containerSx = {
+    ...sharedSx,
+    pl: depth === 0 ? 0 : 2,
+    borderLeft: depth === 0 ? "none" : "1px solid",
+    borderColor: branchColor ? `${branchColor}.main` : "divider",
+    ml: depth === 0 ? 0 : 1,
+    bgcolor: branchColor
+      ? (theme: Theme) => alpha(theme.palette[branchColor].main, 0.08)
+      : "transparent",
+    borderRadius: 1,
   };
 
   if (Array.isArray(value)) {
     return (
-      <Box
-        sx={{
-          ...sharedSx,
-          pl: depth === 0 ? 0 : 2,
-          borderLeft: depth === 0 ? "none" : "1px solid",
-          borderColor: isDifferent ? "warning.main" : "divider",
-          ml: depth === 0 ? 0 : 1,
-          bgcolor: isDifferent ? "rgba(215, 126, 0, 0.08)" : "transparent",
-          borderRadius: 1,
-        }}
-      >
+      <Box sx={containerSx}>
         <Typography component="span" sx={sharedSx}>
           [
         </Typography>
@@ -136,56 +216,60 @@ function renderJsonNode(
   if (value && typeof value === "object") {
     const entries = Object.entries(value as Record<string, unknown>);
     return (
-      <Box
-        sx={{
-          ...sharedSx,
-          pl: depth === 0 ? 0 : 2,
-          borderLeft: depth === 0 ? "none" : "1px solid",
-          borderColor: isDifferent ? "warning.main" : "divider",
-          ml: depth === 0 ? 0 : 1,
-          bgcolor: isDifferent ? "rgba(215, 126, 0, 0.08)" : "transparent",
-          borderRadius: 1,
-        }}
-      >
+      <Box sx={containerSx}>
         <Typography component="span" sx={sharedSx}>
           {"{"}
         </Typography>
         {entries.map(([key, item], index) => {
           const childPath = currentPath === "$" ? `$.${key}` : `${currentPath}.${key}`;
-          const childDifferent = hasDiffInBranch(childPath, diffPaths);
+          const childType = resolveDiffType(childPath, diffPaths);
+          const childMeta = childType ? DIFF_META[childType] : null;
 
           return (
             <Box
               key={childPath}
               sx={{
-                pl: 2,
+                display: "flex",
+                alignItems: "flex-start",
+                pl: 0.5,
                 py: 0.25,
-                bgcolor: childDifferent ? "rgba(215, 126, 0, 0.14)" : "transparent",
+                bgcolor: childMeta
+                  ? (theme) => alpha(theme.palette[childMeta.color].main, 0.14)
+                  : "transparent",
                 borderRadius: 1,
               }}
+              title={childMeta ? `Campo ${childMeta.label}` : undefined}
             >
-              <Typography component="span" sx={sharedSx}>
-                "{key}":{" "}
-              </Typography>
-              {typeof item === "object" && item !== null ? (
-                renderJsonNode(item, childPath, diffPaths, depth + 1)
-              ) : (
-                <Typography
-                  component="span"
-                  sx={{
-                    ...sharedSx,
-                    color: childDifferent ? "warning.light" : "text.primary",
-                    fontWeight: childDifferent ? 800 : 500,
-                  }}
-                >
-                  {JSON.stringify(item)}
-                </Typography>
-              )}
-              {index < entries.length - 1 && (
+              <DiffGutter type={childType} />
+              <Box component="span" sx={{ ...sharedSx, minWidth: 0 }}>
+                {childMeta && (
+                  <Box component="span" sx={visuallyHiddenSx}>
+                    {`(${childMeta.label}) `}
+                  </Box>
+                )}
                 <Typography component="span" sx={sharedSx}>
-                  ,
+                  "{key}":{" "}
                 </Typography>
-              )}
+                {typeof item === "object" && item !== null ? (
+                  renderJsonNode(item, childPath, diffPaths, depth + 1)
+                ) : (
+                  <Typography
+                    component="span"
+                    sx={{
+                      ...sharedSx,
+                      color: "text.primary",
+                      fontWeight: childMeta ? 800 : 500,
+                    }}
+                  >
+                    {JSON.stringify(item)}
+                  </Typography>
+                )}
+                {index < entries.length - 1 && (
+                  <Typography component="span" sx={sharedSx}>
+                    ,
+                  </Typography>
+                )}
+              </Box>
             </Box>
           );
         })}
@@ -202,10 +286,12 @@ function renderJsonNode(
       sx={{
         ...sharedSx,
         pl: depth === 0 ? 0 : 2,
-        color: isDifferent ? "warning.light" : "text.primary",
-        bgcolor: isDifferent ? "rgba(215, 126, 0, 0.14)" : "transparent",
+        color: "text.primary",
+        bgcolor: branchColor
+          ? (theme) => alpha(theme.palette[branchColor].main, 0.14)
+          : "transparent",
         borderRadius: 1,
-        fontWeight: isDifferent ? 800 : 500,
+        fontWeight: diffType ? 800 : 500,
       }}
     >
       {JSON.stringify(value)}
@@ -232,7 +318,7 @@ export default function JsonToolsPage() {
         leftParsed,
         rightParsed,
         diffs,
-        diffPathSet: new Set(diffs.map((item) => item.path)),
+        diffPathMap: new Map(diffs.map((item) => [item.path, item.type])),
         error: null as string | null,
       };
     } catch (error) {
@@ -240,7 +326,7 @@ export default function JsonToolsPage() {
         leftParsed: null,
         rightParsed: null,
         diffs: [],
-        diffPathSet: new Set<string>(),
+        diffPathMap: new Map<string, DiffType>(),
         error: error instanceof Error ? error.message : "JSON inválido",
       };
     }
@@ -337,16 +423,64 @@ export default function JsonToolsPage() {
                 <Alert severity="error">{comparison.error}</Alert>
               ) : comparison ? (
                 <>
-                  <Chip
-                    icon={<CompareIcon />}
-                    label={
-                      comparison.diffs.length === 0
-                        ? "JSONs equivalentes"
-                        : `${comparison.diffs.length} divergência(s) encontrada(s)`
-                    }
-                    color={comparison.diffs.length === 0 ? "success" : "warning"}
-                    sx={{ alignSelf: "flex-start" }}
-                  />
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    useFlexGap
+                    flexWrap="wrap"
+                    alignItems="center"
+                  >
+                    <Chip
+                      icon={<CompareIcon />}
+                      label={
+                        comparison.diffs.length === 0
+                          ? "JSONs equivalentes"
+                          : `${comparison.diffs.length} divergência(s) encontrada(s)`
+                      }
+                      color={comparison.diffs.length === 0 ? "success" : "warning"}
+                    />
+                    {comparison.diffs.length > 0 && (
+                      <Stack
+                        direction="row"
+                        spacing={2}
+                        useFlexGap
+                        flexWrap="wrap"
+                        component="ul"
+                        aria-label="Legenda das divergências"
+                        sx={{ listStyle: "none", m: 0, p: 0 }}
+                      >
+                        {(Object.keys(DIFF_META) as DiffType[]).map((type) => {
+                          const meta = DIFF_META[type];
+                          return (
+                            <Stack
+                              key={type}
+                              component="li"
+                              direction="row"
+                              spacing={0.75}
+                              alignItems="center"
+                            >
+                              <Box
+                                component="span"
+                                aria-hidden
+                                sx={{
+                                  ...sharedSx,
+                                  fontWeight: 800,
+                                  color: (theme) => glyphColor(meta.color, theme),
+                                  width: "1.4ch",
+                                  textAlign: "center",
+                                }}
+                              >
+                                {meta.glyph}
+                              </Box>
+                              <Typography variant="body2" color="text.secondary">
+                                {meta.label}
+                              </Typography>
+                            </Stack>
+                          );
+                        })}
+                      </Stack>
+                    )}
+                  </Stack>
 
                   <Box
                     sx={{
@@ -386,7 +520,7 @@ export default function JsonToolsPage() {
                             maxHeight: 720,
                           }}
                         >
-                          {renderJsonNode(comparison.leftParsed, "$", comparison.diffPathSet)}
+                          {renderJsonNode(comparison.leftParsed, "$", comparison.diffPathMap)}
                         </Box>
                       </CardContent>
                     </Card>
@@ -422,7 +556,7 @@ export default function JsonToolsPage() {
                             maxHeight: 720,
                           }}
                         >
-                          {renderJsonNode(comparison.rightParsed, "$", comparison.diffPathSet)}
+                          {renderJsonNode(comparison.rightParsed, "$", comparison.diffPathMap)}
                         </Box>
                       </CardContent>
                     </Card>
