@@ -26,7 +26,7 @@ import { useSnackbar } from "notistack";
 import { useCompareDatabases } from "@/hooks/queries/useDatabase";
 import { InputSelect } from "@/components/InputSelect";
 import { InputWithHistory } from "@/components/InputWithHistory";
-import { useDatabaseTypes } from "@/hooks/queries/useMetadata";
+import { useDatabaseTypes } from "@/shared/hooks/use-metadata";
 
 export default function CompareDatabasePage() {
   const [connectionString1, setConnectionString1] = useState("");

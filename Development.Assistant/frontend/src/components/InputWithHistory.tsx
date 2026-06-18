@@ -15,7 +15,7 @@ import {
   useInputHistory,
   useDeleteInputHistory,
   useCreateInputHistory,
-} from "@/hooks/queries/useInputHistory";
+} from "@/shared/hooks/use-input-history";
 import { useState } from "react";
 
 interface InputWithHistoryProps {

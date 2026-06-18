@@ -26,7 +26,7 @@ import {
 } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
 import { useAuth } from "@/contexts/AuthContext";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/shared/hooks/use-theme";
 
 export default function LoginPage() {
   const navigate = useNavigate();

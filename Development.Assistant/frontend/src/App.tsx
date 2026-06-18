@@ -48,7 +48,7 @@ import ProfilePage from "@/pages/profile";
 import JsonToolsPage from "@/pages/json-tools";
 import Base64ToolsPage from "@/pages/base64-tools";
 import CryptographyToolsPage from "@/pages/cryptography-tools";
-import { useTheme } from "@/hooks/useTheme";
+import { useTheme } from "@/shared/hooks/use-theme";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { PrivateRoute } from "@/components/PrivateRoute";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";

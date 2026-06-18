@@ -5,7 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline'
 import { SnackbarProvider } from 'notistack'
 import App from './App'
 import { AppProviders } from './providers/AppProviders'
-import { ThemeContext, useThemeProvider } from '@/hooks/useTheme'
+import { ThemeContext, useThemeProvider } from '@/shared/hooks/use-theme'
 import { lightTheme, darkTheme } from '@/shared/theme'
 
 function Root() {

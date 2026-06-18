@@ -36,7 +36,7 @@ import {
 } from "@/hooks/queries/useCodeGenerator";
 import { InputSelect } from "@/components/InputSelect";
 import { InputWithHistory } from "@/components/InputWithHistory";
-import { useTemplates, useDatabaseTypes } from "@/hooks/queries/useMetadata";
+import { useTemplates, useDatabaseTypes } from "@/shared/hooks/use-metadata";
 
 export default function GenerateClassPage() {
   const [connectionString, setConnectionString] = useState("");
