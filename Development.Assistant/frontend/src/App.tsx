@@ -44,7 +44,7 @@ import CopyProjectPage from "@/pages/copy-project";
 import GenerateClassPage from "@/pages/generate-class";
 import { LoginPage } from "@/features/auth";
 import { UsersPage } from "@/features/users";
-import ProfilePage from "@/pages/profile";
+import { ProfilePage } from "@/features/profile";
 import JsonToolsPage from "@/pages/json-tools";
 import Base64ToolsPage from "@/pages/base64-tools";
 import CryptographyToolsPage from "@/pages/cryptography-tools";
