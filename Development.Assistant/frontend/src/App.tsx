@@ -39,7 +39,7 @@ import {
   Menu as MenuIcon,
   AccountCircle as AccountIcon,
 } from "@mui/icons-material";
-import CompareDatabasePage from "@/pages/compare-database";
+import { CompareDatabasePage } from "@/features/compare-database";
 import CopyProjectPage from "@/pages/copy-project";
 import GenerateClassPage from "@/pages/generate-class";
 import { LoginPage } from "@/features/auth";

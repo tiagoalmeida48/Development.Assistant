@@ -23,7 +23,7 @@ import {
   CompareArrows as CompareIcon,
 } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
-import { useCompareDatabases } from "@/hooks/queries/useDatabase";
+import { useCompareDatabases } from "./use-database";
 import { InputSelect } from "@/shared/components/input-select";
 import { InputWithHistory } from "@/shared/components/input-with-history";
 import { useDatabaseTypes } from "@/shared/hooks/use-metadata";
