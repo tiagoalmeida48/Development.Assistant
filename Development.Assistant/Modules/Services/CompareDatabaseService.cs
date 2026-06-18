@@ -4,7 +4,7 @@ using Development.Assistant.Modules.Common;
 
 namespace Development.Assistant.Modules.Services;
 
-public class CompareDatabaseService(MetadataRepository repository)
+public class CompareDatabaseService(IntrospectionRepository repository)
 {
     public async Task<DatabaseClass> CompareAsync(string connectionString1, string connectionString2, string dbType)
     {

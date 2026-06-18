@@ -37,7 +37,7 @@ Siga os padrões já estabelecidos (veja exemplos reais em `Api/Controllers/`). 
 ## Repository (`Infrastructure/Repositories/`) — se precisar de dados
 
 - Herde de `BaseRepository` (dá `Conn` e `_UserLogged`). Primary constructor passando `ApiContext` para a base.
-- Dapper com **parâmetros** (`@param`) — nunca interpole input em SQL. Se um identificador (tabela/schema) precisar entrar via `string.Format`, valide com `ValidateIdentifier` antes (ver `MetadataRepository`).
+- Dapper com **parâmetros** (`@param`) — nunca interpole input em SQL. Se um identificador (tabela/schema) precisar entrar via `string.Format`, valide com `ValidateIdentifier` antes (ver `IntrospectionRepository`).
 - `using var con = Conn;` por operação (uma conexão por query, confia no pool).
 - Para queries multi-banco, ver a skill `add-db-dialect`.
 

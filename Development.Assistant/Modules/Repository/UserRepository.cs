@@ -8,12 +8,14 @@ namespace Development.Assistant.Modules.Repository;
 
 public class UserRepository(ApiContext apiContext) : BaseRepository(apiContext)
 {
+    private const string Columns = "Id, Username, Login, Password";
+
     public UserMod GetUserLogged()
     {
-        const string sql = "SELECT * FROM `user` WHERE ID = @UserLogged LIMIT 1";
+        const string sql = $"SELECT {Columns} FROM `user` WHERE Id = @UserLogged LIMIT 1";
 
         using var con = Conn;
-        return con.QueryFirstOrDefault<UserMod>(sql, new { UserLogged = _UserLogged });
+        return con.QueryFirstOrDefault<UserMod>(sql, new { UserLogged = _userLogged });
     }
 
     public IEnumerable<UserMod> Search(int id = 0, string login = null)
@@ -21,7 +23,7 @@ public class UserRepository(ApiContext apiContext) : BaseRepository(apiContext)
         var param = new DynamicParameters();
         var sb = new StringBuilder();
 
-        sb.Append("SELECT * FROM `user` WHERE 1 = 1 ");
+        sb.Append($"SELECT {Columns} FROM `user` WHERE 1 = 1 ");
 
         if (id > 0)
         {

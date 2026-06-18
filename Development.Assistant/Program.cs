@@ -29,7 +29,9 @@ builder.Services.AddScoped<InputHistoryService>();
 
 builder.Services.AddScoped<BaseRepository>();
 builder.Services.AddScoped<UserRepository>();
-builder.Services.AddScoped<MetadataRepository>();
+builder.Services.AddScoped<IntrospectionRepository>();
+builder.Services.AddScoped<TemplateRepository>();
+builder.Services.AddScoped<DatabaseTypeRepository>();
 builder.Services.AddScoped<InputHistoryRepository>();
 
 builder.Services.AddTransient(provider =>

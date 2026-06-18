@@ -13,8 +13,8 @@ public class InputHistoryRepository(ApiContext apiContext) : BaseRepository(apiC
         var param = new DynamicParameters();
         var sb = new StringBuilder();
 
-        param.Add("user", _UserLogged);
-        sb.Append("SELECT * FROM input_history WHERE `user` = @user ");
+        param.Add("user", _userLogged);
+        sb.Append("SELECT id, `user`, `input`, value_input, database_type FROM input_history WHERE `user` = @user ");
 
         if (id > 0)
         {
@@ -51,7 +51,7 @@ public class InputHistoryRepository(ApiContext apiContext) : BaseRepository(apiC
         const string sql = "INSERT INTO input_history (`USER`, `INPUT`, VALUE_INPUT, DATABASE_TYPE) VALUES(@User, @Input, @ValueInput, @DatabaseType);";
 
         using var con = Conn;
-        return con.Execute(sql, new { User = _UserLogged, Input = input, ValueInput = valueInput, DatabaseType = databaseType }) > 0;
+        return con.Execute(sql, new { User = _userLogged, Input = input, ValueInput = valueInput, DatabaseType = databaseType }) > 0;
     }
 
     public bool Delete(int id)
@@ -59,6 +59,6 @@ public class InputHistoryRepository(ApiContext apiContext) : BaseRepository(apiC
         const string sql = "DELETE FROM input_history WHERE ID = @Id AND USER = @User;";
 
         using var con = Conn;
-        return con.Execute(sql, new { User = _UserLogged, Id = id }) > 0;
+        return con.Execute(sql, new { User = _userLogged, Id = id }) > 0;
     }
 }

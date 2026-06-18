@@ -89,7 +89,7 @@ Estes não são novidade do C# 14, mas são o padrão deste repo — use sempre:
 - **Records** para DTOs/VOs: `public record LoginDto(string Login, string Password);`
   - Exceção: **Models do Dapper são classes com setters públicos** (Dapper popula via reflection).
 - **Collection expressions**: `Task[] tasks = [GenA(), GenB()];`
-- **Switch expressions** e **pattern matching** (incl. property/relational/logical patterns — disponíveis desde versões anteriores), como em `MetadataRepository` e `ErrorHandlingMiddleware`.
+- **Switch expressions** e **pattern matching** (incl. property/relational/logical patterns — disponíveis desde versões anteriores), como em `IntrospectionRepository` e `ErrorHandlingMiddleware`.
 
 ## Notas .NET 10 relevantes ao backend
 

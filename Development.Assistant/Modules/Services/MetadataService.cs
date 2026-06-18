@@ -3,15 +3,15 @@ using Development.Assistant.Modules.Repository;
 
 namespace Development.Assistant.Modules.Services;
 
-public class MetadataService(MetadataRepository repository)
+public class MetadataService(TemplateRepository templateRepository, DatabaseTypeRepository databaseTypeRepository)
 {
     public IEnumerable<DatabaseTypeMod> AllDatabaseType()
     {
-        return repository.AllDatabaseType();
+        return databaseTypeRepository.All();
     }
 
     public IEnumerable<TemplateMod> AllTemplate()
     {
-        return repository.AllTemplate();
+        return templateRepository.All();
     }
 }

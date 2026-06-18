@@ -11,7 +11,7 @@ using Path = System.IO.Path;
 
 namespace Development.Assistant.Modules.Services;
 
-public class ScribanCodeGeneratorService(MetadataRepository repository, InputHistoryService inputHistorySrv)
+public class ScribanCodeGeneratorService(IntrospectionRepository repository, InputHistoryService inputHistorySrv)
 {
     public IEnumerable<string> AllTables(string connectionString, string dbType)
     {

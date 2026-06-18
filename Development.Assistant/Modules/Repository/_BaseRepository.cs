@@ -4,16 +4,10 @@ using System.Data;
 
 namespace Development.Assistant.Modules.Repository;
 
-public class BaseRepository
+public class BaseRepository(ApiContext apiContext)
 {
-    protected readonly string _ConnStr;
-    protected readonly int _UserLogged;
+    protected readonly string _connStr = apiContext.Conn;
+    protected readonly int _userLogged = apiContext.User;
 
-    public BaseRepository(ApiContext apiContext)
-    {
-        _UserLogged = apiContext.User;
-        _ConnStr = apiContext.Conn;
-    }
-
-    protected IDbConnection Conn => new MySqlConnection(_ConnStr);
+    protected IDbConnection Conn => new MySqlConnection(_connStr);
 }

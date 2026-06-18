@@ -1,8 +1,8 @@
-using Development.Assistant.Modules.Common.Extensions;
 using Dapper;
-using Development.Assistant.Modules.Models;
-using Development.Assistant.Modules.Common.Database;
 using Development.Assistant.Modules.Common;
+using Development.Assistant.Modules.Common.Database;
+using Development.Assistant.Modules.Common.Extensions;
+using Development.Assistant.Modules.Models;
 using Microsoft.Data.SqlClient;
 using MySqlConnector;
 using Npgsql;
@@ -12,7 +12,7 @@ using System.Text.RegularExpressions;
 
 namespace Development.Assistant.Modules.Repository;
 
-public class MetadataRepository(ApiContext apiContext) : BaseRepository(apiContext)
+public class IntrospectionRepository
 {
     public IEnumerable<ColumnInfoMod> GetColumnsQuery(string connectionString, string dbType, string tableName, string schema = "dbo_schema")
     {
@@ -82,24 +82,7 @@ public class MetadataRepository(ApiContext apiContext) : BaseRepository(apiConte
         return con.QueryFirstOrDefault<string>(query);
     }
 
-    public IEnumerable<TemplateMod> AllTemplate()
-    {
-        const string query = "SELECT * FROM template";
-
-        using var con = Conn;
-        return con.Query<TemplateMod>(query);
-    }
-
-
-    public IEnumerable<DatabaseTypeMod> AllDatabaseType()
-    {
-        const string query = "SELECT * FROM database_type";
-
-        using var con = Conn;
-        return con.Query<DatabaseTypeMod>(query);
-    }
-
-    public IDbConnection CreateDbConnection(string connectionString, string dbType)
+    private static IDbConnection CreateDbConnection(string connectionString, string dbType)
     {
         return dbType switch
         {

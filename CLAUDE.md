@@ -30,7 +30,7 @@ Frontend em `Development.Assistant/frontend/` (pnpm): `pnpm dev` (porta 3000), `
 
 **Geração de código (coração do projeto)** — `Modules/Services/ScribanCodeGeneratorService.cs`:
 1. `CreateClassAsync(InfoClassRecord)` processa cada tabela em paralelo (`Task.WhenAll`); dentro de cada tabela, gera os N arquivos também em paralelo.
-2. Por tabela: `MetadataRepository.GetColumnsQuery` lê colunas → tipos SQL mapeados para C# por `Constants.GetCSharpType` → monta `DatabaseMetadataRecord` → renderiza cada template `.scriban`.
+2. Por tabela: `IntrospectionRepository.GetColumnsQuery` lê colunas → tipos SQL mapeados para C# por `Constants.GetCSharpType` → monta `DatabaseMetadataRecord` → renderiza cada template `.scriban`.
 3. O dicionário `path→conteúdo` compartilhado é protegido por `lock`. Resultado vira `.zip` em memória.
 - O conjunto de arquivos gerados e os caminhos de saída diferem entre template **DDD** e **Clean** — ambos estão hardcoded em `GenerateForTableAsync`, com paths em `Constants.GetPath` e nomes de template em `Constants.GetTemplateName`.
 - Tabelas terminadas em `Text` geram um subconjunto reduzido (ver `allowedTextTypes` em `GenerateAndSaveAsync`).
@@ -38,7 +38,7 @@ Frontend em `Development.Assistant/frontend/` (pnpm): `pnpm dev` (porta 3000), `
 
 **Templates Scriban** (`Modules/Services/Templates/*.scriban`): copiados para `Templates/` no output via `<Content>` no `.csproj` (`PreserveNewest`). Os dados disponíveis dentro do template são definidos por `Constants.MapInfo` (ex.: `table_name`, `columns`, `columns_key`, `namespace`). Prefixo `DDD_*` ou `Clean_*` no nome do arquivo.
 
-**Multi-banco** (`Modules/Repository/MetadataRepository.cs`): cada operação seleciona o SQL por dialeto via `switch` sobre `dbType` (constantes em `Constants.DbType`); o SQL fica em `Modules/Common/Database/SqlQueries.cs`. Identificadores (nomes de tabela/schema) são interpolados via `string.Format` mas passam por `ValidateIdentifier` (whitelist regex) — ao tocar nessas queries, preserve essa validação.
+**Multi-banco** (`Modules/Repository/IntrospectionRepository.cs`): cada operação seleciona o SQL por dialeto via `switch` sobre `dbType` (constantes em `Constants.DbType`); o SQL fica em `Modules/Common/Database/SqlQueries.cs`. Identificadores (nomes de tabela/schema) são interpolados via `string.Format` mas passam por `ValidateIdentifier` (whitelist regex) — ao tocar nessas queries, preserve essa validação.
 
 **Frontend** — `lib/axios.ts` **desempacota o `ResultApi`**: em sucesso, substitui `response.data` por `data.result`; em `!success` lança `ApiError` com `message`/`errors`. Respostas 401/404 limpam `localStorage` e redirecionam para `/`. Token JWT guardado em `localStorage` e injetado como `Bearer` pelo interceptor de request. Sobre o modo `dynamic` da URL da API, ver README.
 
