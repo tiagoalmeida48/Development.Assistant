@@ -1,18 +1,18 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { useLogin } from '@/hooks/queries/useAuth'
+import { useLogin } from './use-auth'
 
-interface User {
+export interface SessionUser {
   username: string
   login: string
 }
 
 interface AuthContextType {
-  user: User | null
+  user: SessionUser | null
   token: string | null
   loginMutation: ReturnType<typeof useLogin>
   logout: () => void
   syncAuthFromStorage: () => void
-  updateStoredUser: (nextUser: User) => void
+  updateStoredUser: (nextUser: SessionUser) => void
   isAuthenticated: boolean
   isLoading: boolean
 }
@@ -20,7 +20,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<SessionUser | null>(null)
   const [token, setToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const loginMutation = useLogin()
@@ -62,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('user')
   }
 
-  const updateStoredUser = (nextUser: User) => {
+  const updateStoredUser = (nextUser: SessionUser) => {
     setUser(nextUser)
     localStorage.setItem('user', JSON.stringify(nextUser))
   }

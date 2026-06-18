@@ -19,7 +19,7 @@ import {
   PhotoCameraOutlined as PhotoCameraIcon,
   SaveOutlined as SaveIcon,
 } from "@mui/icons-material";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/features/auth";
 import { useUsers, useUpdateUser } from "@/hooks/queries/useUsers";
 import { useSnackbar } from "notistack";
 

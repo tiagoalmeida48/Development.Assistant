@@ -25,7 +25,7 @@ import {
   HubOutlined as HubIcon,
 } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "./auth-context";
 import { useTheme } from "@/shared/hooks/use-theme";
 
 export default function LoginPage() {

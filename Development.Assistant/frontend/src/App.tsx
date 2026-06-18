@@ -42,15 +42,14 @@ import {
 import CompareDatabasePage from "@/pages/compare-database";
 import CopyProjectPage from "@/pages/copy-project";
 import GenerateClassPage from "@/pages/generate-class";
-import LoginPage from "@/pages/login";
+import { LoginPage } from "@/features/auth";
 import UsersPage from "@/pages/users";
 import ProfilePage from "@/pages/profile";
 import JsonToolsPage from "@/pages/json-tools";
 import Base64ToolsPage from "@/pages/base64-tools";
 import CryptographyToolsPage from "@/pages/cryptography-tools";
 import { useTheme } from "@/shared/hooks/use-theme";
-import { AuthProvider, useAuth } from "@/contexts/AuthContext";
-import { PrivateRoute } from "@/components/PrivateRoute";
+import { AuthProvider, useAuth, PrivateRoute } from "@/features/auth";
 import { ScrollToTopButton } from "@/shared/components/scroll-to-top-button";
 import React, { useEffect, useState } from "react";
 
