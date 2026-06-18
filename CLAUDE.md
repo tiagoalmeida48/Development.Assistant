@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Para visão geral, stack, setup e comandos, leia primeiro o [`README.md`](README.md). A documentação técnica detalhada está consolidada em [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) (camadas, padrões, pipeline Scriban, multi-banco, autenticação, referência da API e convenções) — consulte antes de mexer na área correspondente. Este arquivo cobre só o que é difícil descobrir lendo o código.
 
-Para tarefas recorrentes há skills e um agent em `.claude/`: skills **add-scriban-template** (novo tipo de arquivo gerado), **add-endpoint** (novo controller/service/repo) e **add-db-dialect** (novo banco); agent **dotnet-reviewer** (revisão das convenções deste repo). Eles disparam sozinhos pela descrição, mas vale invocá-los explicitamente quando a tarefa casar.
+Para tarefas recorrentes há skills e um agent em `.claude/`: skills **add-scriban-template** (novo tipo de arquivo gerado), **add-endpoint** (novo controller/service/repo), **add-db-dialect** (novo banco) e **csharp-14-reference** (idiomas de C# 14 aplicáveis ao projeto); agent **dotnet-reviewer** (revisão das convenções deste repo). Eles disparam sozinhos pela descrição, mas vale invocá-los explicitamente quando a tarefa casar.
 
 ## Comandos do dia a dia
 

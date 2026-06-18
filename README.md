@@ -115,10 +115,15 @@ Detalhes do pipeline em [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
 ```
 Development.Assistant/
-├── Api/              # Controllers, DTOs e middleware HTTP
-├── Domain/           # Models, Services (regras de negócio) e ValueObjects
-├── Infrastructure/   # Repositórios Dapper, queries SQL e templates Scriban
-├── Shared/           # Constantes, exceptions, extensions e helpers
+├── Modules/          # Maior parte do código, organizado por tipo de artefato:
+│   ├── Record/       #   DTOs/records de contrato da API (sufixo Record)
+│   ├── Models/       #   Models do Dapper (sufixo Mod)
+│   ├── Services/     #   Regras de negócio + Templates/ (.scriban)
+│   ├── Vo/           #   Value objects de comparação (sufixo Vo)
+│   ├── Repository/   #   Repositórios Dapper
+│   └── Common/       #   Constantes, exceptions, helpers, SQL e ApiContext
+├── Controllers/      # Controllers HTTP
+├── Middleware/       # Middleware HTTP (ex.: ErrorHandlingMiddleware)
 ├── frontend/         # SPA React (Vite + MUI)
 └── Program.cs        # Startup, DI e pipeline HTTP
 docs/                 # Documentação detalhada

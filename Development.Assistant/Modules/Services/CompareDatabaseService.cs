@@ -1,49 +1,47 @@
 using Development.Assistant.Modules.Vo;
+using Development.Assistant.Modules.Record;
 using Development.Assistant.Modules.Repository;
 using Development.Assistant.Modules.Common;
+using Development.Assistant.Modules.Common.Extensions;
 
 namespace Development.Assistant.Modules.Services;
 
 public class CompareDatabaseService(IntrospectionRepository repository)
 {
-    public async Task<DatabaseClass> CompareAsync(string connectionString1, string connectionString2, string dbType)
+    public Task<DatabaseClass> CompareAsync(ConnectionStringRecord request)
     {
-        return await CompareAsync(connectionString1, connectionString2, dbType, dbType);
+        var dbType1 = request.DbType1.IsEmpty() ? request.DbType : request.DbType1;
+        var dbType2 = request.DbType2.IsEmpty() ? request.DbType : request.DbType2;
+
+        return CompareAsync(request.ConnectionString1, request.ConnectionString2, dbType1, dbType2);
     }
 
     public async Task<DatabaseClass> CompareAsync(string connectionString1, string connectionString2, string dbType1, string dbType2)
     {
-        try
+        var database1Task = GetInfoDatabaseAsync(connectionString1, dbType1);
+        var database2Task = GetInfoDatabaseAsync(connectionString2, dbType2);
+
+        var results = await Task.WhenAll(database1Task, database2Task);
+
+        var database1 = results[0];
+        var database2 = results[1];
+
+        return new DatabaseClass
         {
-            var database1Task = GetInfoDatabaseAsync(connectionString1, dbType1);
-            var database2Task = GetInfoDatabaseAsync(connectionString2, dbType2);
-
-            var results = await Task.WhenAll(database1Task, database2Task);
-
-            var database1 = results[0];
-            var database2 = results[1];
-
-            return new DatabaseClass
-            {
-                Database1 = database1.Item1,
-                Database2 = database2.Item1,
-                Tables = CompareTables(database1.Item2, database2.Item2),
-                Columns = CompareColumns(database1.Item2, database2.Item2),
-                RegisterTables = CompareRegisterLists(database1, database2)
-            };
-        }
-        catch (Exception e)
-        {
-            throw new BadRequestException($"Erro ao comparar bancos de dados: {e.Message}");
-        }
+            Database1 = database1.Name,
+            Database2 = database2.Name,
+            Tables = CompareTables(database1.Tables, database2.Tables),
+            Columns = CompareColumns(database1.Tables, database2.Tables),
+            RegisterTables = CompareRegisterLists(database1, database2)
+        };
     }
 
-    private static List<RegisterClass> CompareRegisterLists((string, List<TableClass>) database1, (string, List<TableClass>) database2)
+    private static List<RegisterClass> CompareRegisterLists((string Name, List<TableClass> Tables) database1, (string Name, List<TableClass> Tables) database2)
     {
         var registerList = new List<RegisterClass>();
-        var database2Dict = database2.Item2.ToDictionary(t => t.Table, t => t, StringComparer.OrdinalIgnoreCase);
+        var database2Dict = database2.Tables.ToDictionary(t => t.Table, t => t, StringComparer.OrdinalIgnoreCase);
 
-        foreach (var table1 in database1.Item2)
+        foreach (var table1 in database1.Tables)
         {
             if (!database2Dict.TryGetValue(table1.Table, out var table2))
                 continue;
@@ -60,7 +58,7 @@ public class CompareDatabaseService(IntrospectionRepository repository)
         return registerList;
     }
 
-    private async Task<(string, List<TableClass>)> GetInfoDatabaseAsync(string connectionString, string dbType)
+    private async Task<(string Name, List<TableClass> Tables)> GetInfoDatabaseAsync(string connectionString, string dbType)
     {
         var databaseName = repository.GetDatabaseName(connectionString, dbType);
         var tableNames = repository.GetTablesQuery(connectionString, dbType).ToList();

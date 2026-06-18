@@ -26,6 +26,7 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<PasswordService>();
 builder.Services.AddScoped<InputHistoryService>();
+builder.Services.AddScoped<CryptographyService>();
 
 builder.Services.AddScoped<BaseRepository>();
 builder.Services.AddScoped<UserRepository>();

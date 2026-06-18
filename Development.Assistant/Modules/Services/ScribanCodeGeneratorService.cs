@@ -13,6 +13,12 @@ namespace Development.Assistant.Modules.Services;
 
 public class ScribanCodeGeneratorService(IntrospectionRepository repository, InputHistoryService inputHistorySrv)
 {
+    private static readonly Constants.TypeClass[] AllowedTextTypes =
+    [
+        Constants.TypeClass.DDD_Dto, Constants.TypeClass.DDD_Model, Constants.TypeClass.DDD_InterfaceRepo, Constants.TypeClass.DDD_Repository,
+        Constants.TypeClass.Clean_DomainEntity, Constants.TypeClass.Clean_DomainInterface, Constants.TypeClass.Clean_Repository, Constants.TypeClass.Clean_RepositoryModel
+    ];
+
     public IEnumerable<string> AllTables(string connectionString, string dbType)
     {
         return repository.GetTablesQuery(connectionString, dbType);
@@ -20,26 +26,21 @@ public class ScribanCodeGeneratorService(IntrospectionRepository repository, Inp
 
     public async Task<byte[]> CreateClassAsync(InfoClassRecord infoClass)
     {
-        try
-        {
-            var generatedFiles = new Dictionary<string, string>();
+        var generatedFiles = new Dictionary<string, string>();
 
-            var tasks = infoClass.Tables.Select(table => GenerateForTableAsync(table, infoClass, generatedFiles));
-            await Task.WhenAll(tasks);
+        var tasks = infoClass.Tables.Select(table => GenerateForTableAsync(table, infoClass, generatedFiles));
+        await Task.WhenAll(tasks);
 
-            var inputsValue = new List<InputHistoryMod>();
-            inputsValue.Add(new InputHistoryMod(Constants.InputName.ProjectName, infoClass.ProjectName));
-            inputsValue.Add(new InputHistoryMod(Constants.InputName.NameSpace, infoClass.NameSpace));
-            inputsValue.Add(new InputHistoryMod(Constants.InputName.ExcludePrefixTable, infoClass.ExcludePrefixTable));
+        List<InputHistoryMod> inputsValue =
+        [
+            new(Constants.InputName.ProjectName, infoClass.ProjectName),
+            new(Constants.InputName.NameSpace, infoClass.NameSpace),
+            new(Constants.InputName.ExcludePrefixTable, infoClass.ExcludePrefixTable)
+        ];
 
-            inputHistorySrv.Create(inputsValue);
+        inputHistorySrv.Create(inputsValue);
 
-            return CreateZipFile(generatedFiles);
-        }
-        catch (Exception ex)
-        {
-            throw new BadRequestException($"Erro ao gerar classes: {ex.Message}");
-        }
+        return CreateZipFile(generatedFiles);
     }
 
     private static byte[] CreateZipFile(Dictionary<string, string> files)
@@ -134,12 +135,7 @@ public class ScribanCodeGeneratorService(IntrospectionRepository repository, Inp
 
     private static async Task GenerateAndSaveAsync(Constants.TypeClass typeClass, DatabaseMetadataRecord data, string prefix, string suffix, Dictionary<string, string> generatedFiles)
     {
-        Constants.TypeClass[] allowedTextTypes =
-        [
-            Constants.TypeClass.DDD_Dto, Constants.TypeClass.DDD_Model, Constants.TypeClass.DDD_InterfaceRepo, Constants.TypeClass.DDD_Repository,
-            Constants.TypeClass.Clean_DomainEntity, Constants.TypeClass.Clean_DomainInterface, Constants.TypeClass.Clean_Repository, Constants.TypeClass.Clean_RepositoryModel
-        ];
-        if (data.TableName.EndsWith("Text", StringComparison.OrdinalIgnoreCase) && !allowedTextTypes.Contains(typeClass)) return;
+        if (data.TableName.EndsWith("Text", StringComparison.OrdinalIgnoreCase) && !AllowedTextTypes.Contains(typeClass)) return;
         if (data.TableName.EndsWith("Text", StringComparison.OrdinalIgnoreCase) && suffix is "CreateRecord" or "UpdateRecord") return;
 
         var templateName = Constants.GetTemplateName(typeClass);

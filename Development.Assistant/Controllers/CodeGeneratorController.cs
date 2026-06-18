@@ -19,7 +19,6 @@ public class CodeGeneratorController(ScribanCodeGeneratorService scribanCodeGene
     public async Task<IActionResult> CreateClass([FromBody] InfoClassRecord input)
     {
         var zipBytes = await scribanCodeGeneratorService.CreateClassAsync(input);
-        var fileName = $"{input.ProjectName}.zip";
-        return File(zipBytes, "application/zip", fileName);
+        return File(zipBytes, "application/zip", $"{input.ProjectName}.zip");
     }
 }

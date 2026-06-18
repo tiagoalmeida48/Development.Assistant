@@ -18,11 +18,11 @@ public class InputHistoryService(InputHistoryRepository inputHistoryRepository)
         {
             if (input.ValueInput.IsEmpty()) continue;
 
-            var records = inputHistoryRepository.Search(input: input.Input, databaseType: input.DatabaseType);
+            var records = inputHistoryRepository.Search(input: input.Input, databaseType: input.DatabaseType).ToList();
             if (records.Any(r => r.ValueInput == input.ValueInput)) continue;
 
-            if (records.Count() >= 5)
-                inputHistoryRepository.Delete(records.Last().Id);
+            if (records.Count >= 5)
+                inputHistoryRepository.Delete(records[^1].Id);
 
             inputHistoryRepository.Create(input.Input, input.ValueInput, input.DatabaseType);
         }

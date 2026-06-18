@@ -26,12 +26,16 @@ public class CopyProjectService(InputHistoryService inputHistorySrv)
         return true;
     }
 
-    public async Task<byte[]> CopyProjectZipAsync(Stream sourceProjectZip, string sourceFileName, string oldNamespace, string newNamespace)
+    public async Task<byte[]> CopyProjectZipAsync(IFormFile file, string oldNamespace, string newNamespace)
     {
-        if (sourceProjectZip == null || oldNamespace.IsEmpty() || newNamespace.IsEmpty())
+        await using var stream = file?.OpenReadStream();
+        if (stream == null || stream.Length == 0)
+            throw new BadRequestException("Envie um arquivo .zip com o projeto origem");
+
+        if (oldNamespace.IsEmpty() || newNamespace.IsEmpty())
             throw new BadRequestException("Arquivo, namespace antigo e namespace novo são obrigatórios");
 
-        if (!Path.GetExtension(sourceFileName).Equals(".zip", StringComparison.OrdinalIgnoreCase))
+        if (!Path.GetExtension(file.FileName).Equals(".zip", StringComparison.OrdinalIgnoreCase))
             throw new BadRequestException("Envie o projeto origem compactado em .zip");
 
         var tempRoot = Path.Combine(Path.GetTempPath(), "development-assistant", Guid.NewGuid().ToString("N"));
@@ -44,7 +48,7 @@ public class CopyProjectService(InputHistoryService inputHistorySrv)
             Directory.CreateDirectory(sourceDir);
             Directory.CreateDirectory(destinationDir);
 
-            await using (var archive = new ZipArchive(sourceProjectZip, ZipArchiveMode.Read, true))
+            await using (var archive = new ZipArchive(stream, ZipArchiveMode.Read, true))
             {
                 await archive.ExtractToDirectoryAsync(sourceDir);
             }

@@ -48,7 +48,7 @@ public class InputHistoryRepository(ApiContext apiContext) : BaseRepository(apiC
 
     public bool Create(string input, string valueInput, string databaseType = null)
     {
-        const string sql = "INSERT INTO input_history (`USER`, `INPUT`, VALUE_INPUT, DATABASE_TYPE) VALUES(@User, @Input, @ValueInput, @DatabaseType);";
+        const string sql = "INSERT INTO input_history (`user`, `input`, value_input, database_type) VALUES (@User, @Input, @ValueInput, @DatabaseType);";
 
         using var con = Conn;
         return con.Execute(sql, new { User = _userLogged, Input = input, ValueInput = valueInput, DatabaseType = databaseType }) > 0;
@@ -56,7 +56,7 @@ public class InputHistoryRepository(ApiContext apiContext) : BaseRepository(apiC
 
     public bool Delete(int id)
     {
-        const string sql = "DELETE FROM input_history WHERE ID = @Id AND USER = @User;";
+        const string sql = "DELETE FROM input_history WHERE id = @Id AND `user` = @User;";
 
         using var con = Conn;
         return con.Execute(sql, new { User = _userLogged, Id = id }) > 0;
