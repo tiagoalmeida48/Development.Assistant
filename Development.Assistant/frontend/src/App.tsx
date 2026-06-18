@@ -51,7 +51,7 @@ import CryptographyToolsPage from "@/pages/cryptography-tools";
 import { useTheme } from "@/shared/hooks/use-theme";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { PrivateRoute } from "@/components/PrivateRoute";
-import { ScrollToTopButton } from "@/components/ScrollToTopButton";
+import { ScrollToTopButton } from "@/shared/components/scroll-to-top-button";
 import React, { useEffect, useState } from "react";
 
 const navItems = [

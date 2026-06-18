@@ -17,7 +17,7 @@ import {
 } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
 import { useCopyProjectZip } from "@/hooks/queries/useProject";
-import { InputWithHistory } from "@/components/InputWithHistory";
+import { InputWithHistory } from "@/shared/components/input-with-history";
 
 export default function CopyProjectPage() {
   const [projectZip, setProjectZip] = useState<File | null>(null);

@@ -17,7 +17,7 @@ import {
   Clear as ClearIcon,
 } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
-import { InputWithHistory } from "@/components/InputWithHistory";
+import { InputWithHistory } from "@/shared/components/input-with-history";
 import {
   useCryptography,
   type CryptographyOperation,

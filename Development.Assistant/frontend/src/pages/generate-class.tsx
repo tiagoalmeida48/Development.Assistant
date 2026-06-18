@@ -34,8 +34,8 @@ import {
   useGetAllTables,
   useCreateClass,
 } from "@/hooks/queries/useCodeGenerator";
-import { InputSelect } from "@/components/InputSelect";
-import { InputWithHistory } from "@/components/InputWithHistory";
+import { InputSelect } from "@/shared/components/input-select";
+import { InputWithHistory } from "@/shared/components/input-with-history";
 import { useTemplates, useDatabaseTypes } from "@/shared/hooks/use-metadata";
 
 export default function GenerateClassPage() {
