@@ -1,0 +1,32 @@
+{{~ # Template para gerar Controllers ~}}
+using {{ project_name }}.Application.Records{{ namespace }};
+using {{ project_name }}.Application.Interfaces{{ namespace }};
+using {{ project_name }}.WebApi.Security;
+using {{ project_name }}.Shared.Utils;
+using {{ project_name }}.Shared;
+
+namespace {{ project_name }}.WebApi.GraphQl{{ namespace }}.{{ table_name }};
+
+[ObjectType]
+public class {{ table_name }}Query : GraphQlBase
+{
+    [GraphQLAuthorization(default, Constants.AuthActivity.READ)]
+    public {{ table_name }}DisplayRecord Get([Service] I{{ table_name }}Service {{ table_prop }}Service, {{ columns_key }})
+    {
+        return {{ table_prop }}Service.Get({{ columns_key_names }}).MapTo<{{ table_name }}DisplayRecord>();
+    }
+
+    [GraphQLAuthorization(default, Constants.AuthActivity.READ)]
+    public IEnumerable<{{ table_name }}DisplayRecord> All([Service] I{{ table_name }}Service {{ table_prop }}Service, {{ columns_key }})
+    {
+        return {{ table_prop }}Service.All(default, 0).MapTo<IEnumerable<{{ table_name }}DisplayRecord>>();
+    }
+    {{~ if exist_text ~}}
+    
+    [GraphQLAuthorization(default, Constants.AuthActivity.READ)]
+    public IEnumerable<{{ table_name }}TextRecord> AllLanguage([Service] I{{ table_name }}Service {{ table_prop }}Service, {{ columns_key }})
+    {
+        return {{ table_prop }}Service.AllLanguage({{ columns_key_names }}).MapTo<IEnumerable<{{ table_name }}TextRecord>>();
+    }
+    {{~ end ~}}
+}

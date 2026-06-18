@@ -1,0 +1,23 @@
+{{~ # Template para gerar Domain Models ~}}
+using Dapper.Contrib.Extensions;
+using {{ project_name }}.Shared.BaseClass;
+
+namespace {{ project_name }}.Repository{{ if database == "PostgreSql" || database == "SqlServer" }}.{{ database }}{{ end }}.Models{{ namespace }};
+
+[Table("{{ table_name_original }}")]
+public class {{ table_name }}Mod : BaseModel
+{
+{{~ for column in columns ~}}
+{{~ if column.IsPrimaryKey && column.IsIdentity ~}}
+    [Key]
+{{~ else if column.IsPrimaryKey ~}}
+    [ExplicitKey]
+{{~ end ~}}
+    public {{ column.Type }}{{ if column.IsNullable }}?{{ end }} {{ column.Name }} { get; set; } 
+
+{{~ end ~}}
+{{~ if exist_text ~}}
+    [Computed]
+    public IEnumerable<{{ table_name }}TextMod> {{ table_name }}Idiom { get; set; } 
+{{~ end ~}} 
+}

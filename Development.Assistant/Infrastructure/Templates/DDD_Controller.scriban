@@ -1,0 +1,147 @@
+{{~ # Template para gerar Controllers ~}}
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.Collections.Generic;
+using {{ project_name }}.Api.Security;
+using {{ project_name }}.App.Dto{{ namespace }};
+using {{ project_name }}.App.Interfaces{{ namespace }};
+using {{ project_name }}.CrossCutting.Utils;
+
+namespace {{ project_name }}.Api.Controllers{{ namespace }};
+
+[AttributeBundler(Bundler.System)]
+public class {{ table_name }}Controller(I{{ table_name }}AppService {{ table_prop }}AppService) : ControllerBase
+{
+    {{~ if exist_text ~}}
+    [HttpGet]
+    [Authorization(default, Constants.ReadOnly)]
+    public ResultApi<{{ table_name }}DisplayDto> Get([BindRequired] {{ columns_key }})
+    {
+        var res = new ResultApi<{{ table_name }}DisplayDto>
+        {
+            Result = {{ table_prop }}AppService.Get({{ columns_key_names }}, UserLogged.language)
+        };
+        return res;
+    }
+
+    [HttpGet]
+    [Authorization(default, Constants.ReadOnly)]
+    public ResultApi<IEnumerable<{{ table_name }}DisplayDto>> All([FromHeader] string ordinations, long quantityRegister)
+    {
+        var res = new ResultApi<IEnumerable<{{ table_name }}DisplayDto>>
+        {
+            Result = {{ table_prop }}AppService.All(ordinations, quantityRegister, UserLogged.language)
+        };
+        return res;
+    }
+
+    [HttpGet]
+    [Authorization(default, Constants.ReadOnly)]
+    public ResultApi<IEnumerable<{{ table_name }}TextDto>> AllLanguage({{ columns_key }})
+    {
+        var res = new ResultApi<IEnumerable<{{ table_name }}TextDto>>
+        {
+            Result = {{ table_prop }}AppService.AllLanguage({{ columns_key_names }})
+        };
+        return res;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="{{ table_prop }}Dto">Required fields: {{ columns_key_names }}</param>
+    /// <returns></returns>
+    [HttpPost]
+    [Authorization(default)]
+    public ResultApi<bool> Create([FromBody] {{ table_name }}CreateDto {{ table_prop }}Dto)
+    {
+        var res = new ResultApi<bool>
+        {
+            Result = {{ table_prop }}AppService.Create({{ table_prop }}Dto)
+        };
+        return res;
+    }
+
+    [HttpPut]
+    [Authorization(default)]
+    public ResultApi<bool> Update([FromBody] {{ table_name }}UpdateDto {{ table_prop }}Dto)
+    {
+        var res = new ResultApi<bool>
+        {
+            Result = {{ table_prop }}AppService.Update({{ table_prop }}Dto)
+        };
+        return res;
+    }
+
+    [HttpDelete]
+    [Authorization(default)]
+    public ResultApi<bool> Delete([BindRequired] {{ columns_key }})
+    {
+        var res = new ResultApi<bool>
+        {
+            Result = {{ table_prop }}AppService.Delete({{ columns_key_names }}, UserLogged.language)
+        };
+        return res;
+    }
+    {{~ else ~}}
+    [HttpGet]
+    [Authorization(default, Constants.ReadOnly)]
+    public ResultApi<{{ table_name }}DisplayDto> Get([BindRequired] {{ columns_key }})
+    {
+        var res = new ResultApi<{{ table_name }}DisplayDto>
+        {
+            Result = {{ table_prop }}AppService.Get({{ columns_key_names }})
+        };
+        return res;
+    }
+
+    [HttpGet]
+    [Authorization(default, Constants.ReadOnly)]
+    public ResultApi<IEnumerable<{{ table_name }}DisplayDto>> All([FromHeader] string ordinations, long quantityRegister)
+    {
+        var res = new ResultApi<IEnumerable<{{ table_name }}DisplayDto>>
+        {
+            Result = {{ table_prop }}AppService.All(ordinations, quantityRegister)
+        };
+        return res;
+    }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="{{ table_prop }}Dto">Required fields: {{ columns_key_names }}</param>
+    /// <returns></returns>
+    [HttpPost]
+    [Authorization(default)]
+    public ResultApi<bool> Create([FromBody] {{ table_name }}CreateDto {{ table_prop }}Dto)
+    {
+        var res = new ResultApi<bool>
+        {
+            Result = {{ table_prop }}AppService.Create({{ table_prop }}Dto)
+        };
+        return res;
+    }
+
+    [HttpPut]
+    [Authorization(default)]
+    public ResultApi<bool> Update([FromBody] {{ table_name }}UpdateDto {{ table_prop }}Dto)
+    {
+        var res = new ResultApi<bool>
+        {
+            Result = {{ table_prop }}AppService.Update({{ table_prop }}Dto)
+        };
+        return res;
+    }
+
+    [HttpDelete]
+    [Authorization(default)]
+    public ResultApi<bool> Delete([BindRequired] {{ columns_key }})
+    {
+        var res = new ResultApi<bool>
+        {
+            Result = {{ table_prop }}AppService.Delete({{ columns_key_names }})
+        };
+        return res;
+    }
+    {{~ end ~}}
+}

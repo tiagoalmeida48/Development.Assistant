@@ -1,0 +1,20 @@
+{{~ # Template para gerar Interface Domain Service ~}}
+using {{ project_name }}.Domain.Models{{ namespace }};
+using System.Collections.Generic;
+
+namespace {{ project_name }}.Domain.Interfaces.Services{{ namespace }};
+
+public interface I{{ table_name }}Service : IBaseService<{{ table_name }}Mod>
+{
+    bool Exist({{ columns_key }});
+    {{~ if exist_text ~}}
+    {{ table_name }}Mod Get({{ columns_key }}, string language);
+    IEnumerable<{{ table_name }}Mod> All(OrdinationParam ordinations, long quantityRegister, string language);
+    IEnumerable<{{ table_name }}Mod> AllLanguage({{ columns_key }});
+    bool Delete({{ columns_key }}, string language);
+    {{~ else ~}}
+    {{ table_name }}Mod Get({{ columns_key }});
+    IEnumerable<{{ table_name }}Mod> All(OrdinationParam ordinations, long quantityRegister);
+    bool Delete({{ columns_key }});
+    {{~ end ~}}
+}

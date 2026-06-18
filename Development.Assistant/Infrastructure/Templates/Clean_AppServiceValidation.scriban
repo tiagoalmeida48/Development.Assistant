@@ -1,0 +1,38 @@
+{{~ # Template para gerar Domain Service ~}}
+using {{ project_name }}.Domain.Interfaces.Repository{{ namespace }};
+using {{ project_name }}.Domain.Interfaces.Services{{ namespace }};
+using {{ project_name }}.Domain.Entities{{ namespace }};
+using System.Collections.Generic;
+
+namespace {{ project_name }}.Application.Services{{ namespace }}.{{ table_name }};
+
+public partial class {{ table_name }}Service
+{
+    public void ValidatePersistence({{ table_name }}Entity entity, bool create)
+    {
+        if (create)
+        {
+            entity.ValidateCreate();
+
+            if ({{ table_prop }}Rep.Exist(entity))
+                throw new BusinessError(GeneralErrorNumber.FIELD_ALREADY_EXISTS, default);
+        }
+        else
+        {
+            entity.ValidateUpdate();
+
+            if (!{{ table_prop }}Rep.Exist(entity))
+                throw new BusinessError(GeneralErrorNumber.REGISTER_NOT_FOUND, default);
+        }
+    }
+    
+    {{~ if exist_text ~}}
+    public void ValidatePersistenceText({{ table_name }}TextEntity entity)
+    {
+        entity.ValidateCreate();
+        
+        if (!idiomSrv.Exist(entity.Idiom))
+            throw new BusinessError(GeneralErrorNumber.REGISTER_NOT_FOUND, FieldName.COD_IDIOM);
+    }
+    {{~ end ~}}
+}
