@@ -1,24 +1,6 @@
 import { useState, useEffect } from 'react'
 import { api } from '@/shared/api/axios'
-
-interface User {
-  id: number
-  username: string
-  login: string
-}
-
-interface UserCreateDto {
-  username: string
-  login: string
-  password: string
-}
-
-interface UserUpdateDto {
-  id: number
-  username: string
-  login: string
-  password: string
-}
+import type { User, UserCreateDto, UserUpdateDto } from './types'
 
 export function useUsers() {
   const [data, setData] = useState<User[] | null>(null)

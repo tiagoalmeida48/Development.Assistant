@@ -31,13 +31,8 @@ import {
   useUsers,
   useCreateUser,
   useUpdateUser,
-} from "@/hooks/queries/useUsers";
-
-interface User {
-  id: number;
-  username: string;
-  login: string;
-}
+} from "./use-users";
+import type { User } from "./types";
 
 export default function UsersPage() {
   const { data: users, isLoading: loadingUsers } = useUsers();

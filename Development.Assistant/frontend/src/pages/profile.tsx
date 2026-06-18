@@ -20,7 +20,7 @@ import {
   SaveOutlined as SaveIcon,
 } from "@mui/icons-material";
 import { useAuth } from "@/features/auth";
-import { useUsers, useUpdateUser } from "@/hooks/queries/useUsers";
+import { useUsers, useUpdateUser } from "@/features/users";
 import { useSnackbar } from "notistack";
 
 export default function ProfilePage() {
