@@ -9,8 +9,6 @@ declare global {
 import axios, { AxiosError } from "axios";
 import type { ApiError, ResultApi } from "./types";
 
-export type { ApiError } from "./types";
-
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL !== "dynamic" ? import.meta.env.VITE_API_URL : window.environment.URL,
   headers: {
