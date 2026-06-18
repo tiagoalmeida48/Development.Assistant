@@ -6,7 +6,7 @@ import { SnackbarProvider } from 'notistack'
 import App from './App'
 import { AppProviders } from './providers/AppProviders'
 import { ThemeContext, useThemeProvider } from '@/hooks/useTheme'
-import { lightTheme, darkTheme } from '@/theme'
+import { lightTheme, darkTheme } from '@/shared/theme'
 
 function Root() {
   const themeValue = useThemeProvider()
