@@ -123,7 +123,7 @@ export default function UsersPage() {
         }}
       >
         <Box>
-          <Typography variant="h4" fontWeight={700} gutterBottom>
+          <Typography variant="h4" gutterBottom>
             Usuários
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -144,7 +144,7 @@ export default function UsersPage() {
         <Card>
           <CardContent sx={{ py: 12, textAlign: "center" }}>
             <CircularProgress size={48} sx={{ mb: 2 }} />
-            <Typography variant="h6" fontWeight={600} gutterBottom>
+            <Typography variant="h6" gutterBottom>
               Carregando usuários...
             </Typography>
             <Typography variant="body2" color="text.secondary">
@@ -158,7 +158,7 @@ export default function UsersPage() {
             <PersonAddIcon
               sx={{ fontSize: 64, color: "text.secondary", mb: 2 }}
             />
-            <Typography variant="h6" fontWeight={600} gutterBottom>
+            <Typography variant="h6" gutterBottom>
               Nenhum usuário cadastrado
             </Typography>
             <Typography variant="body2" color="text.secondary">

@@ -11,10 +11,11 @@ import {
 } from "@mui/material";
 import {
   Menu as MenuIcon,
-  AutoAwesome as SparkIcon,
+  Terminal as BrandIcon,
 } from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "@/shared/hooks/use-theme";
+import { gridBackdrop } from "@/shared/theme/grid-backdrop";
 import { Sidebar } from "./sidebar";
 
 const EXPANDED_WIDTH = 280;
@@ -59,11 +60,6 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       sx={{
         minHeight: "100vh",
         display: "flex",
-        bgcolor: "background.default",
-        background:
-          theme === "light"
-            ? "radial-gradient(circle at 8% 2%, rgba(20, 125, 111, 0.12), transparent 28%), radial-gradient(circle at 86% 0%, rgba(178, 58, 72, 0.1), transparent 26%)"
-            : "radial-gradient(circle at 8% 2%, rgba(85, 199, 173, 0.16), transparent 28%), radial-gradient(circle at 86% 0%, rgba(240, 120, 131, 0.12), transparent 26%)",
       }}
     >
       {/* Desktop (md+): sidebar persistente, colapsável entre 280/88. */}
@@ -78,7 +74,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             flexShrink: 0,
             display: "flex",
             flexDirection: "column",
-            transition: "width 180ms ease",
+            transition: "width 160ms ease",
             backdropFilter: "blur(18px)",
             borderRight: "1px solid",
             borderColor: "divider",
@@ -122,38 +118,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           flex: 1,
           minWidth: 0,
           pb: 5,
-          position: "relative",
           overflow: "hidden",
-          isolation: "isolate",
-          "& > *": {
-            position: "relative",
-            zIndex: 1,
-          },
-          "&::before": {
-            content: '""',
-            position: "absolute",
-            inset: 0,
-            pointerEvents: "none",
-            zIndex: 0,
-            backgroundImage: `
-              linear-gradient(to right, rgba(255,255,255,0.12) 1px, transparent 1px),
-              linear-gradient(to bottom, rgba(255,255,255,0.12) 1px, transparent 1px)
-            `,
-            backgroundSize: "34px 34px",
-            opacity: theme === "light" ? 0.42 : 0.34,
-            maskImage: "linear-gradient(to bottom, rgba(0,0,0,0.92), rgba(0,0,0,0.18))",
-          },
-          "&::after": {
-            content: '""',
-            position: "absolute",
-            inset: "-20%",
-            pointerEvents: "none",
-            zIndex: 0,
-            background: theme === "light"
-              ? "linear-gradient(115deg, transparent 26%, rgba(20, 125, 111, 0.06) 46%, transparent 68%)"
-              : "linear-gradient(115deg, transparent 24%, rgba(85, 199, 173, 0.05) 46%, transparent 70%)",
-            opacity: theme === "light" ? 0.55 : 0.45,
-          },
+          ...gridBackdrop(theme),
         }}
       >
         {/* Topo mobile: hamburger + marca; some em md+ pois a sidebar volta. */}
@@ -162,6 +128,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             position="sticky"
             elevation={0}
             sx={{
+              zIndex: 1,
               bgcolor: sidebarSurface,
               backdropFilter: "blur(18px)",
               color: "text.primary",
@@ -201,7 +168,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
                     flexShrink: 0,
                   }}
                 >
-                  <SparkIcon sx={{ fontSize: 18 }} />
+                  <BrandIcon sx={{ fontSize: 18 }} />
                 </Box>
                 <Typography variant="h6" component="div" noWrap sx={{ lineHeight: 1.1 }}>
                   Assistente
@@ -210,7 +177,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </Toolbar>
           </AppBar>
         )}
-        {children}
+        <Box sx={{ position: "relative", zIndex: 1 }}>{children}</Box>
       </Box>
     </Box>
   );

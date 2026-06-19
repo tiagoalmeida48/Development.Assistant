@@ -366,8 +366,8 @@ FodyWeavers.xsd
 .idea/
 
 # =========================================================================
-# Frontend (Development.Assistant/frontend — Vite + pnpm)
-# Regras consolidadas do antigo frontend/.gitignore
+# Frontend (Development.Assistant/Frontend — Vite + pnpm)
+# Regras consolidadas do antigo Frontend/.gitignore
 # =========================================================================
 
 # Logs
@@ -394,11 +394,11 @@ dist-ssr
 .DS_Store
 
 # Variáveis de ambiente locais/de produção do frontend
-Development.Assistant/frontend/.env.local
-Development.Assistant/frontend/.env.production
+Development.Assistant/Frontend/.env.local
+Development.Assistant/Frontend/.env.production
 
 # TanStack Router (gerado)
-Development.Assistant/frontend/src/routeTree.gen.ts
+Development.Assistant/Frontend/src/routeTree.gen.ts
 
 # ESLint (removido)
 .eslintrc.json

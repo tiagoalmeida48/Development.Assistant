@@ -138,7 +138,7 @@ export default function Base64ToolsPage() {
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" fontWeight={700} gutterBottom>
+        <Typography variant="h4" gutterBottom>
           Conversor Base64
         </Typography>
         <Typography variant="body2" color="text.secondary">

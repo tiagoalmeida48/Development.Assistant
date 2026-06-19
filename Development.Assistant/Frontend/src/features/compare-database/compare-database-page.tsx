@@ -79,7 +79,7 @@ export default function CompareDatabasePage() {
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" fontWeight={700} gutterBottom>
+        <Typography variant="h4" gutterBottom>
           Comparar Bancos de Dados
         </Typography>
         <Typography variant="body2" color="text.secondary">
@@ -159,7 +159,7 @@ export default function CompareDatabasePage() {
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
                   <DatabaseIcon />
-                  <Typography variant="h6" fontWeight={600}>
+                  <Typography variant="h6">
                     Comparação de Tabelas
                   </Typography>
                   <Chip label={`${result.tables.length} diferença${result.tables.length > 1 ? "s" : ""}`} color="warning" size="small" />
@@ -207,7 +207,7 @@ export default function CompareDatabasePage() {
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
                   <DatabaseIcon />
-                  <Typography variant="h6" fontWeight={600}>
+                  <Typography variant="h6">
                     Comparação de Campos
                   </Typography>
                   <Chip label={`${result.columns.length} tabela${result.columns.length > 1 ? "s" : ""}`} color="warning" size="small" />
@@ -275,7 +275,7 @@ export default function CompareDatabasePage() {
               <CardContent sx={{ p: 3 }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
                   <DatabaseIcon />
-                  <Typography variant="h6" fontWeight={600}>
+                  <Typography variant="h6">
                     Diferenças de Quantidade de Registros
                   </Typography>
                 </Box>
@@ -321,7 +321,7 @@ export default function CompareDatabasePage() {
             <Card>
               <CardContent sx={{ py: 8, textAlign: "center" }}>
                 <CheckCircleIcon color="success" sx={{ fontSize: 64, mb: 2 }} />
-                <Typography variant="h6" fontWeight={600} gutterBottom>
+                <Typography variant="h6" gutterBottom>
                   Bancos Idênticos
                 </Typography>
                 <Typography variant="body2" color="text.secondary">

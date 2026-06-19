@@ -11,6 +11,7 @@ import {
   Chip,
   Dialog,
   DialogTitle,
+  DialogContent,
   DialogActions,
   Checkbox,
   FormControlLabel,
@@ -28,6 +29,7 @@ import {
   CheckBox as CheckBoxIcon,
   CheckBoxOutlineBlank as CheckBoxOutlineBlankIcon,
   Download as DownloadIcon,
+  FolderZip as FolderZipIcon,
 } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
 import {
@@ -37,6 +39,22 @@ import {
 import { InputSelect } from "@/shared/components/input-select";
 import { InputWithHistory } from "@/shared/components/input-with-history";
 import { useTemplates, useDatabaseTypes } from "@/shared/hooks/use-metadata";
+
+// Camadas geradas por template — os grupos espelham os níveis arquiteturais
+// que antes apareciam como prefixos "1 -", "2 -" nos caminhos de saída.
+const dddLayers = [
+  { name: "API", paths: ["Api/Controllers"] },
+  { name: "Aplicação", paths: ["App/Dto", "App/Interfaces", "App/Services"] },
+  { name: "Domínio", paths: ["Domain/Interfaces", "Domain/Models", "Domain/Services"] },
+  { name: "Infraestrutura", paths: ["Repository"] },
+] as const;
+
+const cleanLayers = [
+  { name: "Domínio", paths: ["Domain/Entities", "Domain/Interfaces Repositories"] },
+  { name: "Aplicação", paths: ["Application/Interfaces Services", "Application/Services", "Application/Records"] },
+  { name: "Infraestrutura", paths: ["Infra/Repositories", "Infra/Models"] },
+  { name: "API", paths: ["Api/Controllers", "Api/GraphQl"] },
+] as const;
 
 export default function GenerateClassPage() {
   const [connectionString, setConnectionString] = useState("");
@@ -215,11 +233,12 @@ export default function GenerateClassPage() {
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" fontWeight={700} gutterBottom>
+        <Typography variant="h4" gutterBottom>
           Gerar Classes
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Gere classes e baixe o ZIP gerado sem manter arquivos no servidor
+          Gere as camadas C# a partir do schema e baixe o .zip — sem manter
+          arquivos no servidor.
         </Typography>
       </Box>
 
@@ -309,7 +328,7 @@ export default function GenerateClassPage() {
                     inputName="nameSpace"
                     textFieldProps={{
                       fullWidth: true,
-                      label: "Ultimo nome do namespace",
+                      label: "Último nome do namespace",
                       placeholder: ".Core",
                     }}
                   />
@@ -357,59 +376,54 @@ export default function GenerateClassPage() {
           >
             <CardContent sx={{ p: 3 }}>
               <Box
-                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}
+                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 0.5 }}
               >
-                <LayersIcon />
-                <Typography variant="h6" fontWeight={600}>
-                  {template === "DDD" ? "Estrutura DDD" : "Arquitetura Limpa"}
+                <LayersIcon sx={{ color: "primary.main" }} />
+                <Typography variant="h6">
+                  {template === "DDD" ? "Estrutura DDD" : "Clean Architecture"}
                 </Typography>
               </Box>
-              {template === "DDD" ? (
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                  {[
-                    "1 - Api/Controllers",
-                    "2 - App/Dto",
-                    "2 - App/Interfaces",
-                    "2 - App/Services",
-                    "3 - Domain/Interfaces",
-                    "3 - Domain/Models",
-                    "3 - Domain/Services",
-                    "4 - Repository",
-                  ].map((item) => (
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2.5 }}>
+                Camadas geradas para cada tabela selecionada.
+              </Typography>
+
+              <Stack spacing={2}>
+                {(template === "DDD" ? dddLayers : cleanLayers).map((layer) => (
+                  <Box key={layer.name}>
                     <Typography
-                      key={item}
-                      variant="body2"
-                      sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      variant="subtitle2"
+                      sx={{ fontWeight: 700, mb: 0.75 }}
                     >
-                      <CodeIcon sx={{ fontSize: 16 }} />
-                      {item}
+                      {layer.name}
                     </Typography>
-                  ))}
-                </Box>
-              ) : (
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                  {[
-                    "1 - Domain/Entities",
-                    "1 - Domain/Interfaces Repositories",
-                    "2 - Application/Interfaces Services",
-                    "2 - Application/Services",
-                    "2 - Application/Records",
-                    "3 - Infra/Repositories",
-                    "3 - Infra/Models",
-                    "4 - Api/Controllers",
-                    "4 - Api/GraphQl",
-                  ].map((item) => (
-                    <Typography
-                      key={item}
-                      variant="body2"
-                      sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                    <Stack
+                      direction="row"
+                      flexWrap="wrap"
+                      sx={{ gap: 0.75 }}
                     >
-                      <CodeIcon sx={{ fontSize: 16 }} />
-                      {item}
-                    </Typography>
-                  ))}
-                </Box>
-              )}
+                      {layer.paths.map((path) => (
+                        <Box
+                          key={path}
+                          component="code"
+                          sx={{
+                            fontFamily: "monospace",
+                            fontSize: "0.8125rem",
+                            color: "text.secondary",
+                            px: 1,
+                            py: 0.375,
+                            borderRadius: 1,
+                            border: "1px solid",
+                            borderColor: "divider",
+                            bgcolor: "action.hover",
+                          }}
+                        >
+                          {path}
+                        </Box>
+                      ))}
+                    </Stack>
+                  </Box>
+                ))}
+              </Stack>
             </CardContent>
           </Card>
         </Box>
@@ -622,29 +636,47 @@ export default function GenerateClassPage() {
         open={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
         maxWidth="sm"
-        aria-colspan={2}
         fullWidth
       >
-        <DialogTitle
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            my: 1,
-            mx: "auto",
-            gap: 2,
-          }}
-        >
-          <CheckCircleIcon color="success" sx={{ fontSize: 32 }} />
-          Classes Geradas com Sucesso!
+        <DialogTitle sx={{ display: "flex", alignItems: "center", gap: 1.5, pb: 1 }}>
+          <CheckCircleIcon color="success" />
+          Classes geradas
         </DialogTitle>
-        <DialogActions sx={{ p: 3, pt: 0 }}>
+        <DialogContent sx={{ pb: 1 }}>
+          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+            {checkedTables.size} tabela{checkedTables.size > 1 ? "s" : ""} no
+            template {template === "DDD" ? "DDD" : "Clean Architecture"}.
+            Pronto para baixar.
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              p: 1.5,
+              borderRadius: 1,
+              border: "1px solid",
+              borderColor: "divider",
+              bgcolor: "action.hover",
+            }}
+          >
+            <FolderZipIcon fontSize="small" sx={{ color: "primary.main" }} />
+            <Typography
+              variant="body2"
+              sx={{ fontFamily: "monospace", wordBreak: "break-all" }}
+            >
+              {generatedFilename || `${projectName || "classes"}.zip`}
+            </Typography>
+          </Box>
+        </DialogContent>
+        <DialogActions sx={{ p: 3, pt: 1.5 }}>
+          <Button onClick={() => setShowSuccessModal(false)}>Fechar</Button>
           <Button
             variant="contained"
             onClick={handleDownload}
             startIcon={<DownloadIcon />}
-            fullWidth
           >
-            Baixar Arquivos
+            Baixar .zip
           </Button>
         </DialogActions>
       </Dialog>

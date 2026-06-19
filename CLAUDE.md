@@ -13,7 +13,7 @@ dotnet run --project Development.Assistant   # API em http://localhost:5000 (Swa
 dotnet build                                 # deve compilar com 0 warnings
 dotnet format --verify-no-changes            # checar formatação antes de commitar
 ```
-Frontend em `Development.Assistant/frontend/` (pnpm): `pnpm dev` (porta 3000), `pnpm build` (sai em `../wwwroot`). Não há suíte de testes no repositório.
+Frontend em `Development.Assistant/Frontend/` (pnpm): `pnpm dev` (porta 3000), `pnpm build` (sai em `../wwwroot`). Não há suíte de testes no repositório.
 
 ## Pré-requisitos que travam a execução
 

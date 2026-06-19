@@ -10,7 +10,30 @@
 		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 		<OutputType>WinExe</OutputType>
 		<UserSecretsId>development-assistant-local</UserSecretsId>
+
+		<!-- Não gerar versões comprimidas (.br/.gz) dos static assets no publish. -->
+		<CompressionEnabled>false</CompressionEnabled>
 	</PropertyGroup>
+
+	<!--
+		Frontend/ é o código-fonte do front (build sai para wwwroot via Vite).
+		1) Tiramos a árvore dos globs implícitos do SDK Web (que recolhia *.json
+		   como Content e arrastava package.json/tsconfig.json para o publish).
+		2) Reincluímos como None visível: aparece no IDE, mas nunca vai para o
+		   output nem para o publish (CopyTo* = Never).
+		O glob é case-insensitive no Windows, então casa tanto frontend\ quanto Frontend\.
+	-->
+	<ItemGroup>
+		<Content Remove="Frontend\**" />
+		<Compile Remove="Frontend\**" />
+		<None Remove="Frontend\**" />
+		<None Include="Frontend\**"
+		      Exclude="Frontend\node_modules\**;Frontend\dist\**;Frontend\**\*.tsbuildinfo">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<CopyToPublishDirectory>Never</CopyToPublishDirectory>
+			<Visible>true</Visible>
+		</None>
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Dapper" Version="2.1.79" />

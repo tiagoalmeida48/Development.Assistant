@@ -78,7 +78,7 @@ Disponível em:
 ### 2. Frontend (desenvolvimento)
 
 ```bash
-cd Development.Assistant/frontend
+cd Development.Assistant/Frontend
 pnpm install
 pnpm dev        # dev server em http://localhost:3000
 ```
@@ -124,7 +124,7 @@ Development.Assistant/
 │   └── Common/       #   Constantes, exceptions, helpers, SQL e ApiContext
 ├── Controllers/      # Controllers HTTP
 ├── Middleware/       # Middleware HTTP (ex.: ErrorHandlingMiddleware)
-├── frontend/         # SPA React (Vite + MUI), organizada por feature:
+├── Frontend/         # SPA React (Vite + MUI), organizada por feature:
 │   └── src/
 │       ├── app/        #   Casca: app, app-router, app-providers, layout/ (sidebar, app-layout, nav-items)
 │       ├── features/   #   9 features auto-contidas (página + hooks + types + barrel index.ts):
@@ -141,9 +141,9 @@ O frontend segue arquitetura **feature-based**: cada funcionalidade é uma pasta
 
 ## 🔌 URL da API do frontend
 
-Em desenvolvimento (`pnpm dev`), a URL da API vem de `VITE_API_URL` no `frontend/.env.development` (por padrão `http://localhost:5000/api`).
+Em desenvolvimento (`pnpm dev`), a URL da API vem de `VITE_API_URL` no `Frontend/.env.development` (por padrão `http://localhost:5000/api`).
 
-No build de produção (`pnpm build`), `VITE_API_URL=dynamic` (em `frontend/.env.production`) faz a URL ser lida em **runtime** de `window.environment.URL`, definido em `frontend/public/config.js`. Basta editar a `URL` desse arquivo no servidor para apontar para outro endpoint — **sem recompilar**.
+No build de produção (`pnpm build`), `VITE_API_URL=dynamic` (em `Frontend/.env.production`) faz a URL ser lida em **runtime** de `window.environment.URL`, definido em `Frontend/public/config.js`. Basta editar a `URL` desse arquivo no servidor para apontar para outro endpoint — **sem recompilar**.
 
 ---
 

@@ -8,12 +8,13 @@ import {
   Tooltip,
   Switch,
   Avatar,
+  alpha,
 } from "@mui/material";
 import {
   Logout as LogoutIcon,
   DarkMode as DarkModeIcon,
   LightMode as LightModeIcon,
-  AutoAwesome as SparkIcon,
+  Terminal as BrandIcon,
   MenuOpen as MenuOpenIcon,
   Menu as MenuIcon,
 } from "@mui/icons-material";
@@ -123,10 +124,9 @@ export function Sidebar({
               placeItems: "center",
               color: "primary.contrastText",
               bgcolor: "primary.main",
-              boxShadow: "0 12px 28px rgba(20, 125, 111, 0.28)",
             }}
           >
-            <SparkIcon fontSize="small" />
+            <BrandIcon fontSize="small" />
           </Box>
           {expanded && (
             <Box sx={{ minWidth: 0 }}>
@@ -324,6 +324,11 @@ export function Sidebar({
                 px: 0,
                 "& .MuiButton-startIcon": {
                   mr: expanded ? 1 : 0,
+                },
+                "&:hover": {
+                  color: "error.main",
+                  borderColor: "error.main",
+                  bgcolor: (t) => alpha(t.palette.error.main, 0.08),
                 },
               }}
             >
