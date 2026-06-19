@@ -1,6 +1,0 @@
-{
-  "files": ["Development.Assistant/frontend/index.html"],
-  "insertBefore": "</head>",
-  "commentSyntax": "html",
-  "cspChecked": true
-}
