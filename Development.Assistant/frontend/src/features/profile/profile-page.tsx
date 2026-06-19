@@ -29,12 +29,22 @@ export default function ProfilePage() {
   const updateUserMutation = useUpdateUser();
   const [username, setUsername] = useState(user?.username ?? "");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [profilePhoto, setProfilePhoto] = useState("");
 
   const currentUser = useMemo(
     () => users?.find((item) => item.login === user?.login) ?? null,
     [users, user?.login]
   );
+
+  // A senha é opcional; quando preenchida, as duas devem coincidir.
+  const passwordsMatch = password === confirmPassword;
+  const canSave =
+    !!currentUser &&
+    !isLoadingUsers &&
+    !updateUserMutation.isLoading &&
+    !!username.trim() &&
+    passwordsMatch;
 
   useEffect(() => {
     setUsername(user?.username ?? "");
@@ -108,6 +118,13 @@ export default function ProfilePage() {
       return;
     }
 
+    if (password !== confirmPassword) {
+      enqueueSnackbar("As senhas não coincidem.", {
+        variant: "warning",
+      });
+      return;
+    }
+
     try {
       await updateUserMutation.mutate({
         id: currentUser.id,
@@ -122,6 +139,7 @@ export default function ProfilePage() {
       });
 
       setPassword("");
+      setConfirmPassword("");
       enqueueSnackbar("Perfil atualizado com sucesso.", {
         variant: "success",
       });
@@ -148,11 +166,20 @@ export default function ProfilePage() {
           display: "grid",
           gridTemplateColumns: { xs: "1fr", md: "360px 1fr" },
           gap: 3,
-          alignItems: "start",
+          alignItems: "stretch",
         }}
       >
-        <Card>
-          <CardContent sx={{ p: 4, textAlign: "center" }}>
+        <Card sx={{ height: "100%" }}>
+          <CardContent
+            sx={{
+              p: 4,
+              textAlign: "center",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+            }}
+          >
             <Avatar
               src={profilePhoto || undefined}
               sx={{
@@ -184,7 +211,7 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card sx={{ height: "100%" }}>
           <CardContent sx={{ p: 4 }}>
             <Stack spacing={3}>
               {!currentUser && !isLoadingUsers ? (
@@ -231,11 +258,30 @@ export default function ProfilePage() {
                 }}
               />
 
+              <TextField
+                fullWidth
+                label="Digite a nova senha"
+                type="password"
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+                error={!passwordsMatch}
+                helperText={
+                  !passwordsMatch
+                    ? "As senhas não coincidem."
+                    : "Repita a nova senha para confirmar."
+                }
+                InputProps={{
+                  startAdornment: (
+                    <LockIcon sx={{ color: "text.secondary", mr: 1.25 }} />
+                  ),
+                }}
+              />
+
               <Button
                 variant="contained"
                 startIcon={<SaveIcon />}
                 onClick={handleSaveProfile}
-                disabled={isLoadingUsers || updateUserMutation.isLoading || !currentUser}
+                disabled={!canSave}
                 sx={{ alignSelf: "flex-start" }}
               >
                 Salvar alteracoes
