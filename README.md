@@ -131,9 +131,11 @@ docs/                 # Documentação detalhada
 
 ---
 
-## 🔌 Modo "dynamic" do frontend
+## 🔌 URL da API do frontend
 
-Por padrão a URL da API vem de `VITE_API_URL` no build. No build `dynamic` (`pnpm build:dynamic`), a URL é lida em **runtime** de `window.environment.URL` (definido em `frontend/public/config.js`) — permite apontar para outro endpoint sem recompilar.
+Em desenvolvimento (`pnpm dev`), a URL da API vem de `VITE_API_URL` no `frontend/.env.development` (por padrão `http://localhost:5000/api`).
+
+No build de produção (`pnpm build`), `VITE_API_URL=dynamic` (em `frontend/.env.production`) faz a URL ser lida em **runtime** de `window.environment.URL`, definido em `frontend/public/config.js`. Basta editar a `URL` desse arquivo no servidor para apontar para outro endpoint — **sem recompilar**.
 
 ---
 

@@ -7,7 +7,6 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "build:dynamic": "tsc && vite build --mode dynamic",
     "preview": "vite preview"
   },
   "dependencies": {
