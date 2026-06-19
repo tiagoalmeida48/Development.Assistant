@@ -14,31 +14,43 @@ import {
 export function PasswordField({ InputProps, disabled, ...props }: TextFieldProps) {
   const [visible, setVisible] = useState(false);
 
+  // O olho só aparece quando há algo digitado; campo vazio volta a ocultar.
+  const hasValue = props.value != null && String(props.value).length > 0;
+  const visibleWithValue = visible && hasValue;
+
   return (
     <TextField
       {...props}
-      type={visible ? "text" : "password"}
+      type={visibleWithValue ? "text" : "password"}
       disabled={disabled}
       InputProps={{
         ...InputProps,
-        endAdornment: (
+        endAdornment: hasValue ? (
           <InputAdornment position="end">
-            <Tooltip title={visible ? "Ocultar senha" : "Mostrar senha"}>
+            <Tooltip title={visibleWithValue ? "Ocultar senha" : "Mostrar senha"}>
               <span>
                 <IconButton
                   onClick={() => setVisible((value) => !value)}
                   edge="end"
                   size="small"
                   disabled={disabled}
-                  aria-label={visible ? "Ocultar senha" : "Mostrar senha"}
+                  aria-label={visibleWithValue ? "Ocultar senha" : "Mostrar senha"}
                   tabIndex={-1}
+                  sx={{
+                    color: "text.disabled",
+                    "&:hover": { color: "text.secondary" },
+                  }}
                 >
-                  {visible ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                  {visibleWithValue ? (
+                    <VisibilityOffIcon fontSize="small" />
+                  ) : (
+                    <VisibilityIcon fontSize="small" />
+                  )}
                 </IconButton>
               </span>
             </Tooltip>
           </InputAdornment>
-        ),
+        ) : null,
       }}
     />
   );
