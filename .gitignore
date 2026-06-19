@@ -364,3 +364,42 @@ FodyWeavers.xsd
 
 .impeccable/
 .idea/
+
+# =========================================================================
+# Frontend (Development.Assistant/frontend — Vite + pnpm)
+# Regras consolidadas do antigo frontend/.gitignore
+# =========================================================================
+
+# Logs
+klogs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependências e saídas de build do frontend
+node_modules
+dist
+dist-ssr
+*.local
+
+# Cache de build incremental do TypeScript
+*.tsbuildinfo
+
+# Editores e SO (complementa o template Visual Studio acima)
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+
+# Variáveis de ambiente locais/de produção do frontend
+Development.Assistant/frontend/.env.local
+Development.Assistant/frontend/.env.production
+
+# TanStack Router (gerado)
+Development.Assistant/frontend/src/routeTree.gen.ts
+
+# ESLint (removido)
+.eslintrc.json
+.eslintrc.cjs
