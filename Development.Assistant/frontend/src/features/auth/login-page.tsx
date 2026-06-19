@@ -27,6 +27,7 @@ import {
 import { useSnackbar } from "notistack";
 import { useAuth } from "./auth-context";
 import { useTheme } from "@/shared/hooks/use-theme";
+import { PasswordField } from "@/shared/components/password-field";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -197,11 +198,10 @@ export default function LoginPage() {
                   autoComplete="username"
                 />
 
-                <TextField
+                <PasswordField
                   fullWidth
                   id="password"
                   name="password"
-                  type="password"
                   label="Senha"
                   placeholder="Digite sua senha"
                   value={formData.password}

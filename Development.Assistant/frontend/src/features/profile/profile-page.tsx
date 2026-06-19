@@ -20,6 +20,7 @@ import {
 } from "@mui/icons-material";
 import { useAuth } from "@/features/auth";
 import { useUsers, useUpdateUser } from "@/features/users";
+import { PasswordField } from "@/shared/components/password-field";
 import { useSnackbar } from "notistack";
 
 export default function ProfilePage() {
@@ -244,10 +245,9 @@ export default function ProfilePage() {
                 }}
               />
 
-              <TextField
+              <PasswordField
                 fullWidth
                 label="Nova senha"
-                type="password"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 helperText="Preencha apenas se quiser alterar a senha atual."
@@ -258,10 +258,9 @@ export default function ProfilePage() {
                 }}
               />
 
-              <TextField
+              <PasswordField
                 fullWidth
                 label="Digite a nova senha"
-                type="password"
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
                 error={!passwordsMatch}
