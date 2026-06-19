@@ -124,10 +124,18 @@ Development.Assistant/
 │   └── Common/       #   Constantes, exceptions, helpers, SQL e ApiContext
 ├── Controllers/      # Controllers HTTP
 ├── Middleware/       # Middleware HTTP (ex.: ErrorHandlingMiddleware)
-├── frontend/         # SPA React (Vite + MUI)
+├── frontend/         # SPA React (Vite + MUI), organizada por feature:
+│   └── src/
+│       ├── app/        #   Casca: app, app-router, app-providers, layout/ (sidebar, app-layout, nav-items)
+│       ├── features/   #   9 features auto-contidas (página + hooks + types + barrel index.ts):
+│       │               #     auth, users, profile, compare-database, copy-project,
+│       │               #     generate-class, cryptography, json-tools, base64-tools
+│       └── shared/     #   Infra e código cross-feature: api/, components/, hooks/, theme/
 └── Program.cs        # Startup, DI e pipeline HTTP
 docs/                 # Documentação detalhada
 ```
+
+O frontend segue arquitetura **feature-based**: cada funcionalidade é uma pasta auto-contida em `src/features/<nome>/` (com sua página, hooks, `types.ts` e um barrel `index.ts`); o que é compartilhado entre features ou é infraestrutura fica em `src/shared/`; e a casca da aplicação (providers, roteamento, layout) em `src/app/`. Convenção de nomes: **arquivos em kebab-case** (`cryptography-page.tsx`, `use-auth.ts`), identificadores em PascalCase/camelCase no código. Imports via alias `@/*` → `src/*`.
 
 ---
 
