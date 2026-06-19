@@ -6,7 +6,6 @@ import {
   Button,
   Card,
   CardContent,
-  Chip,
   Container,
   Stack,
   TextField,
@@ -173,12 +172,6 @@ export default function ProfilePage() {
             <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
               {user?.login}
             </Typography>
-            <Chip
-              label="Conta ativa"
-              color="success"
-              variant="outlined"
-              sx={{ mt: 2 }}
-            />
             <Button
               component="label"
               variant="outlined"
@@ -199,31 +192,6 @@ export default function ProfilePage() {
                   Nao foi possivel carregar os dados do usuario para edicao.
                 </Alert>
               ) : null}
-
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 2,
-                  p: 2,
-                  border: "1px solid",
-                  borderColor: "divider",
-                  borderRadius: 2,
-                  bgcolor: "action.hover",
-                }}
-              >
-                <Avatar sx={{ bgcolor: "primary.lighter", color: "primary.main" }}>
-                  <LockIcon />
-                </Avatar>
-                <Box>
-                  <Typography variant="caption" color="text.secondary" fontWeight={800}>
-                    Acesso
-                  </Typography>
-                  <Typography variant="body1" fontWeight={700}>
-                    Usuario autenticado
-                  </Typography>
-                </Box>
-              </Box>
 
               <TextField
                 fullWidth

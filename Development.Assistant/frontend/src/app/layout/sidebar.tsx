@@ -6,9 +6,8 @@ import {
   Divider,
   Stack,
   Tooltip,
-  Select,
-  MenuItem,
-  FormControl,
+  Switch,
+  Avatar,
 } from "@mui/material";
 import {
   Logout as LogoutIcon,
@@ -17,8 +16,8 @@ import {
   AutoAwesome as SparkIcon,
   MenuOpen as MenuOpenIcon,
   Menu as MenuIcon,
-  AccountCircle as AccountIcon,
 } from "@mui/icons-material";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTheme } from "@/shared/hooks/use-theme";
 import { useAuth } from "@/features/auth";
@@ -49,6 +48,43 @@ export function Sidebar({
     logout();
     navigate("/login");
   };
+
+  // Foto de perfil compartilhada com a página de Perfil (localStorage por login).
+  const [profilePhoto, setProfilePhoto] = useState("");
+
+  useEffect(() => {
+    if (!user?.login) {
+      setProfilePhoto("");
+      return;
+    }
+    setProfilePhoto(localStorage.getItem(`profilePhoto:${user.login}`) ?? "");
+  }, [user?.login]);
+
+  const initials = user?.username
+    ? user.username
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0])
+        .join("")
+        .toUpperCase()
+    : "U";
+
+  const profileAvatar = (size: number) => (
+    <Avatar
+      src={profilePhoto || undefined}
+      sx={{
+        width: size,
+        height: size,
+        bgcolor: "primary.main",
+        color: "primary.contrastText",
+        fontSize: size <= 24 ? "0.8rem" : "0.95rem",
+        fontWeight: 800,
+      }}
+    >
+      {initials}
+    </Avatar>
+  );
 
   return (
     <Stack
@@ -176,10 +212,66 @@ export function Sidebar({
               alignItems: expanded ? "stretch" : "center",
             }}
           >
+            {/* Toggle de tema (claro/escuro) — acima do nome do usuário. */}
+            {expanded ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 1,
+                  px: 1.4,
+                  py: 0.5,
+                  borderRadius: 2,
+                  border: "1px solid",
+                  borderColor: "divider",
+                  bgcolor: "background.paper",
+                }}
+              >
+                <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 0 }}>
+                  {theme === "light" ? (
+                    <LightModeIcon fontSize="small" sx={{ color: "warning.dark" }} />
+                  ) : (
+                    <DarkModeIcon fontSize="small" sx={{ color: "primary.light" }} />
+                  )}
+                  <Typography variant="body2" color="text.secondary" noWrap>
+                    {theme === "light" ? "Tema claro" : "Tema escuro"}
+                  </Typography>
+                </Stack>
+                <Switch
+                  checked={theme === "dark"}
+                  onChange={toggleTheme}
+                  size="small"
+                  inputProps={{ "aria-label": "Alternar tema claro e escuro" }}
+                />
+              </Box>
+            ) : (
+              <Tooltip title={theme === "light" ? "Tema claro" : "Tema escuro"} placement="right">
+                <IconButton
+                  onClick={toggleTheme}
+                  color="inherit"
+                  aria-label={theme === "light" ? "Mudar para tema escuro" : "Mudar para tema claro"}
+                  sx={{
+                    width: 48,
+                    height: 42,
+                    border: "1px solid",
+                    borderColor: "divider",
+                    backgroundColor:
+                      theme === "light"
+                        ? "rgba(255,255,255,0.72)"
+                        : "rgba(255,255,255,0.06)",
+                    color: theme === "light" ? "warning.dark" : "primary.light",
+                  }}
+                >
+                  {theme === "light" ? <LightModeIcon /> : <DarkModeIcon />}
+                </IconButton>
+              </Tooltip>
+            )}
+
             {expanded ? (
               <Button
                 variant={isActive("/profile") ? "contained" : "outlined"}
-                startIcon={<AccountIcon />}
+                startIcon={profileAvatar(24)}
                 onClick={() => onNavigate("/profile")}
                 sx={{
                   width: "100%",
@@ -209,14 +301,13 @@ export function Sidebar({
                   aria-label="Perfil"
                   sx={{
                     width: 48,
-                    height: 42,
-                    border: "1px solid",
+                    height: 48,
+                    p: 0,
+                    border: "2px solid",
                     borderColor: isActive("/profile") ? "primary.main" : "divider",
-                    bgcolor: isActive("/profile") ? "primary.lighter" : "transparent",
-                    color: isActive("/profile") ? "primary.main" : "text.secondary",
                   }}
                 >
-                  <AccountIcon />
+                  {profileAvatar(40)}
                 </IconButton>
               </Tooltip>
             )}
@@ -238,89 +329,6 @@ export function Sidebar({
             >
               {expanded ? "Sair" : ""}
             </Button>
-
-            {expanded ? (
-              <FormControl size="small" fullWidth>
-                <Select
-                  value={theme}
-                  onChange={(event) => {
-                    if (event.target.value !== theme) {
-                      toggleTheme();
-                    }
-                  }}
-                  displayEmpty
-                  aria-label="Tema"
-                  sx={{
-                    bgcolor: "background.paper",
-                    textAlign: "left",
-                    "& .MuiSelect-select": {
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                      py: 1,
-                      bgcolor: "background.paper",
-                    },
-                  }}
-                  MenuProps={{
-                    PaperProps: {
-                      sx: {
-                        bgcolor: "background.paper",
-                        backgroundImage: "none",
-                        "& .MuiList-root": {
-                          bgcolor: "background.paper",
-                        },
-                        "& .MuiMenuItem-root": {
-                          bgcolor: "background.paper",
-                        },
-                        "& .MuiMenuItem-root.Mui-selected": {
-                          bgcolor: "primary.lighter",
-                        },
-                        "& .MuiMenuItem-root.Mui-selected:hover": {
-                          bgcolor: "primary.lighter",
-                        },
-                        "& .MuiMenuItem-root:hover": {
-                          bgcolor: "action.hover",
-                        },
-                      },
-                    },
-                  }}
-                >
-                  <MenuItem value="light">
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <LightModeIcon fontSize="small" />
-                      <span>Claro</span>
-                    </Stack>
-                  </MenuItem>
-                  <MenuItem value="dark">
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <DarkModeIcon fontSize="small" />
-                      <span>Escuro</span>
-                    </Stack>
-                  </MenuItem>
-                </Select>
-              </FormControl>
-            ) : (
-              <Tooltip title={theme === "light" ? "Tema claro" : "Tema escuro"} placement="right">
-                <IconButton
-                  onClick={toggleTheme}
-                  color="inherit"
-                  aria-label={theme === "light" ? "Mudar para tema escuro" : "Mudar para tema claro"}
-                  sx={{
-                    width: 48,
-                    height: 42,
-                    border: "1px solid",
-                    borderColor: "divider",
-                    backgroundColor:
-                      theme === "light"
-                        ? "rgba(255,255,255,0.72)"
-                        : "rgba(255,255,255,0.06)",
-                    color: theme === "light" ? "warning.dark" : "primary.light",
-                  }}
-                >
-                  {theme === "light" ? <LightModeIcon /> : <DarkModeIcon />}
-                </IconButton>
-              </Tooltip>
-            )}
           </Stack>
         </>
       )}
